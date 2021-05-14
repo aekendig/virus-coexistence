@@ -1,0 +1,37 @@
+---
+title: "Model"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Description
+
+The model has two resources, two viruses, and a single plant host. The plant-resource relationship is based on models of phytoplankton (Klausmeier et al. 2004) and terrestrial plants (Grace and Tilman 2003). Pathogens were added following models of plant-virus-resource relationships (Fuhrman et al. 2011, Béchette et al. 2013, Gerla et al. 2013, Pell et al. 2019). The plant takes up resources from the environment and integrates them into its tissues. The two viruses and the host then compete for resource-derived molecules.        
+
+\begin{equation}
+\begin{gathered}
+\frac{dR_{1}}{dt} = s_{1} - \frac{u_{1}R_{1}H}{R_{1}+c_{1}}
+\\
+\frac{dR_{2}}{dt} = s_{2} - \frac{u_{2}R_{2}H}{R_{2}+c_{2}}
+\\
+\frac{dQ_{1}}{dt} = \frac{u_{1}R_{1}}{R_{1}+c_{1}} - \mu_{H}min\left(1-\frac{q_{H,1}}{Q_{1}}, 1-\frac{q_{H,2}}{Q_{2}}\right)Q_{1} - \mu_{1}k_{1,1}min\left(1-\frac{q_{1,1}}{Q_{1}}, 1-\frac{q_{1,2}}{Q_{2}}\right)V_{1} - \mu_{2}k_{2,1}min\left(1-\frac{q_{2,1}}{Q_{1}}, 1-\frac{q_{2,2}}{Q_{2}}\right)V_{2}
+\\
+\frac{dQ_{2}}{dt} = \frac{u_{2}R_{2}}{R_{2}+c_{2}} - \mu_{H}min\left(1-\frac{q_{H,1}}{Q_{1}}, 1-\frac{q_{H,2}}{Q_{2}}\right)Q_{2} - \mu_{1}k_{1,2}min\left(1-\frac{q_{1,1}}{Q_{1}}, 1-\frac{q_{1,2}}{Q_{2}}\right)V_{1} - \mu_{2}k_{2,2}min\left(1-\frac{q_{2,1}}{Q_{1}}, 1-\frac{q_{2,2}}{Q_{2}}\right)V_{2}
+\\
+\frac{dH}{dt} = \mu_{H}min\left(1-\frac{q_{H,1}}{Q_{1}}, 1-\frac{q_{H,2}}{Q_{2}}\right)H - m_{H}H
+\\
+\frac{dV_{1}}{dt} = \mu_{1}min\left(1-\frac{q_{1,1}}{Q_{1}}, 1-\frac{q_{1,2}}{Q_{2}}\right)P_{1} - m_{1}V_{1}
+\\
+\frac{dV_{2}}{dt} = \mu_{2}min\left(1-\frac{q_{2,1}}{Q_{1}}, 1-\frac{q_{2,2}}{Q_{2}}\right)P_{2} - m_{2}V_{2}
+\end{gathered}
+\end{equation}
+
+We assume that resource $j$ in the environment ($R_{j}$) is supplied at a constant rate $s_{j}$ and taken up by the plant host $H$ with a Michaelis-Menten functional form. Larger hosts take up more resource. $V_{i}$ represents the concentration of virions of species $i$. The concentration of resource $j$ within the host $Q_{j}$ is diluted by host growth and reduced by virus $i$ replication. We invoke Liebig's law of the minimum with minimum functions that make host growth and virus replication depend on the most limiting resources based on their respective resource requirements (von Liebig 1840, Droop 1974, Leon and Tumpson 1975). The concentration of resource $j$ at which host growth ceases is $q_{H,j}$ and the concentration of resource $j$ at which replication of virus $i$ ceases is $q_{i,j}$. With abundant resource, the host and virus grow at their respective maximum rates $\mu$. The proportion of virus growth that consumes resource $j$ is $k_{i,j}$. Host biomass is lost (e.g., senescing) at rate $m_{H}$ and virions degrade (?) at rate $m_{i}$. 
+
+Because viruses require live cells in which to replicate, we assume q_{i,j} > q_{H,j} for each virus species $i$ and resource $j$. [List other assumptions and constraints here]    
+
+Start here with equilibrium analysis. First, host without viruses.
+
