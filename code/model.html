@@ -372,7 +372,43 @@ pre code {
 \frac{dV_{2}}{dt} = \mu_{2}min\left(1-\frac{q_{2,1}}{Q_{1}}, 1-\frac{q_{2,2}}{Q_{2}}\right)P_{2} - m_{2}V_{2}
 \end{gathered}
 \end{equation}\]</span></p>
-<p>We assume that resource <span class="math inline">\(j\)</span> in the environment (<span class="math inline">\(R_{j}\)</span>) is supplied at a constant rate <span class="math inline">\(s_{j}\)</span> and taken up by the plant host <span class="math inline">\(H\)</span> with a Michaelis-Menten functional form. Larger hosts take up more resource. <span class="math inline">\(V_{i}\)</span> represents the concentration of virions of species <span class="math inline">\(i\)</span>. The concentration of resource <span class="math inline">\(j\)</span> within the host <span class="math inline">\(Q_{j}\)</span> is diluted by host growth and reduced by virus <span class="math inline">\(i\)</span> replication. We invoke Liebig’s law of the minimum with minimum functions that make host growth and virus replication depend on the most limiting resources based on their respective resource requirements (von Liebig 1840, Droop 1974, Leon and Tumpson 1975). The concentration of resource <span class="math inline">\(j\)</span> at which host growth ceases is <span class="math inline">\(q_{H,j}\)</span> and the concentration of resource <span class="math inline">\(j\)</span> at which replication of virus <span class="math inline">\(i\)</span> ceases is <span class="math inline">\(q_{i,j}\)</span>. With abundant resource, the host and virus grow at their respective maximum rates <span class="math inline">\(\mu\)</span>. The proportion of virus growth that consumes resource <span class="math inline">\(j\)</span> is <span class="math inline">\(k_{i,j}\)</span>. Host biomass is lost (e.g., senescing) at rate <span class="math inline">\(m_{H}\)</span> and virions degrade (?) at rate <span class="math inline">\(m_{i}\)</span>.</p>
+<p>We assume that resource <span class="math inline">\(j\)</span> in the environment (<span class="math inline">\(R_{j}\)</span>) is supplied at a constant rate <span class="math inline">\(s_{j}\)</span> and taken up by the plant host <span class="math inline">\(H\)</span> with a Michaelis-Menten functional form. Larger hosts take up more resource. <span class="math inline">\(V_{i}\)</span> represents the concentration of virions of species <span class="math inline">\(i\)</span>. The concentration of resource <span class="math inline">\(j\)</span> within the host <span class="math inline">\(Q_{j}\)</span> is diluted by host growth and reduced by virus <span class="math inline">\(i\)</span> replication. We invoke Liebig’s law of the minimum with minimum functions that make host growth and virus replication depend on the most limiting resources based on their respective resource requirements (von Liebig 1840, Droop 1974, Leon and Tumpson 1975). The concentration of resource <span class="math inline">\(j\)</span> at which host growth ceases is <span class="math inline">\(q_{H,j}\)</span> and the concentration of resource <span class="math inline">\(j\)</span> at which replication of virus <span class="math inline">\(i\)</span> ceases is <span class="math inline">\(q_{i,j}\)</span>. With abundant resource, the host and virus grow at their respective maximum rates <span class="math inline">\(\mu\)</span>. The proportion of virus growth that consumes resource <span class="math inline">\(j\)</span> is <span class="math inline">\(k_{i,j}\)</span>. Host biomass is lost (e.g., senescing) at rate <span class="math inline">\(m_{H}\)</span> and virions are removed (e.g., by the immune system) at rate <span class="math inline">\(m_{i}\)</span>.</p>
+<p>Because viruses require live cells in which to replicate, we assume q_{i,j} &gt; q_{H,j} for each virus species <span class="math inline">\(i\)</span> and resource <span class="math inline">\(j\)</span>. [List other assumptions and constraints here]</p>
+</div>
+<div id="equilibrium" class="section level2">
+<h2>Equilibrium</h2>
+<p>Following Klausmeier et al. (2004), we can solve for the equilibrium states of the host and resources in the absence of infection.</p>
+<p>At equilibrium, one resource <span class="math inline">\(Q_{lim}\)</span> limits growth. To find the equilibrium concentration of <span class="math inline">\(Q_{lim}\)</span> (<span class="math inline">\(\hat{Q}_{lim}\)</span>), we set <span class="math inline">\(dH/dt\)</span> = 0:<br />
+<span class="math display">\[\begin{equation}
+\begin{gathered}
+\mu_{H}\left(1-\frac{q_{H,lim}}{Q_{lim}}\right)H - m_{H}H = 0
+\\
+\mu_{H}\left(1-\frac{q_{H,lim}}{Q_{lim}}\right) = m_{H}
+\\
+1 - \frac{q_{H,lim}}{Q_{lim}} = \frac{m_{H}}{\mu_{H}}
+\\
+1 - \frac{m_{H}}{\mu_{H}} = \frac{q_{H,lim}}{Q_{lim}}
+\\
+\hat{Q}_{lim} = q_{H,lim}\left(\frac{\mu_{H}}{\mu_{H} - m_{H}}\right)
+\end{gathered}
+\end{equation}\]</span> This result suggests that the equilibrium concentration of the resource that most limits host growth will be higher when the host’s tolerance for resource limitation is lower (i.e., <span class="math inline">\(q_{H,lim}\)</span> is higher), when the host’s mortality rate is higher, or when the host’s maximum growth rate is higher (given a relatively high mortality rate).</p>
+<p>To find the equilibrium concentration of resource in the environment when the host’s growth is equal to mortality, we set <span class="math inline">\(dQ_{lim}/dt\)</span> = 0: <span class="math display">\[\begin{equation}
+\begin{gathered}
+\frac{u_{lim}R_{lim}}{R_{lim}+c_{lim}} - \mu_{H}\left(1-\frac{q_{H,lim}}{\hat{Q}_{lim}}\right)\hat{Q}_{lim} = 0
+\\
+\frac{R_{lim}}{R_{lim}+c_{lim}} = \frac{\mu_{H}(\hat{Q}_{lim}-q_{H,lim})}{u_{lim}}
+\\
+\frac{u_{lim}}{\mu_{H}(\hat{Q}_{lim}-q_{H,lim})} = 1 + \frac{c_{lim}}{R_{lim}}
+\\
+\frac{u_{lim} - \mu_{H}(\hat{Q}_{lim}-q_{H,lim})}{\mu_{H}(\hat{Q}_{lim}-q_{H,lim})} = \frac{c_{lim}}{R_{lim}}
+\\
+\hat{R}_{lim} = \frac{c_{lim}\mu_{H}(\hat{Q}_{lim}-q_{H,lim})}{u_{lim} - \mu_{H}(\hat{Q}_{lim}-q_{H,lim})}
+\\
+\hat{Q}_{lim}-q_{H,lim} = \frac{q_{H,lim}m_{H}}{\mu_{H}-m_{H}}
+\\
+\hat{R}_{lim} = R^*_{lim} = \frac{q_{H,lim}m_{H}\mu_{H}c_{lim}}{u_{lim}(\mu_{H} - m_{H}) - q_{H,lim}m_{H}\mu_{H}}
+\end{gathered}
+\end{equation}\]</span> Similar to the result for <span class="math inline">\(\hat{Q}_{lim}\)</span>, this result suggests that the equilibrium resource in the environment will be larger when the hosts’s tolerance for resource limitation is lower and when the host’s mortality rate is higher (given high maximum growth rate). <span class="math inline">\(\hat{R}_{lim}\)</span> will also be larger when when the host’s maximum uptake rate <span class="math inline">\(u_{lim}\)</span> is slower and when host resource uptake is less sensitive to resource availability (larger <span class="math inline">\(c_{lim}\)</span>). These characteristics would also make the host a poorer resource competitor with other hosts (i.e., larger <span class="math inline">\(R^*_{lim}\)</span>).</p>
 </div>
 
 
