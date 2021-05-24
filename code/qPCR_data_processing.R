@@ -1,13 +1,6 @@
 
-### Process qPCR Data from Ex2
+## Goal: process qPCR data
 
-# Updated from 7/10 because some of the mass data was missing, and I updated it
-# Updated from 7/16 because I want the contamination values in the dataset
-# Updated from 7/17 because I wanted samples with all reps below the standard curve to count as "not quantifiable" in Quant 2 and not be removed from the analysis
-# Updated from 9/24 because I wanted to deal with contamination by cutting off the standard curve below it
-# Updated from 10/12 because there were NA's for quant2 that shouldn't have been. NA's in low Samps for RPV group 22 and 0's for low samps when undetected
-# Updated from 10/16 to double check code and make small tweaks
-# Updated from 4/29 to remove duplicates (PAV that were tested in group 22 and other groups - removed all from 22)
 
 #### set up ####
 
@@ -18,8 +11,8 @@ rm(list=ls())
 library(tidyverse)
 
 # import data
-qdat <- read_csv("./intermediate-data/qPCR_data_compiled.csv")
-base <- read_csv("./data/plant_data_071617.csv")
+qdat <- read_csv("./intermediate-data/qPCR_data_compiled.csv") # qPCR data
+edat <- read_csv("./data/plant_data_071617.csv") # experiment data
 
 
 #### edit data ####
@@ -32,6 +25,7 @@ qdat2 <- qdat %>%
 # examine sample names, tasks
 unique(qdat2$sample)
 unique(qdat2$task)
+unique(qdat2$cycle)
 
 # make cycle numeric
 # update tasks
@@ -54,21 +48,23 @@ qdat3 <- qdat2 %>%
          tube_label = case_when(task == "sample" ~ sample,
                                 TRUE ~ NA_character_))
 
+unique(qdat3$task)
+
 # number of tube labels
 length(unique(qdat3$tube_label))
-length(unique(base$tube_label))
+length(unique(edat$tube_label))
 
 # check for NA's
 sum(is.na(qdat3$tube_label))
-sum(is.na(base$tube_label))
+sum(is.na(edat$tube_label))
 
-# examine base NA's
-filter(base, is.na(tube_label)) %>%
+# examine edat NA's
+filter(edat, is.na(tube_label)) %>%
   select(expt_notes, extraction_notes, extraction_date)
 # 18 samples not extracted, all have justifications
 
-# remove samples with errors from base data
-base2 <- filter(base, !is.na(tube_label))
+# remove samples with errors from edat data
+edat2 <- filter(edat, !is.na(tube_label))
 
 # examine qdat NA's
 filter(qdat3, is.na(tube_label)) %>%
@@ -77,22 +73,24 @@ filter(qdat3, is.na(tube_label)) %>%
 # none are samples
 
 # overlap in tube numbers
-nrow(filter(qdat3, task == "sample" & !(tube_label %in% base2$tube_label)))
-nrow(filter(base2, !(tube_label %in% qdat3$tube_label)))
+nrow(filter(qdat3, task == "sample" & !(tube_label %in% edat2$tube_label)))
+nrow(filter(edat2, !(tube_label %in% qdat3$tube_label)))
 
-# add base information to samples
-# create combine set and replicate
+# add edat information to samples
+# create combine set and replicate column
 qdat4 <- qdat3 %>%
-  left_join(base2 %>%
+  left_join(edat2 %>%
               select(-sample)) %>%
   mutate(set_rep = paste(set, replicate, sep = "_"))
 
 
 #### error check ####
 
-# check for missing base data
+# check for missing edat data
 qdat4 %>%
-  filter(task == "sample" & is.na(nutrient)) %>% select(sample) %>% unique() # none
+  filter(task == "sample" & (is.na(nutrient) | is.na(inoculation) | is.na(invasion))) %>% 
+  select(sample) %>% 
+  unique() # none
 
 # check for duplicate qPCR labels
 qdat4 %>%
@@ -105,9 +103,15 @@ qdat4 %>%
   filter(task == "sample") %>%
   select(tube_label, q_group) %>%
   unique() %>%
-  mutate(dup =duplicated(tube_label)) %>%
+  mutate(dup = duplicated(tube_label)) %>%
   filter(dup == T) %>%
-  data.frame() # all are in groups 21 and 22
+  select(tube_label) %>%
+  inner_join(qdat4 %>% 
+               select(tube_label, q_group) %>%
+               unique()) %>%
+  arrange(tube_label) %>%
+  data.frame() 
+# all are in groups 21 and 22 for their second run
 
 # summarize sample number
 qdat4 %>%
@@ -275,19 +279,130 @@ qdat5 %>%
   group_by(PAVstdRem, RPVstdRem) %>%
   summarise(groups = length(unique(q_group)))
 
-#### start here ####
+# look at high concentration contamination
+qdat5 %>%
+  filter(RPVstdRem == 6 & PAVstdRem == 0 & target == "RPV") %>%
+  ggplot(aes(cycle, log10(quantity), color = task)) +
+  geom_point(alpha = 0.5) +
+  geom_vline(aes(xintercept = RPVcont), size = 0.2)
+# some samples below, but pretty low concentration
+
+qdat5 %>%
+  filter(RPVstdRem == 6 & PAVstdRem == 1 & target == "RPV") %>%
+  ggplot(aes(cycle, log10(quantity), color = task)) +
+  geom_point(alpha = 0.5) +
+  geom_vline(aes(xintercept = RPVcont), size = 0.2)
+# no samples below
+
+qdat5 %>%
+  filter(RPVstdRem == 17 & PAVstdRem == 0 & target == "RPV") %>%
+  ggplot(aes(cycle, log10(quantity), color = task)) +
+  geom_point(alpha = 0.5) +
+  geom_vline(aes(xintercept = RPVcont), size = 0.2)
+# all are below, group 22 (contains duplicates)
+
+qdat5 %>%
+  filter(q_group == 22 & task %in% c("control", "nonTargetStandard") & target == "RPV")
+# two PAV samples have very high contamination
 
 # modify samples with new standard curve
-qdat2 <- qdat2 %>%
+qdat6 <- qdat5 %>%
   mutate(quant_adj = case_when(
     task != "standard" & target == "PAV" ~ 10 ^ ((cycle - PAVint) / PAVslope),
     task != "standard" & target == "RPV" ~ 10 ^ ((cycle - RPVint) / RPVslope),
     task == "standard" ~ quantity))
 
+# check that new standard curve conversion worked
+qdat6 %>%
+  ggplot(aes(x = log10(quantity), y = log10(quant_adj))) +
+  geom_point() +
+  geom_abline(slope = 1, intercept = 0)
 
 
+#### create sample dataset ####
+
+samp <- qdat6 %>%
+  filter(task == "sample") %>%
+  as_tibble()
+
+# no std curve info
+samp %>%
+  filter(is.na(PAVslope) | is.na(RPVslope)) %>%
+  select(q_group) %>% unique()
+# just 22 (high RPV contamination)
+
+# minimum values
+min(samp$RPVmin, na.rm = T)
+min(samp$PAVmin, na.rm = T)
+
+# identify which samples will be removed:
+# standard curve efficiency outside of boundaries
+# quantity greater than 1e3, but less than standard curve minimum
+samp2 <- samp %>%
+  mutate(remove = case_when(is.na(PAVslope) | is.na(RPVslope) ~ 1,
+                            target == "RPV" & (round(RPVefficiency) < 85 | round(RPVefficiency) > 115) ~ 1,
+                            target == "PAV" & (round(PAVefficiency) < 85 | round(PAVefficiency) > 115) ~ 1,
+                            target == "RPV" & (quant_adj >= 1e3 & quant_adj < RPVmin) ~ 1,
+                            target == "PAV" & (quant_adj >= 1e3 & quant_adj < PAVmin) ~ 1,
+                            TRUE ~ 0))
+sum(samp2$remove) # 312
+
+# identify duplicate samples and select ones with detection or lower variance
+samp_d <- samp2 %>%
+  filter(remove == 0) %>% # only looking at ones that won't be removed
+  select(q_group, target, sample) %>%
+  distinct() %>%
+  mutate(
+    dup = duplicated(select(., target, sample))
+  ) %>%
+  filter(dup == T) %>% # select duplicates
+  select(-c(q_group, dup)) %>%
+  semi_join(filter(samp2, remove == 0), .) %>% # all samples in duplicate set
+  mutate(quant_adj = case_when(is.na(quant_adj) & !is.na(PAVslope) & !is.na(RPVslope) ~ 0, # make zero for calculations
+                               TRUE ~ quant_adj),
+         detect = case_when(target == "RPV" & quant_adj >= RPVmin ~ 1, # detected?
+                            target == "PAV" & quant_adj >= PAVmin ~ 1,
+                            TRUE ~ 0)) %>%
+  group_by(q_group, sample, target) %>%
+  summarise(quant_var = sd(quant_adj, na.rm = T), # summary statistics within group
+            quant_mean = mean(quant_adj, na.rm = T),
+            detect = sum(detect) > 0) %>%
+  ungroup() %>%
+  group_by(sample, target) %>%
+  mutate(min_var_group = case_when(quant_var == min(quant_var, na.rm = T) ~ 1,
+                                   TRUE ~ 0),
+         n_q_group = length(unique(q_group)),
+         n_min = sum(min_var_group),
+         n_det = sum(detect),
+         sample_q_tar = paste(sample, q_group, target, sep = "_")) %>%
+  ungroup() %>%
+  arrange(sample)
+
+data.frame(samp_d)
+# all detected
+# group 21 always has lower variance
+
+# indicate which samples should be removed
+# not detected when another group was
+# higher than minimum variance when multiple groups were detected
+samp_d_r <- samp_d %>%
+  mutate(remove = case_when(detect == F & n_det > 0 ~ 1,
+                       detect == T & n_det > 1 & min_var_group == 0 ~ 1,
+                       TRUE ~ 0)) %>%
+  filter(remove == 1)
+
+# transfer this over to main dataset
+samp3 <- samp2 %>%
+  mutate(sample_q_tar = paste(sample, q_group, target, sep = "_"),
+         remove = case_when(sample_q_tar %in% samp_d_r$sample_q_tar ~ 1,
+                            TRUE ~ remove)) %>%
+  select(-sample_q_tar)
+
+sum(samp3$remove) # 354
 
 
+#### start here ####
+# above seems like a lot of samples to remove -- look at standard curve efficiences - may want to increase thresholds
 
 
 
@@ -555,9 +670,9 @@ unique(dat2$SampleName)
 dat3=subset(dat2,substring(SampleName,1,1)=="S")
 unique(dat3$SampleName)
 
-# Merge with base data
+# Merge with edat data
 dat3=rename(dat3,c("SampleName"="TubeLabel"))
-dat4=merge(dat3,base,all.x=T)
+dat4=merge(dat3,edat,all.x=T)
 
 # Check that it worked
 nrow(dat3) # 2586
@@ -568,7 +683,7 @@ subset(dat4,is.na(Set))
 #### removed renaming tubes (put at top) ####
 
 # Merge again
-dat4=merge(dat3,base,all.x=T)
+dat4=merge(dat3,edat,all.x=T)
 
 # Check that it worked
 nrow(dat3) # 2586
