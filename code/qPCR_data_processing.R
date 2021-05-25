@@ -11,8 +11,8 @@ rm(list=ls())
 library(tidyverse)
 
 # import data
-qdat <- read_csv("./intermediate-data/qPCR_data_compiled.csv") # qPCR data
-edat <- read_csv("./data/plant_data_071617.csv") # experiment data
+qdat <- read_csv("intermediate-data/qPCR_data_compiled.csv") # qPCR data
+edat <- read_csv("data/plant_data_071617.csv") # experiment data
 
 
 #### edit data ####
@@ -26,6 +26,13 @@ qdat2 <- qdat %>%
 unique(qdat2$sample)
 unique(qdat2$task)
 unique(qdat2$cycle)
+
+# check notes
+unique(edat$expt_notes)
+filter(edat, expt_notes == "Planned to sample at T1, but sampled at T5. May be labelled as L PAV T1 S 1.") %>%
+  data.frame()
+unique(edat$extraction_notes)
+# mis-labelling is handled later
 
 # make cycle numeric
 # update tasks
@@ -335,17 +342,38 @@ samp %>%
 min(samp$RPVmin, na.rm = T)
 min(samp$PAVmin, na.rm = T)
 
+# check notes
+unique(samp$extraction_notes)
+filter(samp, extraction_notes == "May be PP4S2. Both tubes were labelled PP4S2")
+filter(samp, extraction_notes == "May be PP4I2. Both tubes were labelled PP4S2")
+# both contain PAV and RPV above the minimum detection
+
 # identify which samples will be removed:
 # standard curve efficiency outside of boundaries
-# quantity greater than 1e3, but less than standard curve minimum
+# boundaries originally 85%-115%, widened to keep 2 groups in (see below)
+# quantity greater than 1e3, but less than standard curve minimum (removes contamination)
+# mis-labelled samples
 samp2 <- samp %>%
-  mutate(remove = case_when(is.na(PAVslope) | is.na(RPVslope) ~ 1,
-                            target == "RPV" & (round(RPVefficiency) < 85 | round(RPVefficiency) > 115) ~ 1,
-                            target == "PAV" & (round(PAVefficiency) < 85 | round(PAVefficiency) > 115) ~ 1,
-                            target == "RPV" & (quant_adj >= 1e3 & quant_adj < RPVmin) ~ 1,
-                            target == "PAV" & (quant_adj >= 1e3 & quant_adj < PAVmin) ~ 1,
+  mutate(remove = case_when(is.na(PAVslope) | is.na(RPVslope) ~ 1, # 120 (group 22)
+                            target == "RPV" & (round(RPVefficiency) < 80 | round(RPVefficiency) > 120) ~ 1, # 60 (group 4)
+                            target == "PAV" & (round(PAVefficiency) < 80 | round(PAVefficiency) > 120) ~ 1, # 120 (groups 11 and 21)
+                            target == "RPV" & (quant_adj >= 1e3 & quant_adj < RPVmin) ~ 1, # 15 (groups 4 and 6)
+                            target == "PAV" & (quant_adj >= 1e3 & quant_adj < PAVmin) ~ 1, # 23 (group 21)
+                            sample %in% c("S1 PP4I2", "S1 PP4S2") ~ 1,
                             TRUE ~ 0))
-sum(samp2$remove) # 312
+sum(samp2$remove) 
+# 227
+
+# efficiencies of std curves
+samp2 %>%
+  select(q_group, RPVefficiency, PAVefficiency) %>%
+  unique() %>%
+  arrange(q_group) %>%
+  data.frame()
+# RPV group 4: 66%
+# PAV group 11: 82%
+# PAV group 21: 83%
+# adjust bounds to include 11 and 21
 
 # identify duplicate samples and select ones with detection or lower variance
 samp_d <- samp2 %>%
@@ -358,9 +386,7 @@ samp_d <- samp2 %>%
   filter(dup == T) %>% # select duplicates
   select(-c(q_group, dup)) %>%
   semi_join(filter(samp2, remove == 0), .) %>% # all samples in duplicate set
-  mutate(quant_adj = case_when(is.na(quant_adj) & !is.na(PAVslope) & !is.na(RPVslope) ~ 0, # make zero for calculations
-                               TRUE ~ quant_adj),
-         detect = case_when(target == "RPV" & quant_adj >= RPVmin ~ 1, # detected?
+  mutate(detect = case_when(target == "RPV" & quant_adj >= RPVmin ~ 1, # detected?
                             target == "PAV" & quant_adj >= PAVmin ~ 1,
                             TRUE ~ 0)) %>%
   group_by(q_group, sample, target) %>%
@@ -376,19 +402,18 @@ samp_d <- samp2 %>%
          n_det = sum(detect),
          sample_q_tar = paste(sample, q_group, target, sep = "_")) %>%
   ungroup() %>%
-  arrange(sample)
+  arrange(sample, target)
 
 data.frame(samp_d)
-# all detected
-# group 21 always has lower variance
+# 4 not detected
 
 # indicate which samples should be removed
 # not detected when another group was
 # higher than minimum variance when multiple groups were detected
 samp_d_r <- samp_d %>%
   mutate(remove = case_when(detect == F & n_det > 0 ~ 1,
-                       detect == T & n_det > 1 & min_var_group == 0 ~ 1,
-                       TRUE ~ 0)) %>%
+                            detect == T & n_det > 1 & min_var_group == 0 ~ 1,
+                            TRUE ~ 0)) %>%
   filter(remove == 1)
 
 # transfer this over to main dataset
@@ -398,542 +423,47 @@ samp3 <- samp2 %>%
                             TRUE ~ remove)) %>%
   select(-sample_q_tar)
 
-sum(samp3$remove) # 354
-
-
-#### start here ####
-# above seems like a lot of samples to remove -- look at standard curve efficiences - may want to increase thresholds
-
-
-
-## Dealing with contamination
-
-# Function for finding limit of standard curves, values below this limit, and contamination after this has been accounted for
-
-contFun=function(dat){
-	
-	# Make CT numeric
-	dat$CT=as.numeric(as.character(dat$CT))
-	
-	# Find the max CT and Quantity for each standard
-	pmax=max(subset(dat,Task=="STANDARD"&substring(SampleName,1,3)=="PAV"&TargetName=="PAV"&!is.na(CT))$CT)
-	rmax=max(subset(dat,Task=="STANDARD"&substring(SampleName,1,3)=="RPV"&TargetName=="RPV"&!is.na(CT))$CT)
-	
-	pmaxQ=max(subset(dat,Task=="STANDARD"&substring(SampleName,1,3)=="PAV"&TargetName=="PAV"&!is.na(CT))$Quantity)
-	rmaxQ=max(subset(dat,Task=="STANDARD"&substring(SampleName,1,3)=="RPV"&TargetName=="RPV"&!is.na(CT))$Quantity)
-	
-	# Find the min CT and Quantity for each standard
-	pmin=min(subset(dat,Task=="STANDARD"&substring(SampleName,1,3)=="PAV"&TargetName=="PAV"&!is.na(CT))$CT)
-	rmin=min(subset(dat,Task=="STANDARD"&substring(SampleName,1,3)=="RPV"&TargetName=="RPV"&!is.na(CT))$CT)
-	
-	pminQ=min(subset(dat,Task=="STANDARD"&substring(SampleName,1,3)=="PAV"&TargetName=="PAV"&!is.na(CT))$Quantity)
-	rminQ=min(subset(dat,Task=="STANDARD"&substring(SampleName,1,3)=="RPV"&TargetName=="RPV"&!is.na(CT))$Quantity)
-	
-	# Output dataframe 1
-	out1=data.frame(pmax=pmax,rmax=rmax,pmin=pmin,rmin=rmin,pmaxQ=pmaxQ,rmaxQ=rmaxQ,pminQ=pminQ,rminQ=rminQ)
-	
-	# Check for contamination in standards or controls
-	cont=subset(subset(subset(dat,substring(SampleName,1,3)=="NTC"|(substring(SampleName,1,3)=="PAV"&TargetName=="RPV")|(substring(SampleName,1,3)=="RPV"&TargetName=="PAV")),!is.na(CT)),select=c(SampleName,TargetName,CT,Quantity))
-	
-	# Make an empty df in case there are no contamination issues
-	naDF=data.frame(SampleName=NA,TargetName=NA,CT=NA,Quantity=NA)
-	
-	# Merge with output df 1
-	cont.out1=merge(cont,out1,all=T)
-	cont.out2=merge(naDF,out1,all=T)
-	
-	# Mark contamination values within the standard curve as 1
-	cont.out1$inSC<-with(cont.out1,ifelse(TargetName=="PAV"&CT<pmax,1,ifelse(TargetName=="RPV"&CT<rmax,1,0)))
-	cont.out2$inSC=NA
-
-	# Return
-	ifelse(nrow(cont.out1)==0,return(cont.out2),return(cont.out1))
-}
-
-# Apply contFun to each dataset and store in a list
-contOut=llply(qdatL,contFun)
-contOut
-# Groups with contamination inside the SC: 4, 6, 11, 21, 22 (all RPV except 4, which had some PAV)
-
-unique(subset(contOut[[4]],select=c(TargetName,inSC))) # both
-unique(subset(contOut[[6]],select=c(TargetName,inSC))) # RPV
-unique(subset(contOut[[11]],select=c(TargetName,inSC))) # RPV
-unique(subset(contOut[[21]],select=c(TargetName,inSC))) # RPV
-unique(subset(contOut[[22]],select=c(TargetName,inSC)))# RPV
-
-
-## Make dataset to analyze
-
-# Add a qPCR Group ID and contamination information, make CT numeric
-rows=c()
-for(i in 1:length(ex2Files)){
-	qdatL[[i]]$CT=as.numeric(as.character(qdatL[[i]]$CT))
-	qdatL[[i]]$qPCRGroup=i
-	qdatL[[i]]$pmax=contOut[[i]]$pmax[1]
-	qdatL[[i]]$rmax=contOut[[i]]$rmax[1]
-	qdatL[[i]]$pmin=contOut[[i]]$pmin[1]
-	qdatL[[i]]$rmin=contOut[[i]]$rmin[1]
-	qdatL[[i]]$pmaxQ=contOut[[i]]$pmaxQ[1]
-	qdatL[[i]]$rmaxQ=contOut[[i]]$rmaxQ[1]
-	qdatL[[i]]$pminQ=contOut[[i]]$pminQ[1]
-	qdatL[[i]]$rminQ=contOut[[i]]$rminQ[1]
-	qdatL[[i]]$pcon=min(subset(contOut[[i]],TargetName=="PAV")$CT)
-	qdatL[[i]]$rcon=min(subset(contOut[[i]],TargetName=="RPV")$CT)
-	rows=c(rows,nrow(qdatL[[i]]))
-}
-sum(rows)
-# 4221 rows
-head(qdatL[[1]]) 
-
-# Make list into dataframe
-dat=do.call(rbind.data.frame,qdatL)
-head(dat)
-nrow(dat)
-
-
-## Assessing standard curves: Use dat (still has standards)
-
-stdFun=function(df){
-	
-	# Dataframe for efficiency values
-	stdEff=data.frame(group=unique(df$qPCRGroup),pEff=NA,rEff=NA,pInt=NA,pSlope=NA,rInt=NA,rSlope=NA)
-	
-	# Indexer (for when the groups aren't sequential, as used later)
-	j=0
-	
-
-	# Cycle through groups and calculate curves and efficiency
-	for(i in min(df$qPCRGroup):max(df$qPCRGroup)){
-		
-		j=j+1
-
-		tempDat=subset(df,qPCRGroup==i)
-	
-		# Subset data for standards
-		PAVdat=subset(tempDat,Task=="STANDARD"&substring(SampleName,1,3)=="PAV"&TargetName=="PAV")
-		RPVdat=subset(tempDat,Task=="STANDARD"&substring(SampleName,1,3)=="RPV"&TargetName=="RPV")
-	
-		# Find slope and intercept of standard curve
-		pInt=lm(CT~log10(Quantity),data=PAVdat)$coefficients[1]
-		pSlope=lm(CT~log10(Quantity),data=PAVdat)$coefficients[2]
-		rInt=ifelse(nrow(RPVdat)>0,lm(CT~log10(Quantity),data=RPVdat)$coefficients[1],NA)
-		rSlope=ifelse(nrow(RPVdat)>0,lm(CT~log10(Quantity),data=RPVdat)$coefficients[2],NA)
-	
-		# Plot standard curves with data
-	#print(ggplot(subset(tempDat,TargetName=="PAV"),aes(x=log10(Quantity),y=CT))+geom_point(size=2,aes(colour=Task))+xlab("Quantity (log 10)")+ylab("Detection Cycle")+geom_abline(intercept=pInt,slope=pSlope)+ggtitle(paste("PAV Plot. Group",tempDat$qPCRGroup[1],sep="")))
-			#print(ggplot(subset(tempDat,TargetName=="RPV"),aes(x=log10(Quantity),y=CT))+geom_point(size=2,aes(colour=Task))+xlab("Quantity (log 10)")+ylab("Detection Cycle")+geom_abline(intercept=rInt,slope=rSlope)+ggtitle(paste("RPV Plot. Group",tempDat$qPCRGroup[1],sep="")))
-		
-		# Calculate efficiency
-		pEff=100*(10^(1/abs(pSlope))-1)
-		rEff=100*(10^(1/abs(rSlope))-1)
-	
-		# Add to dataframe
-		stdEff$pEff[j]=pEff
-		stdEff$rEff[j]=rEff
-		stdEff$pInt[j]=pInt
-		stdEff$rInt[j]=rInt
-		stdEff$pSlope[j]=pSlope
-		stdEff$rSlope[j]=rSlope
-	}
-	return(stdEff)
-}
-
-# Set up PDF with standard curves and data
-#setwd("/Users/AmyKendig/Google Drive/Within Host Coexistence/qPCR/Ex2 Standards")
-#pdf("Ex2_StdCurves_041017.pdf")
-stdDat=stdFun(dat)
-stdDat
-#dev.off()
-
-
-## Efficiencies outside of range 85%-115%
-# Group 4: RPV eff=84
-# Group 6: RPV eff=120
-# Group 11: PAV eff=82
-# Group 21: PAV eff=83
-# Group 22: RPV eff=83
-# Note: Groups with contamination: 4, 6, 11, 21, 22
-
-
-## Check replication for each standard
-
-(pavStdSum=ddply(subset(dat,Task=="STANDARD"&substring(SampleName,1,3)=="PAV"&TargetName=="PAV"),.(qPCRGroup,SampleName),summarise,meanCT=mean(CT,na.rm=T),meanQ=mean(Quantity),nReps=sum(!is.na(CT))))
-# Groups with 0 1e3: 21
-# Groups with 1 1e3: 11, 12, 13, 22
-# Groups with 2 1e3: 15, 16, 18, 20
-
-(rpvStdSum=ddply(subset(dat,Task=="STANDARD"&substring(SampleName,1,3)=="RPV"&TargetName=="RPV"),.(qPCRGroup,SampleName),summarise,meanCT=mean(CT,na.rm=T),meanQ=mean(Quantity),nReps=sum(!is.na(CT))))
-# Groups with 2 1e3: 11, 22
-
-
-## Re-calculate standard curves, max and min values, and sample values for runs with contamination inside the SC after curve has been modified
-
-
-# Add a column indicating this
-dat$contIn=with(dat,ifelse(qPCRGroup%in%c(6,11,21,22),"RPV",ifelse(qPCRGroup==4,"both","neither")))
-
-reCFun=function(grps,df){
-	
-	for(i in 1:length(grps)){
-		grpDat=subset(df,qPCRGroup==grps[i]&((Task=="STANDARD"&TargetName=="PAV"&substring(SampleName,1,3)=="PAV"&CT<pcon)|(Task=="STANDARD"&TargetName=="RPV"&substring(SampleName,1,3)=="RPV"&CT<rcon)))
-		
-	#stdReps=ddply(grpDat,.(SampleName),summarise,nreps=length(unique(Well)))
-	
-	#stdRepsKeep=subset(stdReps,nreps>1)
-	
-	#grpDat=subset(grpDat,SampleName%in%stdRepsKeep$SampleName)
-		
-	print(grpDat)
-		
-	newRMin=min(subset(grpDat,TargetName=="RPV"&!is.na(CT))$CT)
-	newRMinQ=min(subset(grpDat,TargetName=="RPV"&!is.na(CT))$Quantity)
-	newPMin=min(subset(grpDat,TargetName=="PAV"&!is.na(CT))$CT)
-	newPMinQ=min(subset(grpDat,TargetName=="PAV"&!is.na(CT))$Quantity)
-	
-	newRMax=max(subset(grpDat,TargetName=="RPV"&!is.na(CT))$CT)
-	newRMaxQ=max(subset(grpDat,TargetName=="RPV"&!is.na(CT))$Quantity)
-	newPMax=max(subset(grpDat,TargetName=="PAV"&!is.na(CT))$CT)
-	newPMaxQ=max(subset(grpDat,TargetName=="PAV"&!is.na(CT))$Quantity)
-	
-	df$rmin=with(df,ifelse(qPCRGroup==grps[i],newRMin,rmin))
-	df$rminQ=with(df,ifelse(qPCRGroup==grps[i],newRMinQ,rminQ))
-	df$pmin=with(df,ifelse(qPCRGroup==grps[i],newPMin,pmin))
-	df$pminQ=with(df,ifelse(qPCRGroup==grps[i],newPMinQ,pminQ))
-	
-	df$rmax=with(df,ifelse(qPCRGroup==grps[i],newRMax,rmax))
-	df$rmaxQ=with(df,ifelse(qPCRGroup==grps[i],newRMaxQ,rmaxQ))
-	df$pmax=with(df,ifelse(qPCRGroup==grps[i],newPMax,pmax))
-	df$pmaxQ=with(df,ifelse(qPCRGroup==grps[i],newPMaxQ,pmaxQ))
-		
-	stds=stdFun(grpDat)
-	print(stds)
-	df$QuantNew=with(df,ifelse(qPCRGroup==grps[i]&TargetName=="PAV"&Task!="STANDARD",10^((CT-stds$pInt)/stds$pSlope),ifelse(qPCRGroup==grps[i]&TargetName=="RPV"&Task!="STANDARD",10^((CT-stds$rInt)/stds$rSlope),QuantNew)))
-
-	}
-	return(df)
-}
-
-# Set up new column
-dat$QuantNew=dat$Quantity
-
-# Set up groups with contamination inside curve
-contGrps=c(4,6,11,21,22)
-
-# Apply function
-dat2=reCFun(contGrps,dat)
-
-# Efficiencies previously outside range
-# Group 4: RPV eff=66 (worse)
-# Group 6: RPV eff=96 (fixed)
-# Group 11: PAV eff=82 (same, 76 when you remove the 1e3 replicate (code commented out above because it only really affects this group))
-# Group 21: PAV eff=83 (same)
-# Group 22: no value RPV because all standards are below the contamination
-
-# Make sure it worked appropriately
-unique(subset(subset(dat2,Quantity!=QuantNew),select=c(qPCRGroup,TargetName))) # correct groups, RPV is missing for 22
-head(subset(dat2,qPCRGroup==6&TargetName=="PAV"&Quantity!=QuantNew)) # samples with PAV re-calculated are slightly different because of rounding of the slope and intercept
-
-# Change PAV re-calculated PAV quantities back for runs without PAV contamination in the the SC (but did have RPV)
-dat2$QuantNew=with(dat2,ifelse(contIn=="RPV"&TargetName=="PAV",Quantity,QuantNew))
-unique(subset(subset(dat2,Quantity!=QuantNew),select=c(qPCRGroup,TargetName))) # Fixed 
-
-# For RPV in group 22, RPV contamination was higher than standard curve (CT of 14)
-subset(dat2,qPCRGroup==22&TargetName=="RPV"&CT<rcon) # none more conc.
-nrow(subset(dat2,qPCRGroup==22&TargetName=="RPV"&CT>rcon)) # Lose 77 measurements
-nrow(subset(dat2,qPCRGroup==22&TargetName=="RPV"&is.na(CT))) # 18 are NA
-unique(subset(dat2,qPCRGroup==22&TargetName=="RPV"&CT>rcon)$QuantNew)
-# Make a column to remove quantities when desired, currently, they're NA
-dat2$remQuant=with(dat2,ifelse(qPCRGroup==22&TargetName=="RPV",1,0))
-
-# Check that min and max re-calculations worked
-unique(subset(subset(dat,qPCRGroup%in%c(4,6,11,21,22)),select=c(qPCRGroup,rmin,rmax,rminQ,rmaxQ,pmin,pmax,pminQ,pmaxQ)))
-unique(subset(subset(dat2,qPCRGroup%in%c(4,6,11,21,22)),select=c(qPCRGroup,rmin,rmax,rminQ,rmaxQ,pmin,pmax,pminQ,pmaxQ)))
-
-# Make 22's max and min NA instead of Inf (easier to deal with)
-dat2$rmin=with(dat2,ifelse(qPCRGroup==22,NA,rmin))
-dat2$rminQ=with(dat2,ifelse(qPCRGroup==22,NA,rminQ))
-dat2$rmax=with(dat2,ifelse(qPCRGroup==22,NA,rmax))
-dat2$rmaxQ=with(dat2,ifelse(qPCRGroup==22,NA,rmaxQ))
-
-
-
-## Sample detected? 
-# Don't worry about contamination at this point, because I didn't with the main experiment
-dat2$det=as.numeric(with(dat2,ifelse(!is.na(CT),1,0)))
-dat2$det
-
-
-## Work with sample-only data 
-
-# Subset for just samples
-unique(dat2$SampleName)
-dat3=subset(dat2,substring(SampleName,1,1)=="S")
-unique(dat3$SampleName)
-
-# Merge with edat data
-dat3=rename(dat3,c("SampleName"="TubeLabel"))
-dat4=merge(dat3,edat,all.x=T)
-
-# Check that it worked
-nrow(dat3) # 2586
-nrow(dat4) # 2586
-dat4$Set # There are some NA's
-subset(dat4,is.na(Set))
-
-#### removed renaming tubes (put at top) ####
-
-# Merge again
-dat4=merge(dat3,edat,all.x=T)
-
-# Check that it worked
-nrow(dat3) # 2586
-nrow(dat4) # 2586
-sum(is.na(dat4$Set)) # No NA's
-sum(is.na(dat4$SampleID)) # No NA's
-
-
-## See how many samples exceed their highest standard
-highSampsP=subset(dat4,TargetName=="PAV"&CT<pmin)
-nrow(highSampsP) # None
-highSampsR=subset(dat4,TargetName=="RPV"&CT<rmin)
-nrow(highSampsR) # 105
-highSampsRSum=ddply(highSampsR,.(qPCRGroup,TubeLabel),summarise,CTMean=mean(CT),n=length(TubeLabel),qMean=mean(Quantity))
-nrow(highSampsRSum) # 45 samples
-highSampsRSum2=subset(highSampsRSum,n>1)
-nrow(highSampsRSum2)		#34 RPV samples have multiple reps with higher CT's than max
-highSampsREarly=subset(highSampsRSum,qPCRGroup<4)
-highSampsREarly				#14 samples were tested without 1e8. Add to last qPCR Run. If their values don't change much, no need to do the other 20.
-
-
-## Check to see how the re-do of high samples went
-
-subset(highSampsR,TubeLabel%in%highSampsREarly$TubeLabel&qPCRGroup>=4) # None of them showed up again
-
-# Isolate the samples from the second and first runs
-highSampsRReDo=subset(dat4,TubeLabel%in%highSampsREarly$TubeLabel&qPCRGroup>=4)
-unique(highSampsRReDo$qPCRGroup) # All in group 21
-highSampsRFirst=subset(dat4,TubeLabel%in%highSampsREarly$TubeLabel&qPCRGroup<4)
-
-# Take the mean for each and merge
-redoSum=ddply(highSampsRReDo,.(TubeLabel,TargetName),summarise,meanCT.redo=mean(CT,na.rm=T),nCT.redo=length(CT),meanQ.redo=mean(QuantNew,na.rm=T))
-redoSum
-firstSum=ddply(highSampsRFirst,.(TubeLabel,TargetName),summarise,meanCT.first=mean(CT,na.rm=T),nCT.first=length(CT),meanQ.first=mean(QuantNew,na.rm=T))
-firstSum
-rMaxSum=merge(redoSum,firstSum,all=T)
-rMaxSum
-
-# Compare values
-ggplot(rMaxSum,aes(x=meanCT.redo,y=meanCT.first))+geom_point()+facet_wrap(~TargetName,scales="free") # The CT's are correlated, but higher for the redo runs than the first
-ggplot(rMaxSum,aes(x=meanQ.redo,y=meanQ.first))+geom_point()+facet_wrap(~TargetName,scales="free") # For the redo, the values were estimated to be much smaller for RPV and higher for PAV
-subset(subset(rMaxSum,TargetName=="RPV"),select=c(meanQ.redo,meanQ.first))
-
-# Look at samples that weren't redone
-subset(highSampsRSum,qPCRGroup>=4) # All are very close to 1e8
-nrow(subset(highSampsRSum,qPCRGroup>=4)) #31 samples
-nrow(subset(highSampsRSum,qPCRGroup>=4&n>1)) # 20 of them had more than one rep above the standard curve
-# Leave them in the analysis. Can try without them
-
-# Flag samples that are above the standard curve
-nrow(highSampsR) # 105
-dat4$highSamps=with(dat4,ifelse(CT<rmin&TargetName=="RPV",1,0))
-sum(dat4$highSamps, na.rm=T) #105
-sum(is.na(dat4$highSamps)) # 61 NA's
-subset(subset(dat4,is.na(highSamps)),select=c(qPCRGroup,TubeLabel,TargetName,CT))# All in group 22, one that has an CT of NA that's in group 19 - change the NA to 0 (not too high) and the 22 to 1 (so that other reps decide whether all are high)
-dat4$highSamps[is.na(dat4$CT)&dat4$qPCRGroup==19]=0
-dat4$highSamps[dat4$qPCRGroup==22&dat4$TargetName=="RPV"]=1
-# Changed above on 9/24/17 - used to be set to NA (427 samples)
-# All RPV samps in qPCR group 22 are considered above curve (because there is no curve when contamination is taken into account)
-sum(is.na(dat4$highSamps)) # 0
-sum(subset(dat4,!is.na(highSamps))$highSamps) # 165
-165-nrow(subset(dat4,qPCRGroup==22&TargetName=="RPV")) #105 (same as above)
-
-
-## See how many samples are below the lowest standard
-lowSampsP=subset(dat4,TargetName=="PAV"&CT>pmax)
-nrow(lowSampsP) # 96
-lowSampsR=subset(dat4,TargetName=="RPV"&CT>rmax)
-nrow(lowSampsR) # 23
-
-lowSampsPSum=ddply(lowSampsP,.(qPCRGroup,TubeLabel),summarise,CTMean=mean(CT),n=length(TubeLabel),qMean=mean(Quantity))
-lowSampsPSum #57 samples affected
-nrow(subset(lowSampsPSum,n==3)) #11 with 3 reps
-lowSampsRSum=ddply(lowSampsR,.(qPCRGroup,TubeLabel),summarise,CTMean=mean(CT),n=length(TubeLabel),qMean=mean(Quantity))
-lowSampsRSum #10 samples affected, 5 with 3 reps
-
-# Flag samples with low values
-dat4$lowSamps=with(dat4,ifelse((CT>rmax&TargetName=="RPV")|(CT>pmax&TargetName=="PAV"),1,0))
-sum(is.na(dat4$lowSamps)) # 486 are NA's
-unique(subset(subset(dat4,is.na(lowSamps)),select=c(qPCRGroup,TargetName))) # some are RPV group 22
-head(subset(dat4,is.na(lowSamps)&TargetName=="RPV"&qPCRGroup==19)) # the rest are probably NA
-dat4$lowSamps[is.na(dat4$CT)|(dat4$qPCRGroup==22&dat4$TargetName=="RPV")]=1
-sum(is.na(dat4$lowSamps)) # 0
-sum(dat4$lowSamps) # 605
-sum(is.na(dat4$CT))+nrow(subset(dat4,qPCRGroup==22&TargetName=="RPV"))+96+23-nrow(subset(dat4,qPCRGroup==22&TargetName=="RPV"&is.na(CT))) # all are accounted for
-
-# Create tube labe with target
-dat4$TubeTarget=with(dat4,paste(TubeLabel,TargetName,sep="."))
-
-## Mark duplicate testings
-
-# See if each sample was once for PAV and once RPV
-sampList=ddply(dat4,.(qPCRGroup,TubeLabel),summarise,targets=length(unique(TargetName)),highSamps=sum(highSamps,na.rm=T))
-sampList 
-sum(sampList$targets!=2)# Yes
-
-# Mark duplicates
-sampList$Dups=duplicated(sampList$TubeLabel)
-sum(sampList$Dups==T) # 34
-dupIDs=subset(sampList,Dups==T)$TubeLabel
-dupIDs
-unique(dupIDs)
-dupList=ddply(subset(sampList,TubeLabel%in%dupIDs),.(TubeLabel),summarise,qGroups=paste(qPCRGroup,collapse=","),highS=paste(highSamps,collapse=","))
-dupList # all in groups 21 or 22
-# The group 7 one should be S1 LR2S2 - go back up and change - done
-dat4$Dups=with(dat4,ifelse(TubeLabel%in%dupIDs,1,0))
-# The duplicates in 21 were re-done because they were above the standard curve
-# However, groups 4, 11, 21, and 22 all had poor efficiency curves and contamination (6 was fixed when potentially contaminated samples were removed)
-# RPV for 22 is totally unreliable - quantities converted to NA below
-
-# Group 22 PAV
-# 22 and 11 only have one low PAV standard
-# the efficiency for 11 is outside of the range
-grp22Dups=subset(dat4,Dups==1&qPCRGroup==22&TargetName=="PAV")
-length(unique(grp22Dups$TubeTarget)) #20 samples
-grp22Dups
-# some are low samples
-subset(dat4,TubeTarget%in%grp22Dups$TubeTarget&qPCRGroup!=22)
-# some are low samples
-unique(subset(subset(dat4,TubeTarget%in%grp22Dups$TubeTarget&lowSamps==1),select=c(qPCRGroup,TubeTarget)))
-# 1 only low in 22, the rest low in both runs
-grp22Mean=ddply(subset(subset(dat4,TubeTarget%in%grp22Dups$TubeTarget),select=c(TubeTarget,QuantNew,qPCRGroup,Well)),.(TubeTarget,qPCRGroup),summarise,meanQ=mean(QuantNew,na.rm=T))
-grp22Mean$qPCRGroup=as.factor(grp22Mean$qPCRGroup)
-grp22Mean$qPCRGroup=revalue(grp22Mean$qPCRGroup,c("6"="non22","11"="non22","4"="non22"))
-grp22Wide=reshape(grp22Mean,direction="wide",idvar="TubeTarget",v.names="meanQ",timevar="qPCRGroup")
-grp22Wide$meanQ.non22[is.na(grp22Wide$meanQ.non22)]=0
-grp22Wide$meanQ.22[is.na(grp22Wide$meanQ.22)]=0
-ggplot(grp22Wide,aes(x=meanQ.non22,y=meanQ.22))+geom_point()+xlim(c(0,35000))+ylim(c(0,35000))
-#values are all higher coming out of 22, but they are relatively correlated
-#remove all from 22
-dat4$remQuant=with(dat4,ifelse(TubeTarget%in%grp22Dups$TubeTarget&qPCRGroup==22,1,remQuant))
-
-# Deicde how to deal with group 21 duplicates
-# 21 is the only group wtih no PAV 1e3 (makes low values unreliable)
-# poor efficiency for PAV, contamination with RPV that's within SC
-grp21Dups=subset(dat4,Dups==1&qPCRGroup==21)$TubeTarget
-subset(dat4,TubeTarget%in%grp21Dups&qPCRGroup!=21)
-# some duplicates have no issues, some are high, and some are low
-
-subset(subset(dat4,TubeTarget%in%grp21Dups&lowSamps==1),select=c(TubeLabel,TargetName,qPCRGroup,CT)) #the ones that were low samples in their other group were also low in 21 because they were not detected in both groups
-# there are low samples in 21 that aren't low in the other groups
-# the low samples should come from their non-21 group
-subset(dat4,qPCRGroup==21&lowSamps==1&!(TubeTarget%in%grp21Dups))
-# 4 samples have values below SC and are in 21 (no low SC values) do not have replacements 
-# 2 of the 4 are not detected
-# keep these 4 in
-
-subset(subset(dat4,TubeTarget%in%grp21Dups&highSamps==1),select=c(TubeLabel,TargetName,qPCRGroup,CT)) #there are no high samples in 21
-# From re-do analysis above, the RPV estimates were lower in grp 21 and PAV were higher
-grp21HighSamps=subset(dat4,TubeTarget%in%grp21Dups&highSamps==1)$TubeTarget
-subset(subset(dat4,TubeTarget%in%grp21HighSamps&qPCRGroup==21),select=c(TubeTarget,qPCRGroup,CT,rcon))
-# all of the RPV samples have CT's more concentrated (lower) than the contamination
-# I think I want to keep the group 21 samples in this case
-
-# Duplicated samples:
-# Keep from non 21 if there's no issue
-# Keep from non 21 if they are below the SC in 21
-# Keep from 21 if they're low (besides above) or high
-
-remSamps21=subset(dat4,TubeTarget%in%grp21Dups&((qPCRGroup!=21&lowSamps==0&highSamps==0)|(qPCRGroup==21&lowSamps==1)))$TubeTarget
-remSampsNon21=subset(dat4,TubeTarget%in%grp21Dups&(lowSamps==1|highSamps==1)&!(TubeTarget%in%remSamps21))$TubeTarget
-length(unique(c(remSamps21,remSampsNon21)))
-length(unique(grp21Dups))
-
-# Mark samples for removal
-dat4$remQuant=with(dat4,ifelse((TubeTarget%in%remSamps21&qPCRGroup==21)|(TubeTarget%in%remSampsNon21&qPCRGroup!=21),1,remQuant))
-
-# Make sure all duplicates are represented
-length(unique(subset(dat4,qPCRGroup!=22|TargetName=="PAV")$TubeTarget)) #794
-length(unique(subset(dat4,remQuant==0)$TubeTarget)) #794
-
-
-# Mark contamination and poor efficiency groups
-dat4$PoorSCEff=with(dat4,ifelse((qPCRGroup==4&TargetName=="RPV")|(qPCRGroup%in%c(11,21)&TargetName=="PAV"),1,0))
-
-
-# Check S2 PP5S1. The cage broke off the leaf after IAP, and I didn't mean to extract this one.
-subset(dat4,TubeLabel=="S2 PP5S1")
-# Remove to be consistent with analysis decisions. Also, it's supposed to be a singly infected PAV plant and RPV is present
-dat5=subset(dat4,TubeLabel!="S2 PP5S1")
-
-# See which samples have all three reps fitting criteria of low samps, high samps, or undetected
-dat6<-ddply(dat5,.(TubeLabel,TargetName,qPCRGroup),mutate,nSamps=length(TubeLabel),nLow=sum(lowSamps),nHigh=sum(highSamps),nCTNA=sum(is.na(CT)))
-# Did within qPCR group because I get rid of the duplicate groups later
-
-# See if any of the above are NA
-sum(is.na(dat6$nLow))
-sum(is.na(dat6$nHigh))
-
-# For samples with all three reps below the standard curve (lowSamps), want to change their values to 0 instead of NA for some of the quantities (below). 
-dat6$AllBelow=with(dat6,ifelse(nLow==nSamps,1,0))
-nrow(subset(dat6,AllBelow==1)) # 561 (include undetected)
-
-# For samples with all three reps undetected, want to change their values to 0 instead of NA for all of the quantities (below).
-dat6$AllCTNA=with(dat6,ifelse(nCTNA==nSamps,1,0))
-nrow(subset(dat6,AllCTNA==1)) # 387
-
-# How many have all three reps as high
-dat6$AllHigh=with(dat6,ifelse(nHigh==nSamps,1,0))
-nrow(subset(dat6,AllHigh==1)) # 138
-nrow(subset(dat6,AllHigh==1&remQuant==0)) #39
-length(unique(subset(dat6,AllHigh==1&remQuant==0)$TubeTarget)) #13 samples
-subset(subset(dat6,AllHigh==1&remQuant==0),select=c(TubeTarget,qPCRGroup,CT,rmin,QuantNew,rmaxQ))
-# all are very close to max quantity of SC, within 1/2 an order of magnitude larger
-subset(subset(dat6,AllHigh==0&highSamps==1&remQuant==0),select=c(TubeTarget,qPCRGroup,CT,rmin,QuantNew,rmaxQ))
-# these ones are also vary close
-subset(subset(dat6,AllHigh==0&highSamps==1&remQuant==0),select=c(TubeTarget,qPCRGroup,CT,rmin,QuantNew,rmaxQ))
-# so are these
-someHigh=subset(dat6,AllHigh==0&highSamps==1&remQuant==0)$TubeTarget
-ggplot(subset(dat6,TubeTarget%in%someHigh),aes(x=TubeTarget,y=QuantNew))+geom_point(aes(colour=as.factor(highSamps)))
-# all the reps are close together - leave high samples in analysis
-length(unique(subset(dat6,highSamps==1&remQuant==0)$TubeTarget)) #32 samples affected - keep them all in
-
-
-### Add quantity columns
-
-## Factors to consider
-# contamination (contIn, both, RPV, neither)
-# poor efficiency (PoorSCEff, 1/0)
-# duplicates (Dups, 1/0)
-# low or high samples relative to standard curve (lowSamps, highSamps, 1/0/NA)
-
-## Quantity 1 
-# Contamination accounted for (removed stds that could have been contaminated), poor eff okay, all detected quantities used, 0 if all reps undetected
-dat6$Quant1=dat6$QuantNew
-unique(subset(subset(dat6,AllCTNA==1),select=c(qPCRGroup,TargetName,Quant1)))
-dat6$Quant1=with(dat6,ifelse(AllCTNA==1,0,Quant1))
-
-# Remove RPV from group 22 and duplicates with better values
-dat6$Quant1=with(dat6,ifelse(remQuant==1,NA,Quant1))
-
-## Quantity 1.GE 
-# Contamination accounted for, poor eff removed, all detected quantities used
-dat6$Quant1.GE=with(dat6,ifelse(PoorSCEff==0,Quant1,NA))
-
-## Quantity 2 
-# Cont accounted for, poor eff okay, samples below curve set to NA, unless all reps are below, then they are zero, except for RPV grp 22 
-dat6$Quant2=with(dat6,ifelse(lowSamps==1,NA,Quant1))
-dat6$Quant2=with(dat6,ifelse(AllBelow==1,0,Quant2))
-
-# Remove RPV from group 22 and duplicates with better values
-dat6$Quant2=with(dat6,ifelse(remQuant==1,NA,Quant2))
-
-## Quantity 2.GE 
-# No cont, poor eff removed, samples outside curve set to NA
-dat6$Quant2.GE=with(dat6,ifelse(PoorSCEff==0,Quant2,NA))
-
-## Double check RPV group 22
-subset(dat6,qPCRGroup==22)
-
-## Export full dataset
-setwd("/Users/AmyKendig/Google Drive/Within Host Coexistence/Data")
-write.csv(dat6,"Expt2_qPCRDataEdited_050318.csv",row.names=F)
+sum(samp3$remove) 
+# 292 
+
+# save full data
+write_csv(samp3, "intermediate-data/qPCR_expt_data_compiled.csv")
+
+
+#### clean for analyses ####
+
+# NA values
+samp3 %>%
+  filter(is.na(quant_adj) & remove == 0) %>%
+  select(cycle, quantity) %>%
+  unique()
+
+# no analysis column
+filter(samp3, no_analysis == 1) %>%
+  select(expt_notes, extraction_notes) %>%
+  unique()
+unique(samp3$no_analysis)
+
+# clean data for analyses
+samp4 <- samp3 %>%
+  filter(remove == 0 & is.na(no_analysis)) %>% # removes issues identified above
+  group_by(set, nutrient, inoculation, time, invasion, replicate, set_rep, sample, tube_label, extraction_mass.mg, shoot_mass.g, expt_notes, extraction_notes, target, q_group, PAVint, PAVslope, PAVmin, PAVmax, RPVint, RPVslope, RPVmin, RPVmax) %>%
+  summarise(tech_cycle = mean(cycle, na.rm = T)) %>%
+  ungroup() %>%
+  mutate(quant = case_when(target == "PAV" ~ 10 ^ ((tech_cycle - PAVint) / PAVslope),
+                           target == "RPV" ~ 10 ^ ((tech_cycle - RPVint) / RPVslope)),
+         quant_adj = case_when(target == "PAV" & quant < PAVmin ~ 0, # below standard curve
+                               target == "RPV" & quant < RPVmin ~ 0,
+                               is.na(quant) ~ 0, # not detected
+                               TRUE ~ quant),
+         quant_ul = quant_adj / 7) %>%
+  filter(!(target == "PAV" & quant_adj > PAVmax) &
+           !(target == "RPV" & quant_adj > RPVmax)) # removes 31 samples
+
+# save data
+write_csv(samp4, "intermediate-data/qPCR_expt_data_cleaned.csv")
+
+#### things to check ####
+# use of quantity earlier in the code - it is re-calculated here at the end
+# is 7ul right?
+# other processing steps from concentration_analysis in nutrient-virus and Expt2_VirusconcentrationAnalysis
