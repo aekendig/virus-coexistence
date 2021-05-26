@@ -93,6 +93,11 @@ qdat4 <- qdat3 %>%
 
 #### error check ####
 
+# see how many were added
+nrow(edat2)
+length(unique(filter(qdat4, !is.na(freezer_bag_ID))$tube_label))
+# all
+
 # check for missing edat data
 qdat4 %>%
   filter(task == "sample" & (is.na(nutrient) | is.na(inoculation) | is.na(invasion))) %>% 
@@ -249,9 +254,10 @@ confun <- function(dat){
   stddf <- fulldf %>%
     group_by(q_group) %>%
     filter(task == "standard") %>%
-    mutate(stdRem = case_when(
-      target == "PAV" & cycle > unique(PAVcont) ~ 1,
-      target == "RPV" & cycle > unique(RPVcont) ~ 1)) %>%
+    mutate(stdRem = case_when(target == "PAV" & cycle > unique(PAVcont) ~ 1,
+                              target == "RPV" & cycle > unique(RPVcont) ~ 1,
+                              TRUE ~ 0)) %>%
+    ungroup() %>%
     group_by(q_group, target) %>%
     summarise(removed = sum(stdRem, na.rm = T)) %>%
     ungroup() %>%
@@ -279,6 +285,8 @@ confun <- function(dat){
 # remove these standards and re-calculate standard curve
 qdat5 <- qdat4 %>%
   confun()
+# warnings: Inf returned when no contamination
+# this is okay because all cyclces < Inf
 
 # check that confun worked
 head(qdat5)
@@ -314,10 +322,9 @@ qdat5 %>%
 
 # modify samples with new standard curve
 qdat6 <- qdat5 %>%
-  mutate(quant_adj = case_when(
-    task != "standard" & target == "PAV" ~ 10 ^ ((cycle - PAVint) / PAVslope),
-    task != "standard" & target == "RPV" ~ 10 ^ ((cycle - RPVint) / RPVslope),
-    task == "standard" ~ quantity))
+  mutate(quant_adj = case_when(task != "standard" & target == "PAV" ~ 10 ^ ((cycle - PAVint) / PAVslope),
+                               task != "standard" & target == "RPV" ~ 10 ^ ((cycle - RPVint) / RPVslope),
+                               task == "standard" ~ quantity))
 
 # check that new standard curve conversion worked
 qdat6 %>%
@@ -356,7 +363,7 @@ filter(samp, extraction_notes == "May be PP4I2. Both tubes were labelled PP4S2")
 samp2 <- samp %>%
   mutate(remove = case_when(is.na(PAVslope) | is.na(RPVslope) ~ 1, # 120 (group 22)
                             target == "RPV" & (round(RPVefficiency) < 80 | round(RPVefficiency) > 120) ~ 1, # 60 (group 4)
-                            target == "PAV" & (round(PAVefficiency) < 80 | round(PAVefficiency) > 120) ~ 1, # 120 (groups 11 and 21)
+                            target == "PAV" & (round(PAVefficiency) < 80 | round(PAVefficiency) > 120) ~ 1, # 0
                             target == "RPV" & (quant_adj >= 1e3 & quant_adj < RPVmin) ~ 1, # 15 (groups 4 and 6)
                             target == "PAV" & (quant_adj >= 1e3 & quant_adj < PAVmin) ~ 1, # 23 (group 21)
                             sample %in% c("S1 PP4I2", "S1 PP4S2") ~ 1,
@@ -403,49 +410,73 @@ samp_d <- samp2 %>%
          sample_q_tar = paste(sample, q_group, target, sep = "_")) %>%
   ungroup() %>%
   arrange(sample, target)
+# okay to ignore warnings
 
 data.frame(samp_d)
 # 4 not detected
 
+ggplot(samp_d, aes(x = quant_mean, y = quant_var, color = target)) +
+  geom_point()
+cor.test(~ quant_mean + quant_var, data = samp_d)
+# the high variance ones are also the high mean ones
+
+# decided not to do below because:
+# the undetected samples don't have detected replacemens
+# by removing the high variance samples, we're removing the high concentration samples
+
 # indicate which samples should be removed
 # not detected when another group was
 # higher than minimum variance when multiple groups were detected
-samp_d_r <- samp_d %>%
-  mutate(remove = case_when(detect == F & n_det > 0 ~ 1,
-                            detect == T & n_det > 1 & min_var_group == 0 ~ 1,
-                            TRUE ~ 0)) %>%
-  filter(remove == 1)
+# samp_d_r <- samp_d %>%
+#   mutate(remove = case_when(detect == F & n_det > 0 ~ 1,
+#                             detect == T & n_det > 1 & min_var_group == 0 ~ 1,
+#                             TRUE ~ 0)) %>%
+#   filter(remove == 1)
+
 
 # transfer this over to main dataset
-samp3 <- samp2 %>%
-  mutate(sample_q_tar = paste(sample, q_group, target, sep = "_"),
-         remove = case_when(sample_q_tar %in% samp_d_r$sample_q_tar ~ 1,
-                            TRUE ~ remove)) %>%
-  select(-sample_q_tar)
-
-sum(samp3$remove) 
+# samp3 <- samp2 %>%
+#   mutate(sample_q_tar = paste(sample, q_group, target, sep = "_"),
+#          remove = case_when(sample_q_tar %in% samp_d_r$sample_q_tar ~ 1,
+#                             TRUE ~ remove)) %>%
+#   select(-sample_q_tar)
+# 
+# sum(samp3$remove) 
 # 292 
 
 # save full data
-write_csv(samp3, "intermediate-data/qPCR_expt_data_compiled.csv")
+write_csv(samp2, "intermediate-data/qPCR_expt_data_compiled.csv")
 
 
 #### clean for analyses ####
 
 # NA values
-samp3 %>%
+samp2 %>%
   filter(is.na(quant_adj) & remove == 0) %>%
   select(cycle, quantity) %>%
   unique()
 
 # no analysis column
-filter(samp3, no_analysis == 1) %>%
+filter(samp2, no_analysis == 1) %>%
   select(expt_notes, extraction_notes) %>%
   unique()
-unique(samp3$no_analysis)
+unique(samp2$no_analysis)
+
+# maximum values
+unique(samp2$RPVmax)
+samp2 %>%
+  group_by(RPVmax) %>%
+  count()
+# most are 1e8
+unique(samp2$PAVmax)
+
+# time and dpi conversion
+times = tibble(time = c(1,2,3,4,5),
+               dpiR = c(17,20,24,28,31),
+               dpiI = c(5,8,12,16,19))
 
 # clean data for analyses
-samp4 <- samp3 %>%
+samp3 <- samp2 %>%
   filter(remove == 0 & is.na(no_analysis)) %>% # removes issues identified above
   group_by(set, nutrient, inoculation, time, invasion, replicate, set_rep, sample, tube_label, extraction_mass.mg, shoot_mass.g, expt_notes, extraction_notes, target, q_group, PAVint, PAVslope, PAVmin, PAVmax, RPVint, RPVslope, RPVmin, RPVmax) %>%
   summarise(tech_cycle = mean(cycle, na.rm = T)) %>%
@@ -455,15 +486,22 @@ samp4 <- samp3 %>%
          quant_adj = case_when(target == "PAV" & quant < PAVmin ~ 0, # below standard curve
                                target == "RPV" & quant < RPVmin ~ 0,
                                is.na(quant) ~ 0, # not detected
-                               TRUE ~ quant),
-         quant_ul = quant_adj / 7) %>%
-  filter(!(target == "PAV" & quant_adj > PAVmax) &
-           !(target == "RPV" & quant_adj > RPVmax)) # removes 31 samples
+                               TRUE ~ quant)) %>%
+  group_by(set, nutrient, inoculation, time, invasion, replicate, set_rep, sample, tube_label, extraction_mass.mg, shoot_mass.g, expt_notes, extraction_notes, target) %>%
+  summarise(quant_adj = mean(quant_adj)) %>% # average across qPCR groups
+  ungroup() %>%
+  mutate(quant_ul = quant_adj / 7,
+         quant_mg = quant_ul * 50 / extraction_mass.mg,
+         highN = ifelse(nutrient %in% c("N", "NP"), 1, 0),
+         highP = ifelse(nutrient %in% c("P", "NP"), 1, 0),
+         second_inoculation = case_when(inoculation == "PAV" & invasion == "I" ~ "RPV",
+                                        inoculation == "RPV" & invasion == "I" ~ "PAV",
+                                        TRUE ~ NA_character_)) %>%
+  left_join(times) %>%
+  rename(first_inoculation = inoculation) %>%
+  filter(!(target == "PAV" & quant_adj > 1e7) &
+           !(target == "RPV" & quant_adj > 1e8)) # removes 30 RPV samples
 
 # save data
-write_csv(samp4, "intermediate-data/qPCR_expt_data_cleaned.csv")
+write_csv(samp3, "intermediate-data/qPCR_expt_data_cleaned.csv")
 
-#### things to check ####
-# use of quantity earlier in the code - it is re-calculated here at the end
-# is 7ul right?
-# other processing steps from concentration_analysis in nutrient-virus and Expt2_VirusconcentrationAnalysis
