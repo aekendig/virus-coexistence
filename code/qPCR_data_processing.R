@@ -1,4 +1,3 @@
-
 ## Goal: process qPCR data
 
 
@@ -490,8 +489,8 @@ samp3 <- samp2 %>%
   group_by(set, nutrient, inoculation, time, invasion, replicate, set_rep, sample, tube_label, extraction_mass.mg, shoot_mass.g, expt_notes, extraction_notes, target) %>%
   summarise(quant_adj = mean(quant_adj)) %>% # average across qPCR groups
   ungroup() %>%
-  mutate(quant_ul = quant_adj / 7,
-         quant_mg = quant_ul * 50 / extraction_mass.mg,
+  mutate(quant.ul = quant_adj / 7,
+         quant.mg = quant.ul * 50 / extraction_mass.mg,
          highN = ifelse(nutrient %in% c("N", "NP"), 1, 0),
          highP = ifelse(nutrient %in% c("P", "NP"), 1, 0),
          second_inoculation = case_when(inoculation == "PAV" & invasion == "I" ~ "RPV",
