@@ -9,6 +9,8 @@ rm(list=ls())
 # load packages
 library(tidyverse)
 library(nlme)
+# library(FlexParamCurve)
+library(nlshelper)
 
 # import data
 dat <- read_csv("intermediate-data/qPCR_expt_data_cleaned.csv")
@@ -209,26 +211,26 @@ RPVdat %>%
   facet_wrap(~ nutrient)
 # invaders don't reach K
 
-# select resident
-PAVRdat <- PAVdat %>%
-  filter(PAV_role == "resident") %>%
+# select single
+PAVSdat <- PAVdat %>%
+  filter(PAV_role == "single") %>%
   select(set, nutrient, highN, highP, time, dpiI, replicate, quant.mg)
 
-RPVRdat <- RPVdat %>%
-  filter(RPV_role == "resident") %>%
+RPVSdat <- RPVdat %>%
+  filter(RPV_role == "single") %>%
   select(set, nutrient, highN, highP, time, dpiI, replicate, quant.mg)
 
 # estimate carrying capacity
-PAVmodK <- lm(quant.mg ~ highN * highP, data = PAVRdat)
-summary(PAVmodK) # no sig difference among treatments
-PAVK <- PAVRdat %>%
+PAVmodK <- lm(quant.mg ~ highN * highP, data = PAVSdat)
+summary(PAVmodK) # N increases K
+PAVK <- PAVSdat %>%
   select(nutrient, highN, highP) %>%
   unique() %>%
   mutate(K = predict(PAVmodK, newdata = .))
 
-RPVmodK <- lm(quant.mg ~ highN * highP, data = RPVRdat)
+RPVmodK <- lm(quant.mg ~ highN * highP, data = RPVSdat)
 summary(RPVmodK)  # no sig difference among treatments
-RPVK <- RPVRdat %>%
+RPVK <- RPVSdat %>%
   select(nutrient, highN, highP) %>%
   unique() %>%
   mutate(K = predict(RPVmodK, newdata = .))
@@ -244,55 +246,261 @@ RPVIdat <- RPVdat %>%
   select(set, nutrient, highN, highP, time, dpiI, replicate, quant.mg) %>%
   left_join(RPVK)
 
-### parameters vary by treatment (4) ###
-
 # simulated data/starting values
 PAVIdat %>%
+  filter(time == 1) %>%
   group_by(nutrient) %>%
-  summarise(minVal = min(quant.mg))
+  summarise(minVal = min(quant.mg),
+            meanVal = mean(quant.mg))
 
 PAVIsim <- PAVIdat %>%
   select(dpiI) %>%
   unique() %>%
   expand_grid(PAVK) %>%
-  mutate(N0 = 10,
-         r = 0.1,
+  mutate(N0 = 1,
+         r = 0.3,
          quant.mg = K*N0/(N0 + (K-N0) * exp(-r * dpiI)))
-# I think N0 = 1 and r = 0.4 are better starting values
-# but I get a singular gradient with these
 
+# visualize
 ggplot(PAVIdat, aes(dpiI, quant.mg)) +
   geom_point() +
   geom_line(data = PAVIsim) +
   facet_wrap(~nutrient)
-  
+
+# simulated data/starting values
+RPVIdat %>%
+  filter(time == 1) %>%
+  group_by(nutrient) %>%
+  summarise(minVal = min(quant.mg),
+            meanVal = mean(quant.mg))
+
 RPVIsim <- RPVIdat %>%
   select(dpiI) %>%
   unique() %>%
   expand_grid(RPVK) %>%
-  mutate(N0 = 100,
-         r = 0.6,
+  mutate(N0 = 1e4,
+         r = 0.4,
          quant.mg = K*N0/(N0 + (K-N0) * exp(-r * dpiI)))
 
+# visualize
 ggplot(RPVIdat, aes(dpiI, quant.mg)) +
   geom_point() +
   geom_line(data = RPVIsim) +
   facet_wrap(~nutrient)
 
+
+### parameters don't vary by treatment ###
+
 # formula
-form1 <- formula(quant.mg ~ K*N0/(N0 + (K-N0) * exp(-r * dpiI)) | nutrient)
+form1 <- formula(quant.mg ~ K*N0/(N0 + (K-N0) * exp(-r * dpiI)))
 
 # model
-(PAVmod1 <- nlsList(form1, data = PAVIdat, 
-                    start = list(N0 = 10, r = 0.1)))
+(PAVmod1 <- nls(form1, data = PAVIdat,
+                start = list(N0 = 1, r = 0.3)))
 
-(RPVmod1 <- nlsList(form1, data = RPVIdat, 
-                    start = list(N0 = 100, r = 0.6)))
+(RPVmod1 <- nls(form1, data = RPVIdat,
+                start = list(N0 = 1e4, r = 0.4)))
 
-#### start here ####
-# fit the below models
-# AIC or something to pick best one
+# visualize
+PAVIsim1 <- PAVIdat %>%
+  select(dpiI) %>%
+  unique() %>%
+  expand_grid(PAVK) %>%
+  mutate(quant.mg = predict(PAVmod1, newdata = .))
 
-# parameters vary by N level (2)
-# parameters vary by P level (2)
-# parameters don't vary
+ggplot(PAVIdat, aes(dpiI, quant.mg)) +
+  geom_point() +
+  geom_line(data = PAVIsim1) +
+  facet_wrap(~nutrient)
+
+RPVIsim1 <- RPVIdat %>%
+  select(dpiI) %>%
+  unique() %>%
+  expand_grid(RPVK) %>%
+  mutate(quant.mg = predict(RPVmod1, newdata = .))
+
+ggplot(RPVIdat, aes(dpiI, quant.mg)) +
+  geom_point() +
+  geom_line(data = RPVIsim1) +
+  facet_wrap(~nutrient)
+
+# add starting value to dataframe
+PAVIdat2 <- PAVIdat %>%
+  mutate(N0 = as.numeric(coef(PAVmod1)[1]))
+
+RPVIdat2 <- RPVIdat %>%
+  mutate(N0 = as.numeric(coef(RPVmod1)[1]))
+
+# refit model with fixed N0 for comparison
+(PAVmod1b <- nls(form1, data = PAVIdat2,
+                start = list(r = 0.1)))
+
+(RPVmod1b <- nls(form1, data = RPVIdat2,
+                start = list(r = 0.1)))
+
+
+### parameters vary by treatment (4) ###
+
+# formula
+form2 <- formula(quant.mg ~ K*N0/(N0 + (K-N0) * exp(-r * dpiI)) | nutrient)
+
+# model
+(PAVmod2 <- nlsList(form2, data = PAVIdat2, 
+                    start = list(r = 0.1)))
+
+(RPVmod2 <- nlsList(form2, data = RPVIdat2, 
+                    start = list(r = 0.1)))
+
+# compare
+anova_nlslist(PAVmod2, PAVmod1b)
+anova_nlslist(RPVmod2, RPVmod1b)
+
+# coefficients
+PAVcoef2 <- coef(PAVmod2) %>%
+  mutate(nutrient = rownames(.))
+
+RPVcoef2 <- coef(RPVmod2) %>%
+  mutate(nutrient = rownames(.))
+
+# visualize
+PAVIsim2 <- PAVIdat2 %>%
+  select(nutrient, dpiI, N0, K) %>%
+  unique() %>%
+  left_join(PAVcoef2) %>%
+  mutate(quant.mg = K*N0/(N0 + (K-N0) * exp(-r * dpiI)))
+# the predict function was giving multiple values
+# for the same nutrient/dpI combinations
+
+ggplot(PAVIdat2, aes(dpiI, quant.mg)) +
+  geom_point() +
+  geom_line(data = PAVIsim2) +
+  facet_wrap(~nutrient)
+
+RPVIsim2 <- RPVIdat2 %>%
+  select(nutrient, dpiI, N0, K) %>%
+  unique() %>%
+  left_join(RPVcoef2) %>%
+  mutate(quant.mg = K*N0/(N0 + (K-N0) * exp(-r * dpiI)))
+
+ggplot(RPVIdat2, aes(dpiI, quant.mg)) +
+  geom_point() +
+  geom_line(data = RPVIsim2) +
+  facet_wrap(~nutrient)
+
+
+### parameters vary by N level (2) ###
+
+# formula
+form3 <- formula(quant.mg ~ K*N0/(N0 + (K-N0) * exp(-r * dpiI)) | highN)
+
+# model
+(PAVmod3 <- nlsList(form3, data = PAVIdat2, 
+                    start = list(r = 0.1)))
+
+(RPVmod3 <- nlsList(form3, data = RPVIdat2, 
+                    start = list(r = 0.1)))
+
+# compare
+anova_nlslist(PAVmod3, PAVmod1b)
+anova_nlslist(RPVmod3, RPVmod1b)
+
+
+### parameters vary by P level (2) ###
+
+# formula
+form4 <- formula(quant.mg ~ K*N0/(N0 + (K-N0) * exp(-r * dpiI)) | highP)
+
+# model
+(PAVmod4 <- nlsList(form4, data = PAVIdat2, 
+                    start = list(r = 0.1)))
+
+(RPVmod4 <- nlsList(form4, data = RPVIdat2, 
+                    start = list(r = 0.1)))
+
+# compare
+anova_nlslist(PAVmod4, PAVmod1b)
+anova_nlslist(RPVmod4, RPVmod1b)
+
+# grouping factor does not significantly improve fit for any of the models
+
+
+#### visualize ####
+
+# figure settings
+fig_theme <- theme_bw() +
+  theme(panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.spacing.x = unit(0,"line"),
+        axis.text.y = element_text(size = 8, color = "black"),
+        axis.text.x = element_text(size = 8, color = "black"),
+        axis.title.y = element_text(size = 10),
+        axis.title.x = element_blank(),
+        axis.line = element_line(color = "black"),
+        legend.text = element_text(size = 8),
+        legend.title = element_text(size = 8),
+        legend.background = element_blank(),
+        legend.position = "none",
+        legend.key.size = unit(5, "mm"),
+        strip.background = element_blank(),
+        strip.text = element_text(size = 10),
+        strip.placement = "outside",
+        plot.title = element_text(size = 12, vjust = 0))
+
+
+PAVSIsim <- PAVdat %>%
+  filter(PAV_role %in% c("single", "invader")) %>%
+  select(PAV_role, dpiI, dpiSI, nutrient, highN, highP) %>%
+  unique() %>%
+  left_join(PAVcoef2) %>%
+  mutate(K = predict(PAVmodK, newdata = .),
+         N0 = as.numeric(coef(PAVmod1)[1]),
+         PAV_quant.mg = case_when(PAV_role == "single" ~ K,
+                                  PAV_role == "invader" ~ K*N0/(N0 + (K-N0) * exp(-r * dpiI))),
+         Inoculation = case_when(PAV_role == "single" ~ "uninvaded",
+                                 PAV_role == "invader" ~ "invader"),
+         Nutrient = fct_recode(nutrient, "low" = "L", "N+P" = "NP") %>%
+           fct_relevel("low", "N", "P"))
+
+PAVdat %>%
+  filter(PAV_role %in% c("single", "invader")) %>%
+  mutate(Inoculation = case_when(PAV_role == "single" ~ "uninvaded",
+                                 PAV_role == "invader" ~ "invader"),
+         Nutrient = fct_recode(nutrient, "low" = "L", "N+P" = "NP") %>%
+           fct_relevel("low", "N", "P")) %>%
+  ggplot(aes(dpiSI, PAV_quant.mg, color = Nutrient, group = interaction(Nutrient, Inoculation))) +
+  stat_summary(geom = "point", fun = "mean", position = position_dodge(0.5), aes(shape = Inoculation)) +
+  stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0, position = position_dodge(0.5)) +
+  geom_line(data = PAVSIsim, aes(linetype = Inoculation)) +
+  scale_color_viridis_d() +
+  ggtitle("A.   PAV") +
+  xlab("Days post inoculation") +
+  ylab(expression(paste("Virus titer (no. ", mg^-1, " tissue)", sep = ""))) +
+  fig_theme +
+  theme(legend.position = c(0.05, 0.75))
+
+#### start here: update RPV figure to match PAV ####
+
+RPVSIsim <- RPVdat %>%
+  filter(RPV_role %in% c("single", "invader")) %>%
+  select(RPV_role, dpiI, dpiSI, nutrient, highN, highP) %>%
+  unique() %>%
+  left_join(RPVcoef2) %>%
+  mutate(K = predict(RPVmodK, newdata = .),
+         N0 = as.numeric(coef(RPVmod1)[1]),
+         RPV_quant.mg = case_when(RPV_role == "single" ~ K,
+                                  RPV_role == "invader" ~ K*N0/(N0 + (K-N0) * exp(-r * dpiI))),
+         Inoculation = case_when(RPV_role == "single" ~ "uninvaded",
+                                 RPV_role == "invader" ~ "invader"))
+
+RPVdat %>%
+  filter(RPV_role %in% c("single", "invader")) %>%
+  mutate(Inoculation = case_when(RPV_role == "single" ~ "uninvaded",
+                                 RPV_role == "invader" ~ "invader")) %>%
+  ggplot(aes(dpiSI, RPV_quant.mg, color = nutrient, group = interaction(nutrient, Inoculation))) +
+  stat_summary(geom = "point", fun = "mean", position = position_dodge(0.5), aes(shape = Inoculation)) +
+  stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0, position = position_dodge(0.5)) +
+  geom_line(data = RPVSIsim, aes(linetype = Inoculation)) +
+  xlab("Days post inoculation") +
+  ylab(expression(paste("Virus titer (no. ", mg^-1, " tissue)", sep = "")))
