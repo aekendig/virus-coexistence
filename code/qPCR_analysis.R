@@ -194,6 +194,59 @@ RPVdat <- dat5 %>%
          log_quant.mg = log(quant.mg + 1))
 
 
+#### compare resident to single ####
+
+# select data
+PAVSRdat <- PAVdat %>%
+  filter(PAV_role %in% c("single", "resident")) %>%
+  mutate(role = fct_recode(PAV_role, uninvaded = "single") %>%
+           fct_rev())
+
+RPVSRdat <- RPVdat %>%
+  filter(RPV_role %in% c("single", "resident")) %>%
+  mutate(role = fct_recode(RPV_role, uninvaded = "single") %>%
+           fct_rev())
+
+# visualize
+ggplot(PAVSRdat, aes(dpiR, quant.mg, color = role)) +
+  stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0) +
+  stat_summary(geom = "line", fun = "mean") +
+  stat_summary(geom = "point", fun = "mean") +
+  facet_wrap(~ nutrient)
+
+ggplot(RPVSRdat, aes(dpiR, quant.mg, color = role)) +
+  stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0) +
+  stat_summary(geom = "line", fun = "mean") +
+  stat_summary(geom = "point", fun = "mean") +
+  facet_wrap(~ nutrient)
+
+# fit model 
+PAVSRmod <- lme(quant.mg ~ highN * highP * role, random = ~  1|time, data = PAVSRdat)
+summary(PAVSRmod)
+plot(PAVSRmod)
+PAVSRmod2 <- lme(log_quant.mg ~ highN * highP * role, random = ~  1|time, data = PAVSRdat)
+summary(PAVSRmod2)
+plot(PAVSRmod)
+
+RPVSRmod <- lme(quant.mg ~ highN * highP * role, random = ~  1|time, data = RPVSRdat)
+summary(RPVSRmod)
+plot(RPVSRmod)
+RPVSRmod2 <- lme(log_quant.mg ~ highN * highP * role, random = ~  1|time, data = RPVSRdat)
+summary(RPVSRmod2)
+plot(RPVSRmod)
+
+# values
+PAVSRval <- PAVSRdat %>%
+  select(nutrient, highN, highP, role) %>%
+  unique() %>%
+  mutate(titer = exp(predict(PAVSRmod2, newdata = ., level = 0)))
+
+RPVSRval <- RPVSRdat %>%
+  select(nutrient, highN, highP, role) %>%
+  unique() %>%
+  mutate(titer = exp(predict(RPVSRmod2, newdata = ., level = 0)))
+
+
 #### estimate growth parameters ####
 
 # visualize growth of invaders and single as one process
@@ -213,37 +266,16 @@ RPVdat %>%
   facet_wrap(~ nutrient)
 # invaders don't reach K
 
-# select single
-PAVSdat <- PAVdat %>%
-  filter(PAV_role == "single") %>%
-  select(set, nutrient, highN, highP, time, dpiI, replicate, quant.mg, log_quant.mg)
+# carrying capacity based on previous model
+PAVK <- PAVSRval %>%
+  filter(role == "uninvaded") %>%
+  select(-role) %>%
+  rename(K = titer)
 
-RPVSdat <- RPVdat %>%
-  filter(RPV_role == "single") %>%
-  select(set, nutrient, highN, highP, time, dpiI, replicate, quant.mg, log_quant.mg)
-
-# estimate carrying capacity
-PAVmodK <- lm(quant.mg ~ highN * highP, data = PAVSdat)
-summary(PAVmodK) # N increases K
-# plot(PAVmodK) # q-q plot shows non-normality
-PAVmodK2 <- lm(log_quant.mg ~ highN * highP, data = PAVSdat)
-summary(PAVmodK2) # N and P increase K
-# plot(PAVmodK2) # better q-q plot
-PAVK <- PAVSdat %>%
-  select(nutrient, highN, highP) %>%
-  unique() %>%
-  mutate(K = exp(predict(PAVmodK2, newdata = .)))
-
-RPVmodK <- lm(quant.mg ~ highN * highP, data = RPVSdat)
-summary(RPVmodK)  # no sig difference among treatments
-# plot(RPVmodK) # slight non-normality with q-q plot
-RPVmodK2 <- lm(log_quant.mg ~ highN * highP, data = RPVSdat)
-summary(RPVmodK2) # no nutrient effect
-# plot(RPVmodK2) # better q-q plot, especially at high end
-RPVK <- RPVSdat %>%
-  select(nutrient, highN, highP) %>%
-  unique() %>%
-  mutate(K = exp(predict(RPVmodK2, newdata = .)))
+RPVK <- RPVSRval %>%
+  filter(role == "uninvaded") %>%
+  select(-role) %>%
+  rename(K = titer)
 
 # select invader
 PAVIdat <- PAVdat %>%
@@ -289,7 +321,7 @@ RPVIsim <- RPVIdat %>%
   unique() %>%
   expand_grid(RPVK) %>%
   mutate(N0 = 1e4,
-         r = 0.4,
+         r = 0.3,
          quant.mg = K*N0/(N0 + (K-N0) * exp(-r * dpiI)))
 
 # visualize
@@ -309,7 +341,7 @@ form1 <- formula(quant.mg ~ K*N0/(N0 + (K-N0) * exp(-r * dpiI)))
                 start = list(N0 = 1, r = 0.3)))
 
 (RPVmod1 <- nls(form1, data = RPVIdat,
-                start = list(N0 = 1e4, r = 0.4)))
+                start = list(N0 = 1e4, r = 0.3)))
 
 # visualize
 PAVIsim1 <- PAVIdat %>%
@@ -461,14 +493,14 @@ fig_theme <- theme_bw() +
 # dodge points
 dodge_size = 1
 
-
+### invasion figure ###
 PAVSIsim <- PAVdat %>%
   filter(PAV_role %in% c("single", "invader")) %>%
   select(PAV_role, dpiI, dpiSI, nutrient, highN, highP) %>%
   unique() %>%
   left_join(PAVcoef2) %>%
-  mutate(K = exp(predict(PAVmodK2, newdata = .)),
-         N0 = as.numeric(coef(PAVmod1)[1]),
+  left_join(PAVK) %>%
+  mutate(N0 = as.numeric(coef(PAVmod1)[1]),
          PAV_quant.mg = case_when(PAV_role == "single" ~ K,
                                   PAV_role == "invader" ~ K*N0/(N0 + (K-N0) * exp(-r * dpiI))),
          Inoculation = case_when(PAV_role == "single" ~ "uninvaded",
@@ -498,8 +530,8 @@ RPVSIsim <- RPVdat %>%
   select(RPV_role, dpiI, dpiSI, nutrient, highN, highP) %>%
   unique() %>%
   left_join(RPVcoef2) %>%
-  mutate(K = exp(predict(RPVmodK2, newdata = .)),
-         N0 = as.numeric(coef(RPVmod1)[1]),
+  left_join(RPVK) %>%
+  mutate(N0 = as.numeric(coef(RPVmod1)[1]),
          RPV_quant.mg = case_when(RPV_role == "single" ~ K,
                                   RPV_role == "invader" ~ K*N0/(N0 + (K-N0) * exp(-r * dpiI))),
          Inoculation = case_when(RPV_role == "single" ~ "uninvaded",
@@ -524,11 +556,15 @@ RPVSIfig <- RPVdat %>%
   theme(axis.title.y = element_blank())
 
 # combine
-pdf("output/PAV_RPV_invasion_figure.pdf", width = 6.5, height = 3.25)
+pdf("output/PAV_RPV_invasion_figure.pdf", width = 6.5, height = 3)
 plot_grid(PAVSIfig, RPVSIfig,
           nrow = 1,
           rel_widths = c(1, 0.9))
 dev.off()
 
+### resident figure ###
 
-#### start here: compare resident to single ####
+# may not need to be in main text, but it's striking how similar titer is for RPV when it's alone or resident, so I think it should be included somewhere
+
+# need to print out model summaries
+
