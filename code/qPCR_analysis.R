@@ -200,12 +200,14 @@ RPVdat <- dat5 %>%
 PAVSRdat <- PAVdat %>%
   filter(PAV_role %in% c("single", "resident")) %>%
   mutate(role = fct_recode(PAV_role, uninvaded = "single") %>%
-           fct_rev())
+           fct_rev(),
+         dpiSR = dpiR - min(dpiR))
 
 RPVSRdat <- RPVdat %>%
   filter(RPV_role %in% c("single", "resident")) %>%
   mutate(role = fct_recode(RPV_role, uninvaded = "single") %>%
-           fct_rev())
+           fct_rev(),
+         dpiSR = dpiR - min(dpiR))
 
 # visualize
 ggplot(PAVSRdat, aes(dpiR, quant.mg, color = role)) +
@@ -234,6 +236,15 @@ plot(RPVSRmod)
 RPVSRmod2 <- lme(log_quant.mg ~ highN * highP * role, random = ~  1|time, data = RPVSRdat)
 summary(RPVSRmod2)
 plot(RPVSRmod)
+
+# polynomial model?
+RPVSRmod3 <- lm(log_quant.mg ~ highN * highP * role * (dpiSR + I(dpiSR^2)), data = RPVSRdat)
+summary(RPVSRmod3)
+plot(RPVSRmod3)
+RPVSRmod4 <- lm(log_quant.mg ~ highN * highP * role * dpiSR, data = RPVSRdat)
+summary(RPVSRmod4)
+AIC(RPVSRmod4, RPVSRmod3)
+# 3 is better than 4
 
 # values
 PAVSRval <- PAVSRdat %>%
@@ -564,7 +575,73 @@ dev.off()
 
 ### resident figure ###
 
-# may not need to be in main text, but it's striking how similar titer is for RPV when it's alone or resident, so I think it should be included somewhere
+# figure settings
+fig_theme2 <- theme_bw() +
+  theme(panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.spacing.x = unit(0,"line"),
+        axis.text.y = element_text(size = 8, color = "black"),
+        axis.text.x = element_text(size = 8, color = "black"),
+        axis.title = element_text(size = 10),
+        legend.text = element_text(size = 8),
+        legend.title = element_text(size = 8),
+        legend.background = element_blank(),
+        legend.position = "none",
+        legend.key.height = unit(3, "mm"),
+        legend.key.width = unit(7, "mm"),
+        legend.spacing.y = unit(0, "cm"),
+        strip.background = element_blank(),
+        strip.text = element_text(size = 8),
+        plot.title = element_text(size = 12, vjust = 0))
 
-# need to print out model summaries
+# data for figure
+PAVSRsim <- PAVSRdat %>%
+  mutate(titer = predict(PAVSRmod2, newdata = ., level = 0),
+         Inoculation = case_when(PAV_role == "single" ~ "uninvaded",
+                                 TRUE ~ PAV_role),
+         Nutrient = fct_recode(nutrient, "low" = "L", "+N+P" = "NP", "+N" = "N", "+P" = "P") %>%
+           fct_relevel("low", "+N", "+P"))
 
+RPVSRsim <- RPVSRdat %>%
+  mutate(titer = predict(RPVSRmod2, newdata = ., level = 0),
+         Inoculation = case_when(RPV_role == "single" ~ "uninvaded",
+                                 TRUE ~ RPV_role),
+         Nutrient = fct_recode(nutrient, "low" = "L", "+N+P" = "NP", "+N" = "N", "+P" = "P") %>%
+           fct_relevel("low", "+N", "+P"))
+
+# figures
+PAVSRfig <- PAVSRsim %>%
+  ggplot(aes(dpiR, log_quant.mg, color = Nutrient, group = interaction(Nutrient, Inoculation))) +
+  stat_summary(geom = "point", fun = "mean", position = position_dodge(dodge_size), aes(shape = Inoculation)) +
+  stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0, alpha = 0.7, position = position_dodge(dodge_size)) +
+  geom_line(aes(y = titer, linetype = Inoculation)) +
+  scale_x_continuous(breaks = c(17, 20, 24, 28, 31)) +
+  facet_wrap(~Nutrient) +
+  scale_color_viridis_d(guide = F) +
+  ggtitle("(A) PAV") +
+  xlab("Days post inoculation") +
+  ylab(expression(paste("Virus titer (no. ", mg^-1, " tissue) [log]", sep = ""))) +
+  fig_theme2 +
+  theme(legend.position = c(0.16, 0.1))
+
+RPVSRfig <- RPVSRsim %>%
+  ggplot(aes(dpiR, log_quant.mg, color = Nutrient, group = interaction(Nutrient, Inoculation))) +
+  stat_summary(geom = "point", fun = "mean", position = position_dodge(dodge_size), aes(shape = Inoculation)) +
+  stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0, alpha = 0.7, position = position_dodge(dodge_size)) +
+  geom_line(aes(y = titer, linetype = Inoculation)) +
+  facet_wrap(~Nutrient) +
+  scale_color_viridis_d() +
+  ggtitle("(B) RPV") +
+  xlab("Days post inoculation") +
+  scale_x_continuous(breaks = c(17, 20, 24, 28, 31)) +
+  scale_y_continuous(breaks = c(14, 15, 16)) +
+  fig_theme2 +
+  theme(axis.title.y = element_blank())
+
+# combine
+pdf("output/PAV_RPV_resident_figure.pdf", width = 6.5, height = 3)
+plot_grid(PAVSRfig, RPVSRfig,
+          nrow = 1,
+          rel_widths = c(1, 0.9))
+dev.off()
