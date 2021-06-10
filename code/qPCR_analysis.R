@@ -201,13 +201,17 @@ PAVSRdat <- PAVdat %>%
   filter(PAV_role %in% c("single", "resident")) %>%
   mutate(role = fct_recode(PAV_role, uninvaded = "single") %>%
            fct_rev(),
-         dpiSR = dpiR - min(dpiR))
+         dpiSR = dpiR - min(dpiR),
+         dpiSRF = as.factor(dpiSR),
+         lowN = ifelse(highN == 1, 0 , 1))
 
 RPVSRdat <- RPVdat %>%
   filter(RPV_role %in% c("single", "resident")) %>%
   mutate(role = fct_recode(RPV_role, uninvaded = "single") %>%
            fct_rev(),
-         dpiSR = dpiR - min(dpiR))
+         dpiSR = dpiR - min(dpiR),
+         dpiSRF = as.factor(dpiSR),
+         lowN = ifelse(highN == 1, 0 , 1))
 
 # visualize
 ggplot(PAVSRdat, aes(dpiR, quant.mg, color = role)) +
@@ -222,40 +226,56 @@ ggplot(RPVSRdat, aes(dpiR, quant.mg, color = role)) +
   stat_summary(geom = "point", fun = "mean") +
   facet_wrap(~ nutrient)
 
-# fit model 
-PAVSRmod <- lme(quant.mg ~ highN * highP * role, random = ~  1|time, data = PAVSRdat)
-summary(PAVSRmod)
-plot(PAVSRmod)
-PAVSRmod2 <- lme(log_quant.mg ~ highN * highP * role, random = ~  1|time, data = PAVSRdat)
+# high N treatments have the strongest polynomial pattern
+
+# fit PAV models 
+PAVSRmod1 <- lm(log_quant.mg ~ lowN * highP * role * (dpiSR + I(dpiSR^2)), data = PAVSRdat)
+summary(PAVSRmod1)
+# plot(PAVSRmod1)
+PAVSRmod2 <- lm(log_quant.mg ~ lowN * highP * role * dpiSR, data = PAVSRdat)
 summary(PAVSRmod2)
-plot(PAVSRmod)
+# plot(PAVSRmod2)
+PAVSRmod3 <- lm(log_quant.mg ~ dpiSRF + lowN * highP * role, data = PAVSRdat)
+summary(PAVSRmod3)
+# plot(PAVSRmod3)
 
-RPVSRmod <- lme(quant.mg ~ highN * highP * role, random = ~  1|time, data = RPVSRdat)
-summary(RPVSRmod)
-plot(RPVSRmod)
-RPVSRmod2 <- lme(log_quant.mg ~ highN * highP * role, random = ~  1|time, data = RPVSRdat)
+# compare models
+AIC(PAVSRmod1, PAVSRmod2, PAVSRmod3)
+# separate intercept model is the best
+
+PAVSRmod4 <- lme(log_quant.mg ~ highN * highP * role, random = ~  1|dpiSR, data = PAVSRdat)
+summary(PAVSRmod4)
+plot(PAVSRmod4)
+
+# fit RPV models
+RPVSRmod1 <- lm(log_quant.mg ~ lowN * highP * role * (dpiSR + I(dpiSR^2)), data = RPVSRdat)
+summary(RPVSRmod1)
+# plot(RPVSRmod1)
+RPVSRmod2 <- lm(log_quant.mg ~ lowN * highP * role * dpiSR, data = RPVSRdat)
 summary(RPVSRmod2)
-plot(RPVSRmod)
-
-# polynomial model?
-RPVSRmod3 <- lm(log_quant.mg ~ highN * highP * role * (dpiSR + I(dpiSR^2)), data = RPVSRdat)
+# plot(RPVSRmod2)
+RPVSRmod3 <- lm(log_quant.mg ~ dpiSRF + lowN * highP * role, data = RPVSRdat)
 summary(RPVSRmod3)
-plot(RPVSRmod3)
-RPVSRmod4 <- lm(log_quant.mg ~ highN * highP * role * dpiSR, data = RPVSRdat)
+# plot(RPVSRmod3)
+
+# compare models
+AIC(RPVSRmod1, RPVSRmod2, RPVSRmod3)
+# separate intercept model is the best
+
+RPVSRmod4 <- lme(log_quant.mg ~ highN * highP * role, random = ~  1|dpiSR, data = RPVSRdat)
 summary(RPVSRmod4)
-AIC(RPVSRmod4, RPVSRmod3)
-# 3 is better than 4
+plot(RPVSRmod4)
 
 # values
-PAVSRval <- PAVSRdat %>%
+PAVSRdat %>%
   select(nutrient, highN, highP, role) %>%
   unique() %>%
-  mutate(titer = exp(predict(PAVSRmod2, newdata = ., level = 0)))
+  mutate(titer = exp(predict(PAVSRmod4, newdata = ., level = 0)))
 
-RPVSRval <- RPVSRdat %>%
+RPVSRdat %>%
   select(nutrient, highN, highP, role) %>%
   unique() %>%
-  mutate(titer = exp(predict(RPVSRmod2, newdata = ., level = 0)))
+  mutate(titer = exp(predict(RPVSRmod4, newdata = ., level = 0)))
 
 
 #### estimate growth parameters ####
@@ -278,12 +298,18 @@ RPVdat %>%
 # invaders don't reach K
 
 # carrying capacity based on previous model
-PAVK <- PAVSRval %>%
+PAVK <- PAVSRdat %>%
+  select(nutrient, highN, highP, role) %>%
+  unique() %>%
+  mutate(titer = exp(predict(PAVSRmod4, newdata = ., level = 0))) %>%
   filter(role == "uninvaded") %>%
   select(-role) %>%
   rename(K = titer)
 
-RPVK <- RPVSRval %>%
+RPVK <- RPVSRdat %>%
+  select(nutrient, highN, highP, role) %>%
+  unique() %>%
+  mutate(titer = exp(predict(RPVSRmod4, newdata = ., level = 0))) %>%
   filter(role == "uninvaded") %>%
   select(-role) %>%
   rename(K = titer)
@@ -506,15 +532,19 @@ dodge_size = 1
 
 ### invasion figure ###
 PAVSIsim <- PAVdat %>%
-  filter(PAV_role %in% c("single", "invader")) %>%
+  filter(PAV_role == "invader") %>%
   select(PAV_role, dpiI, dpiSI, nutrient, highN, highP) %>%
   unique() %>%
   left_join(PAVcoef2) %>%
   left_join(PAVK) %>%
   mutate(N0 = as.numeric(coef(PAVmod1)[1]),
-         PAV_quant.mg = case_when(PAV_role == "single" ~ K,
-                                  PAV_role == "invader" ~ K*N0/(N0 + (K-N0) * exp(-r * dpiI))),
-         Inoculation = case_when(PAV_role == "single" ~ "uninvaded",
+         PAV_quant.mg = K*N0/(N0 + (K-N0) * exp(-r * dpiI))) %>%
+  full_join(PAVSRdat %>%
+              filter(role == "uninvaded") %>%
+              select(PAV_role, role, dpiI, dpiSI, dpiSR, nutrient, highN, highP) %>%
+              unique() %>%
+              mutate(PAV_quant.mg = exp(predict(PAVSRmod4, newdata = .)))) %>%
+  mutate(Inoculation = case_when(PAV_role == "single" ~ "uninvaded",
                                  PAV_role == "invader" ~ "invader"),
          Nutrient = fct_recode(nutrient, "low" = "L", "+N+P" = "NP", "+N" = "N", "+P" = "P") %>%
            fct_relevel("low", "+N", "+P"))
@@ -537,15 +567,19 @@ PAVSIfig <- PAVdat %>%
   theme(legend.position = c(0.16, 0.6))
 
 RPVSIsim <- RPVdat %>%
-  filter(RPV_role %in% c("single", "invader")) %>%
+  filter(RPV_role == "invader") %>%
   select(RPV_role, dpiI, dpiSI, nutrient, highN, highP) %>%
   unique() %>%
   left_join(RPVcoef2) %>%
   left_join(RPVK) %>%
   mutate(N0 = as.numeric(coef(RPVmod1)[1]),
-         RPV_quant.mg = case_when(RPV_role == "single" ~ K,
-                                  RPV_role == "invader" ~ K*N0/(N0 + (K-N0) * exp(-r * dpiI))),
-         Inoculation = case_when(RPV_role == "single" ~ "uninvaded",
+         RPV_quant.mg = K*N0/(N0 + (K-N0) * exp(-r * dpiI))) %>%
+  full_join(RPVSRdat %>%
+              filter(role == "uninvaded") %>%
+              select(RPV_role, role, dpiI, dpiSI, dpiSR, nutrient, highN, highP) %>%
+              unique() %>%
+              mutate(RPV_quant.mg = exp(predict(RPVSRmod4, newdata = .)))) %>%
+  mutate(Inoculation = case_when(RPV_role == "single" ~ "uninvaded",
                                  RPV_role == "invader" ~ "invader"),
          Nutrient = fct_recode(nutrient, "low" = "L", "+N+P" = "NP", "+N" = "N", "+P" = "P") %>%
            fct_relevel("low", "+N", "+P"))
@@ -573,6 +607,7 @@ plot_grid(PAVSIfig, RPVSIfig,
           rel_widths = c(1, 0.9))
 dev.off()
 
+
 ### resident figure ###
 
 # figure settings
@@ -597,14 +632,14 @@ fig_theme2 <- theme_bw() +
 
 # data for figure
 PAVSRsim <- PAVSRdat %>%
-  mutate(titer = predict(PAVSRmod2, newdata = ., level = 0),
+  mutate(titer = predict(PAVSRmod4, newdata = .),
          Inoculation = case_when(PAV_role == "single" ~ "uninvaded",
                                  TRUE ~ PAV_role),
          Nutrient = fct_recode(nutrient, "low" = "L", "+N+P" = "NP", "+N" = "N", "+P" = "P") %>%
            fct_relevel("low", "+N", "+P"))
 
 RPVSRsim <- RPVSRdat %>%
-  mutate(titer = predict(RPVSRmod2, newdata = ., level = 0),
+  mutate(titer = predict(RPVSRmod4, newdata = .),
          Inoculation = case_when(RPV_role == "single" ~ "uninvaded",
                                  TRUE ~ RPV_role),
          Nutrient = fct_recode(nutrient, "low" = "L", "+N+P" = "NP", "+N" = "N", "+P" = "P") %>%
