@@ -187,15 +187,17 @@ dat5 %>%
 PAVdat <- dat5 %>%
   filter(!is.na(PAV_role) & !is.na(PAV_quant.mg)) %>%
   mutate(quant.mg = PAV_quant.mg,
-         log_quant.mg = log(quant.mg + 1))
+         log_quant.mg = log(quant.mg + 1),
+         role = PAV_role)
 
 RPVdat <- dat5 %>%
   filter(!is.na(RPV_role) & !is.na(RPV_quant.mg)) %>%
   mutate(quant.mg = RPV_quant.mg,
-         log_quant.mg = log(quant.mg + 1))
+         log_quant.mg = log(quant.mg + 1),
+         role = RPV_role)
 
 
-#### estimate growth parameters ####
+#### estimate r, K, and N0 parameters ####
 
 # select invader and uninvaded
 PAVUIdat <- PAVdat %>%
@@ -306,174 +308,145 @@ ggplot(PAVUIdat, aes(dpiUI, quant.mg)) +
   geom_line(data = PAVUIsim1) +
   facet_wrap(~nutrient)
 
-#### start here ####
 # issue is that invader points are pulling down the value of uninvaded so that the population doesn't reach K
 # uninvaded is influencing r and invaded is influencing K
-# artificially space out the days between them?
-# add the resident data in too? (duplicate invader data and make it belong to each role)
-# analyze invader separately without the carrying capacity?
-# the brms model is much better for testing nutrient effects than the nls
 
-RPVUIsim1 <- RPVUIdat %>%
-  select(dpiUI) %>%
+
+#### estimate r and N0 parameters ####
+
+# subset data
+PAVIdat <- PAVdat %>%
+  filter(role == "invader")
+
+RPVIdat <- RPVdat %>%
+  filter(role == "invader")
+
+# simulated data/starting values
+PAVIsim <- PAVIdat %>%
+  select(dpiI) %>%
   unique() %>%
-  mutate(quant.mg = predict(RPVmod1, newdata = .))
-
-ggplot(RPVUIdat, aes(dpiUI, quant.mg)) +
-  geom_point() +
-  geom_line(data = RPVUIsim1) +
-  facet_wrap(~nutrient)
-
-# formula
-form1 <- formula(quant.mg ~ K*N0/(N0 + (K-N0) * exp(-r * dpiUI)))
-
-# model
-(PAVmod1 <- nls(form1, data = PAVUIdat,
-                start = list(N0 = 1, r = 0.4, K = 1500)))
-
-(RPVmod1 <- nls(form1, data = RPVUIdat,
-                start = list(N0 = 1e4, r = 0.4, K = 5e6),
-                nls.control(maxiter = 500)))
-
-# add starting value to dataframe
-PAVUIdat2 <- PAVUIdat %>%
-  mutate(N0 = as.numeric(coef(PAVmod1)[1])) %>%
-  select(set:tube_label, highN, highP, dpiUI:N0)
-
-RPVUIdat2 <- RPVUIdat %>%
-  mutate(N0 = as.numeric(coef(RPVmod1)[1])) %>%
-  select(set:tube_label, highN, highP, dpiUI:N0)
-
-# refit model with fixed N0 for comparison
-(PAVmod1b <- nls(form1, data = PAVUIdat2,
-                 start = list(r = 0.4, K = 1500)))
-
-(RPVmod1b <- nls(form1, data = RPVUIdat2,
-                 start = list(r = 0.4, K = 5e6)))
-# same estimates as previous models
-
-
-### parameters vary by treatment (4) ###
-
-# formula
-form2 <- formula(quant.mg ~ K*N0/(N0 + (K-N0) * exp(-r * dpiUI)) | nutrient)
-
-# model
-(PAVmod2 <- nlsList(form2, data = PAVUIdat2, 
-                    start = list(r = 0.5, K = 1280)))
-
-(RPVmod2 <- nlsList(form2, data = RPVUIdat2, 
-                    start = list(r = 0.3, K = 5e6)))
-
-# compare
-anova_nlslist(PAVmod2, PAVmod1b) # fit is better with grouping variable
-anova_nlslist(RPVmod2, RPVmod1b) # no difference
-
-# coefficients
-PAVcoef2 <- coef(PAVmod2) %>%
-  mutate(nutrient = rownames(.))
-
-RPVcoef2 <- coef(RPVmod2) %>%
-  mutate(nutrient = rownames(.))
+  mutate(log_N0 = log(1),
+         r = 0.3,
+         log_quant.mg = log_N0 + r * dpiI)
 
 # visualize
-PAVUIsim2 <- PAVUIdat2 %>%
-  select(nutrient, dpiUI, N0) %>%
-  unique() %>%
-  left_join(PAVcoef2) %>%
-  mutate(quant.mg = K*N0/(N0 + (K-N0) * exp(-r * dpiUI)))
-# the predict function was giving multiple values
-# for the same nutrient/dpi combinations
-
-ggplot(PAVUIdat2, aes(dpiUI, quant.mg)) +
+ggplot(PAVIdat, aes(dpiI, log_quant.mg)) +
   geom_point() +
-  geom_line(data = PAVUIsim2) +
+  geom_line(data = PAVIsim) +
   facet_wrap(~nutrient)
 
-RPVUIsim2 <- RPVUIdat2 %>%
-  select(nutrient, dpiUI, N0) %>%
+# simulated data/starting values
+RPVIsim <- RPVIdat %>%
+  select(dpiI) %>%
   unique() %>%
-  left_join(RPVcoef2) %>%
-  mutate(quant.mg = K*N0/(N0 + (K-N0) * exp(-r * dpiUI)))
+  mutate(log_N0 = 10,
+         r = 0.3,
+         log_quant.mg = log_N0 + r * dpiI)
 
-ggplot(RPVUIdat2, aes(dpiUI, quant.mg)) +
+# visualize
+ggplot(RPVIdat, aes(dpiI, log_quant.mg)) +
   geom_point() +
-  geom_line(data = RPVUIsim2) +
+  geom_line(data = RPVIsim) +
   facet_wrap(~nutrient)
 
+# model 1: each nutrient treatment has a different growth rate
+PAVImod1 <- lm(log_quant.mg ~ dpiI + highN:dpiI + highP:dpiI + highN:highP:dpiI, data = PAVIdat)
+summary(PAVImod1)
+RPVImod1 <- lm(log_quant.mg ~ dpiI + highN:dpiI + highP:dpiI + highN:highP:dpiI, data = RPVIdat)
+summary(RPVImod1)
 
-### parameters vary by N level (2) ###
+# model 2: N and P each have a different growth rate, no interaction
+PAVImod2 <- lm(log_quant.mg ~ dpiI + highN:dpiI + highP:dpiI, data = PAVIdat)
+summary(PAVImod2)
+RPVImod2 <- lm(log_quant.mg ~ dpiI + highN:dpiI + highP:dpiI, data = RPVIdat)
+summary(RPVImod2)
 
-# formula
-form3 <- formula(quant.mg ~ K*N0/(N0 + (K-N0) * exp(-r * dpiUI)) | highN)
+# model 3: only N causes a different growth rate
+PAVImod3 <- lm(log_quant.mg ~ dpiI + highN:dpiI, data = PAVIdat)
+summary(PAVImod3)
+RPVImod3 <- lm(log_quant.mg ~ dpiI + highN:dpiI, data = RPVIdat)
+summary(RPVImod3)
 
-# model
-(PAVmod3 <- nlsList(form3, data = PAVUIdat2, 
-                    start = list(r = 0.5, K = 1280)))
+# model 4: only P causes a different growth rate
+PAVImod4 <- lm(log_quant.mg ~ dpiI + highP:dpiI, data = PAVIdat)
+summary(PAVImod4)
+RPVImod4 <- lm(log_quant.mg ~ dpiI + highP:dpiI, data = RPVIdat)
+summary(RPVImod4)
 
-(RPVmod3 <- nlsList(form3, data = RPVUIdat2, 
-                    start = list(r = 0.3, K = 5e6)))
+# model 5: all growth rates are the same
+PAVImod5 <- lm(log_quant.mg ~ dpiI, data = PAVIdat)
+summary(PAVImod5)
+RPVImod5 <- lm(log_quant.mg ~ dpiI, data = RPVIdat)
+summary(RPVImod5)
 
 # compare
-anova_nlslist(PAVmod3, PAVmod1b) # significantly different with groups
-anova_nlslist(RPVmod3, RPVmod1b) # not significantly different
+anova(PAVImod1, PAVImod2) # no effect of losing interaction
+anova(PAVImod3, PAVImod5) # no effect of losing N
+anova(PAVImod4, PAVImod5) # no effect of losing P
 
+anova(RPVImod1, RPVImod2) # no effect of losing interaction
+anova(RPVImod3, RPVImod5) # no effect of losing N
+anova(RPVImod4, RPVImod5) # no effect of losing P
 
-### parameters vary by P level (2) ###
+# visualize
+PAVIsim1 <- PAVIdat %>%
+  select(nutrient, highN, highP, dpiI) %>%
+  unique() %>%
+  mutate(quant.mg = exp(predict(PAVImod5, newdata = .)))
 
-# formula
-form4 <- formula(quant.mg ~ K*N0/(N0 + (K-N0) * exp(-r * dpiUI)) | highP)
+ggplot(PAVIdat, aes(dpiI, quant.mg)) +
+  geom_point() +
+  geom_line(data = PAVIsim1) +
+  facet_wrap(~nutrient)
 
-# model
-(PAVmod4 <- nlsList(form4, data = PAVUIdat2, 
-                    start = list(r = 0.5, K = 1280)))
+RPVIsim1 <- RPVIdat %>%
+  select(nutrient, highN, highP, dpiI) %>%
+  unique() %>%
+  mutate(quant.mg = exp(predict(RPVImod5, newdata = .)))
 
-(RPVmod4 <- nlsList(form4, data = RPVUIdat2, 
-                    start = list(r = 0.3, K = 5e6)))
-
-# compare
-anova_nlslist(PAVmod4, PAVmod1b) # not significantly different
-anova_nlslist(RPVmod4, RPVmod1b) # not significantly different
-
-
+ggplot(RPVIdat, aes(dpiI, quant.mg)) +
+  geom_point() +
+  geom_line(data = RPVIsim1) +
+  facet_wrap(~nutrient)
 
 
 #### compare resident to single ####
 
 # select data
-PAVSRdat <- PAVdat %>%
-  filter(PAV_role %in% c("single", "resident")) %>%
-  mutate(role = fct_recode(PAV_role, uninvaded = "single") %>%
-           fct_rev(),
-         dpiSR = dpiR - min(dpiR),
-         dpiSRF = as.factor(dpiSR),
-         lowN = ifelse(highN == 1, 0 , 1))
+PAVURdat <- PAVdat %>%
+  filter(role %in% c("uninvaded", "resident")) %>%
+  mutate(dpiUR = dpiR - min(dpiR))
 
-RPVSRdat <- RPVdat %>%
-  filter(RPV_role %in% c("single", "resident")) %>%
-  mutate(role = fct_recode(RPV_role, uninvaded = "single") %>%
-           fct_rev(),
-         dpiSR = dpiR - min(dpiR),
-         dpiSRF = as.factor(dpiSR),
-         lowN = ifelse(highN == 1, 0 , 1))
+RPVURdat <- RPVdat %>%
+  filter(role %in% c("uninvaded", "resident")) %>%
+  mutate(dpiUR = dpiR - min(dpiR))
 
 # visualize
-ggplot(PAVSRdat, aes(dpiR, quant.mg, color = role)) +
+ggplot(PAVURdat, aes(dpiUR, log_quant.mg, color = nutrient)) +
   stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0) +
   stat_summary(geom = "line", fun = "mean") +
   stat_summary(geom = "point", fun = "mean") +
-  facet_wrap(~ nutrient)
+  facet_wrap(~ role)
+# role affects intercept and linearity
 
-ggplot(RPVSRdat, aes(dpiR, quant.mg, color = role)) +
+ggplot(RPVURdat, aes(dpiUR, log_quant.mg, color = nutrient)) +
   stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0) +
   stat_summary(geom = "line", fun = "mean") +
   stat_summary(geom = "point", fun = "mean") +
-  facet_wrap(~ nutrient)
+  facet_wrap(~ role)
+# nutrient affects peak
 
-# high N treatments have the strongest polynomial pattern
+# no effects of nutrients
+PAVURmod1 <- lm(log_quant.mg ~ role  * (dpiUR + I(dpiUR^2)), data = PAVURdat)
+summary(PAVURmod1)
+RPVURmod1 <- lm(log_quant.mg ~ role  * (dpiUR + I(dpiUR^2)), data = RPVURdat)
+summary(RPVURmod1)
+
+#### start here: test above models with nutrients ####
+
 
 # fit PAV models 
-PAVSRmod1 <- lm(log_quant.mg ~ lowN * highP * role * (dpiSR + I(dpiSR^2)), data = PAVSRdat)
+PAVURmod1 <- lm(log_quant.mg ~ lowN * highP * role * (dpiSR + I(dpiSR^2)), data = PAVSRdat)
 summary(PAVSRmod1)
 # plot(PAVSRmod1)
 PAVSRmod2 <- lm(log_quant.mg ~ lowN * highP * role * dpiSR, data = PAVSRdat)
