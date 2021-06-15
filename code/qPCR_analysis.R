@@ -8,10 +8,10 @@ rm(list=ls())
 
 # load packages
 library(tidyverse)
-library(nlme)
-library(nlshelper) # anova_nlslist
-library(cowplot)
-library(brms)
+# library(nlme)
+# library(nlshelper) # anova_nlslist
+# library(cowplot)
+# library(brms)
 
 # import data
 dat <- read_csv("intermediate-data/qPCR_expt_data_cleaned.csv")
@@ -436,116 +436,72 @@ ggplot(RPVURdat, aes(dpiUR, log_quant.mg, color = nutrient)) +
   facet_wrap(~ role)
 # nutrient affects peak
 
-# no effects of nutrients
-PAVURmod1 <- lm(log_quant.mg ~ role  * (dpiUR + I(dpiUR^2)), data = PAVURdat)
+# linear model with no effects of nutrients
+PAVURmod1 <- lm(log_quant.mg ~ dpiUR, data = PAVURdat)
 summary(PAVURmod1)
-RPVURmod1 <- lm(log_quant.mg ~ role  * (dpiUR + I(dpiUR^2)), data = RPVURdat)
+RPVURmod1 <- lm(log_quant.mg ~ dpiUR, data = RPVURdat)
 summary(RPVURmod1)
 
-#### start here: test above models with nutrients ####
+# polynomial model with no effects of nutrients
+PAVURmod2 <- lm(log_quant.mg ~ dpiUR + I(dpiUR^2), data = PAVURdat)
+summary(PAVURmod2)
+RPVURmod2 <- lm(log_quant.mg ~ dpiUR + I(dpiUR^2), data = RPVURdat)
+summary(RPVURmod2)
+
+# compare shapes
+anova(PAVURmod1, PAVURmod2) # not different
+anova(RPVURmod1, RPVURmod2) # quadratic
+
+# full model
+PAVURmod3 <- lm(log_quant.mg ~ highN * highP * role  * dpiUR, data = PAVURdat)
+summary(PAVURmod3)
+RPVURmod3 <- lm(log_quant.mg ~ highN * highP * role  * (dpiUR + I(dpiUR^2)), data = RPVURdat)
+summary(RPVURmod3)
+
+drop1(PAVURmod3, test = "F")
+drop1(RPVURmod3, test = "F")
+
+# remove 4-way interactions
+PAVURmod4 <- update(PAVURmod3, .~. -highN:highP:role:dpiUR)
+summary(PAVURmod4)
+RPVURmod4 <- update(RPVURmod3, .~. -highN:highP:role:dpiUR-highN:highP:role:I(dpiUR^2))
+summary(RPVURmod4)
+
+drop1(PAVURmod4, test = "F")
+drop1(RPVURmod4, test = "F")
+
+# remove 3-way interactions
+PAVURmod5 <- update(PAVURmod4, .~. -highN:highP:role-highN:highP:dpiUR-highN:role:dpiUR-highP:role:dpiUR)
+summary(PAVURmod5)
+RPVURmod5 <- update(RPVURmod4, .~. -highN:highP:role-highN:highP:dpiUR-highN:role:dpiUR-highP:role:dpiUR-
+                      highN:highP:I(dpiUR^2)-highN:role:I(dpiUR^2)-highP:role:I(dpiUR^2))
+summary(RPVURmod5)
+
+drop1(PAVURmod5, test = "F")
+drop1(RPVURmod5, test = "F")
+
+# remove 2-way interactions
+PAVURmod6 <- lm(log_quant.mg ~ highN + highP + role  + dpiUR, data = PAVURdat)
+summary(PAVURmod6)
+RPVURmod6 <- lm(log_quant.mg ~ highN + highP + role  + dpiUR + I(dpiUR^2), data = RPVURdat)
+summary(RPVURmod6)
+
+drop1(PAVURmod6, test = "F") # none sig
+drop1(RPVURmod6, test = "F") # keep time
+
+# simplified model
+PAVURmod7 <- lm(log_quant.mg ~ 1, data = PAVURdat)
+summary(PAVURmod7)
+summary(RPVURmod2)
+
+add1(PAVURmod7, ~ highN + highP + role + dpiUR, test = "F") # no effect
+add1(RPVURmod2, ~ .+ highN + highP + role, test = "F") # no effect
+
+plot(PAVURmod7)
+plot(RPVURmod2)
 
 
-# fit PAV models 
-PAVURmod1 <- lm(log_quant.mg ~ lowN * highP * role * (dpiSR + I(dpiSR^2)), data = PAVSRdat)
-summary(PAVSRmod1)
-# plot(PAVSRmod1)
-PAVSRmod2 <- lm(log_quant.mg ~ lowN * highP * role * dpiSR, data = PAVSRdat)
-summary(PAVSRmod2)
-# plot(PAVSRmod2)
-PAVSRmod3 <- lm(log_quant.mg ~ dpiSRF + lowN * highP * role, data = PAVSRdat)
-summary(PAVSRmod3)
-# plot(PAVSRmod3)
-
-# compare models
-AIC(PAVSRmod1, PAVSRmod2, PAVSRmod3)
-# separate intercept model is the best
-
-PAVSRmod4 <- lme(log_quant.mg ~ highN * highP * role, random = ~  1|dpiSR, data = PAVSRdat)
-summary(PAVSRmod4)
-plot(PAVSRmod4)
-
-# check autocorrelation
-PAVSRmod5 <- lm(log_quant.mg ~ highN * highP * role, data = PAVSRdat)
-PAVSRacf <- PAVSRdat %>%
-  mutate(resid = residuals(PAVSRmod5)) %>%
-  arrange(set_rep, nutrient, role, dpiSR) %>%
-  select(set_rep, nutrient, role, dpiSR, resid) %>%
-  group_by(set_rep, nutrient, role) %>%
-  complete(dpiSR = 0:21) %>%
-  ungroup()
-
-PAVSRacfN = map_df(1:7, 
-                   ~PAVSRdat %>%
-                     group_by(set_rep, nutrient, role) %>%
-                     arrange(set_rep, nutrient, role, dpiSR) %>%
-                     summarise(lag = list(diff(dpiSR, lag = .x )))) %>%
-  unnest(lag) %>%
-  group_by(lag) %>%
-  summarise(n = n())
-
-acf(PAVSRacf$resid, lag.max = 7, na.action = na.pass, ci = 0, ylim = c(-0.4, 1))
-lines(PAVSRacfN$lag, -qnorm(1-.025)/sqrt(PAVSRacfN$n), lty = 2)
-lines(PAVSRacfN$lag, qnorm(1-.025)/sqrt(PAVSRacfN$n), lty = 2)
-# no sig autocorrelation
-
-# fit RPV models
-RPVSRmod1 <- lm(log_quant.mg ~ lowN * highP * role * (dpiSR + I(dpiSR^2)), data = RPVSRdat)
-summary(RPVSRmod1)
-# plot(RPVSRmod1)
-RPVSRmod2 <- lm(log_quant.mg ~ lowN * highP * role * dpiSR, data = RPVSRdat)
-summary(RPVSRmod2)
-# plot(RPVSRmod2)
-RPVSRmod3 <- lm(log_quant.mg ~ dpiSRF + lowN * highP * role, data = RPVSRdat)
-summary(RPVSRmod3)
-# plot(RPVSRmod3)
-
-# compare models
-AIC(RPVSRmod1, RPVSRmod2, RPVSRmod3)
-# separate intercept model is the best
-# this might be the cause because the quadratic doesn't need separate intercept, slope, and peaks for every treatment
-# model simiplification with quadratic?
-
-RPVSRmod4 <- lme(log_quant.mg ~ highN * highP * role, random = ~  1|dpiSR, data = RPVSRdat)
-summary(RPVSRmod4)
-plot(RPVSRmod4)
-
-# check autocorrelation
-RPVSRmod5 <- lm(log_quant.mg ~ highN * highP * role, data = RPVSRdat)
-RPVSRacf <- RPVSRdat %>%
-  mutate(resid = residuals(RPVSRmod5)) %>%
-  arrange(set_rep, nutrient, role, dpiSR) %>%
-  select(set_rep, nutrient, role, dpiSR, resid) %>%
-  group_by(set_rep, nutrient, role) %>%
-  complete(dpiSR = 0:21) %>%
-  ungroup()
-
-RPVSRacfN = map_df(1:7, 
-                   ~RPVSRdat %>%
-                     group_by(set_rep, nutrient, role) %>%
-                     arrange(set_rep, nutrient, role, dpiSR) %>%
-                     summarise(lag = list(diff(dpiSR, lag = .x )))) %>%
-  unnest(lag) %>%
-  group_by(lag) %>%
-  summarise(n = n())
-
-acf(RPVSRacf$resid, lag.max = 7, na.action = na.pass, ci = 0, ylim = c(-0.4, 1))
-lines(RPVSRacfN$lag, -qnorm(1-.025)/sqrt(RPVSRacfN$n), lty = 2)
-lines(RPVSRacfN$lag, qnorm(1-.025)/sqrt(RPVSRacfN$n), lty = 2)
-# 7 day lag is negative (hump-shape)
-
-# values
-PAVSRdat %>%
-  select(nutrient, highN, highP, role) %>%
-  unique() %>%
-  mutate(titer = exp(predict(PAVSRmod4, newdata = ., level = 0)))
-
-RPVSRdat %>%
-  select(nutrient, highN, highP, role) %>%
-  unique() %>%
-  mutate(titer = exp(predict(RPVSRmod4, newdata = ., level = 0)))
-
-
-#### visualize ####
+#### start here: visualize ####
 
 # figure settings
 fig_theme <- theme_bw() +
