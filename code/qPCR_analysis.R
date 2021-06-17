@@ -8,10 +8,8 @@ rm(list=ls())
 
 # load packages
 library(tidyverse)
-# library(nlme)
-# library(nlshelper) # anova_nlslist
-# library(cowplot)
-# library(brms)
+library(cowplot)
+library(brms)
 
 # import data
 dat <- read_csv("intermediate-data/qPCR_expt_data_cleaned.csv")
@@ -188,13 +186,17 @@ PAVdat <- dat5 %>%
   filter(!is.na(PAV_role) & !is.na(PAV_quant.mg)) %>%
   mutate(quant.mg = PAV_quant.mg,
          log_quant.mg = log(quant.mg + 1),
-         role = PAV_role)
+         role = PAV_role,
+         rel_quant.mg = quant.mg/max(quant.mg, na.rm = T),
+         rel_log_quant.mg = log_quant.mg/max(log_quant.mg))
 
 RPVdat <- dat5 %>%
   filter(!is.na(RPV_role) & !is.na(RPV_quant.mg)) %>%
   mutate(quant.mg = RPV_quant.mg,
          log_quant.mg = log(quant.mg + 1),
-         role = RPV_role)
+         role = RPV_role,
+         rel_quant.mg = quant.mg/max(quant.mg, na.rm = T),
+         rel_log_quant.mg = log_quant.mg/max(log_quant.mg))
 
 
 #### estimate r, K, and N0 parameters ####
@@ -392,9 +394,15 @@ anova(RPVImod4, RPVImod5) # no effect of losing P
 PAVIsim1 <- PAVIdat %>%
   select(nutrient, highN, highP, dpiI) %>%
   unique() %>%
-  mutate(quant.mg = exp(predict(PAVImod5, newdata = .)))
+  mutate(log_quant.mg = predict(PAVImod5, newdata = .),
+         quant.mg = exp(log_quant.mg))
 
 ggplot(PAVIdat, aes(dpiI, quant.mg)) +
+  geom_point() +
+  geom_line(data = PAVIsim1) +
+  facet_wrap(~nutrient)
+
+ggplot(PAVIdat, aes(dpiI, log_quant.mg)) +
   geom_point() +
   geom_line(data = PAVIsim1) +
   facet_wrap(~nutrient)
@@ -497,11 +505,11 @@ summary(RPVURmod2)
 add1(PAVURmod7, ~ highN + highP + role + dpiUR, test = "F") # no effect
 add1(RPVURmod2, ~ .+ highN + highP + role, test = "F") # no effect
 
-plot(PAVURmod7)
-plot(RPVURmod2)
+#plot(PAVURmod7)
+#plot(RPVURmod2)
 
 
-#### start here: visualize ####
+#### visualize ####
 
 # figure settings
 fig_theme <- theme_bw() +
@@ -526,109 +534,94 @@ fig_theme <- theme_bw() +
         plot.title = element_text(size = 12, vjust = 0))
 
 # dodge points
-dodge_size = 1
+dodge_size = 2
+
+# max values
+maxPAV_log_quant.mg <- max(PAVdat$log_quant.mg, na.rm = T)
+maxRPV_log_quant.mg <- max(RPVdat$log_quant.mg, na.rm = T)
 
 ### invasion figure ###
-PAVSIsim <- PAVdat %>%
-  filter(PAV_role == "invader") %>%
-  select(PAV_role, dpiI, dpiSI, nutrient, highN, highP) %>%
+PAVISimFig <- PAVdat %>%
+  filter(role == "invader") %>%
+  select(role, dpiI) %>%
   unique() %>%
-  left_join(PAVcoef2) %>%
-  left_join(PAVK) %>%
-  mutate(N0 = as.numeric(coef(PAVmod1)[1]),
-         PAV_quant.mg = K*N0/(N0 + (K-N0) * exp(-r * dpiI))) %>%
-  full_join(PAVSRdat %>%
-              filter(role == "uninvaded") %>%
-              select(PAV_role, role, dpiI, dpiSI, dpiSR, nutrient, highN, highP) %>%
+  mutate(log_quant.mg = predict(PAVImod5, newdata = .),
+         rel_log_quant.mg = log_quant.mg/maxPAV_log_quant.mg,
+         Virus = "PAV") %>%
+  full_join(RPVdat %>%
+              filter(role == "resident") %>%
+              mutate(dpiUR = dpiR - min(dpiR)) %>%
+              select(role, dpiI, dpiUR) %>%
               unique() %>%
-              mutate(PAV_quant.mg = exp(predict(PAVSRmod4, newdata = .)))) %>%
-  mutate(Inoculation = case_when(PAV_role == "single" ~ "uninvaded",
-                                 PAV_role == "invader" ~ "invader"),
-         Nutrient = fct_recode(nutrient, "low" = "L", "+N+P" = "NP", "+N" = "N", "+P" = "P") %>%
-           fct_relevel("low", "+N", "+P"))
+              mutate(log_quant.mg = predict(RPVURmod2, newdata = .),
+                     rel_log_quant.mg = log_quant.mg/maxRPV_log_quant.mg,
+                     Virus = "RPV"))
 
-PAVSIfig <- PAVdat %>%
-  filter(PAV_role %in% c("single", "invader")) %>%
-  mutate(Inoculation = case_when(PAV_role == "single" ~ "uninvaded",
-                                 PAV_role == "invader" ~ "invader"),
-         Nutrient = fct_recode(nutrient, "low" = "L", "+N+P" = "NP", "+N" = "N", "+P" = "P") %>%
+PAVIfig <- PAVdat %>%
+  filter(role == "invader") %>%
+  mutate(Virus = "PAV") %>%
+  full_join(RPVdat %>%
+              filter(role == "resident") %>%
+              mutate(Virus = "RPV")) %>%
+  mutate(Nutrient = fct_recode(nutrient, "low" = "L", "+N+P" = "NP", "+N" = "N", "+P" = "P") %>%
            fct_relevel("low", "+N", "+P")) %>%
-  ggplot(aes(dpiSI, PAV_quant.mg, color = Nutrient, group = interaction(Nutrient, Inoculation))) +
-  stat_summary(geom = "point", fun = "mean", position = position_dodge(dodge_size), aes(shape = Inoculation)) +
-  stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0, alpha = 0.7, position = position_dodge(dodge_size)) +
-  geom_line(data = PAVSIsim, aes(linetype = Inoculation)) +
+  ggplot(aes(dpiI, rel_log_quant.mg)) +
+  stat_summary(geom = "point", fun = "mean", position = position_dodge(dodge_size), aes(shape = Virus, color = Nutrient)) +
+  stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0, alpha = 0.7, position = position_dodge(dodge_size), aes(shape = Virus, color = Nutrient)) +
+  geom_line(data = PAVISimFig, aes(linetype = Virus)) +
   scale_color_viridis_d() +
-  ggtitle("(A) PAV") +
-  xlab("Days post inoculation") +
-  ylab(expression(paste("Virus titer (no. ", mg^-1, " tissue)", sep = ""))) +
+  ggtitle("(A) PAV invades RPV") +
+  xlab("Days post invader inoculation") +
+  ylab("Relative virus titer") +
   fig_theme +
-  theme(legend.position = c(0.16, 0.6))
+  theme(legend.position = c(0.16, 0.47))
 
-RPVSIsim <- RPVdat %>%
-  filter(RPV_role == "invader") %>%
-  select(RPV_role, dpiI, dpiSI, nutrient, highN, highP) %>%
+RPVISimFig <- RPVdat %>%
+  filter(role == "invader") %>%
+  select(role, dpiI) %>%
   unique() %>%
-  left_join(RPVcoef2) %>%
-  left_join(RPVK) %>%
-  mutate(N0 = as.numeric(coef(RPVmod1)[1]),
-         RPV_quant.mg = K*N0/(N0 + (K-N0) * exp(-r * dpiI))) %>%
-  full_join(RPVSRdat %>%
-              filter(role == "uninvaded") %>%
-              select(RPV_role, role, dpiI, dpiSI, dpiSR, nutrient, highN, highP) %>%
+  mutate(log_quant.mg = predict(RPVImod5, newdata = .),
+         rel_log_quant.mg = log_quant.mg/maxRPV_log_quant.mg,
+         Virus = "RPV") %>%
+  full_join(PAVdat %>%
+              filter(role == "resident") %>%
+              mutate(dpiUR = dpiR - min(dpiR)) %>%
+              select(role, dpiI, dpiUR) %>%
               unique() %>%
-              mutate(RPV_quant.mg = exp(predict(RPVSRmod4, newdata = .)))) %>%
-  mutate(Inoculation = case_when(RPV_role == "single" ~ "uninvaded",
-                                 RPV_role == "invader" ~ "invader"),
-         Nutrient = fct_recode(nutrient, "low" = "L", "+N+P" = "NP", "+N" = "N", "+P" = "P") %>%
-           fct_relevel("low", "+N", "+P"))
+              mutate(log_quant.mg = predict(PAVURmod7, newdata = .),
+                     rel_log_quant.mg = log_quant.mg/maxPAV_log_quant.mg,
+                     Virus = "PAV"))
 
-RPVSIfig <- RPVdat %>%
-  filter(RPV_role %in% c("single", "invader")) %>%
-  mutate(Inoculation = case_when(RPV_role == "single" ~ "uninvaded",
-                                 RPV_role == "invader" ~ "invader"),
-         Nutrient = fct_recode(nutrient, "low" = "L", "+N+P" = "NP", "+N" = "N", "+P" = "P") %>%
+RPVIfig <- RPVdat %>%
+  filter(role == "invader") %>%
+  mutate(Virus = "RPV") %>%
+  full_join(PAVdat %>%
+              filter(role == "resident") %>%
+              mutate(Virus = "PAV")) %>%
+  mutate(Nutrient = fct_recode(nutrient, "low" = "L", "+N+P" = "NP", "+N" = "N", "+P" = "P") %>%
            fct_relevel("low", "+N", "+P")) %>%
-  ggplot(aes(dpiSI, RPV_quant.mg, color = Nutrient, group = interaction(Nutrient, Inoculation))) +
-  stat_summary(geom = "point", fun = "mean", position = position_dodge(dodge_size), aes(shape = Inoculation)) +
-  stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0, alpha = 0.7, position = position_dodge(dodge_size)) +
-  geom_line(data = RPVSIsim, aes(linetype = Inoculation)) +
+  ggplot(aes(dpiI, rel_log_quant.mg)) +
+  stat_summary(geom = "point", fun = "mean", position = position_dodge(dodge_size), aes(shape = Virus, color = Nutrient)) +
+  stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0, alpha = 0.7, position = position_dodge(dodge_size), aes(shape = Virus, color = Nutrient)) +
+  geom_line(data = RPVISimFig, aes(linetype = Virus)) +
   scale_color_viridis_d() +
-  ggtitle("(B) RPV") +
-  xlab("Days post inoculation") +
+  ggtitle("(B) RPV invades PAV") +
+  xlab("Days post invader inoculation") +
   fig_theme +
   theme(axis.title.y = element_blank())
 
-# combine
-pdf("output/PAV_RPV_invasion_figure.pdf", width = 6.5, height = 3)
-plot_grid(PAVSIfig, RPVSIfig,
-          nrow = 1,
-          rel_widths = c(1, 0.9))
-dev.off()
 
-
-### resident figure ###
-
-# figure settings
-fig_theme2 <- theme_bw() +
-  theme(panel.background = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        panel.spacing.x = unit(0,"line"),
-        axis.text.y = element_text(size = 8, color = "black"),
-        axis.text.x = element_text(size = 8, color = "black"),
-        axis.title = element_text(size = 10),
-        legend.text = element_text(size = 8),
-        legend.title = element_text(size = 8),
-        legend.background = element_blank(),
-        legend.position = "none",
-        legend.key.height = unit(3, "mm"),
-        legend.key.width = unit(7, "mm"),
-        legend.spacing.y = unit(0, "cm"),
-        strip.background = element_blank(),
-        strip.text = element_text(size = 8),
-        plot.title = element_text(size = 12, vjust = 0))
+### start here: resident figure ###
+# make these panels C and D
 
 # data for figure
+RPVRSimFig <- RPVURdat %>%
+  select(role, dpiUR) %>%
+  unique() %>%
+  mutate(log_quant.mg = predict(RPVURmod2, newdata = .),
+         rel_log_quant.mg = log_quant.mg/maxRPV_log_quant.mg,
+         Virus = "RPV")
+
 PAVSRsim <- PAVSRdat %>%
   mutate(titer = predict(PAVSRmod4, newdata = .),
          Inoculation = case_when(PAV_role == "single" ~ "uninvaded",
@@ -673,8 +666,8 @@ RPVSRfig <- RPVSRsim %>%
   theme(axis.title.y = element_blank())
 
 # combine
-pdf("output/PAV_RPV_resident_figure.pdf", width = 6.5, height = 3)
-plot_grid(PAVSRfig, RPVSRfig,
+tiff("output/PAV_RPV_virus_titer_figure.tiff", width = 6.5, height = 3, units = "in", res = 300)
+plot_grid(PAVIfig, RPVIfig,
           nrow = 1,
           rel_widths = c(1, 0.9))
 dev.off()
