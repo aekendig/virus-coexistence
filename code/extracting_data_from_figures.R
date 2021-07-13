@@ -1,0 +1,105 @@
+#### Goal: extract data from figures
+
+# reference: Emmanuel Jjunju, https://www.r-bloggers.com/digitizing-jpeg-graphs-in-r/
+
+
+#### Set-up ####
+
+# clear all existing data
+rm(list=ls())
+
+# libraries
+library(jpeg) # to use jpeg images in R
+library(zoo)
+library(tidyverse)
+
+# digitize functions
+ReadAndCal = function(fname){
+  ReadImg(fname)
+  calpoints <- locator(n=4,type='p',pch=4,col='blue',lwd=2)
+  return(calpoints)
+}
+
+ReadImg = function(fname){
+  img <- readJPEG(fname)
+  op <- par(mar=c(0,0,0,0))
+  on.exit(par(op))
+  plot.new()
+  rasterImage(img,0,0,1,1)
+}
+
+DigitData = function(col='red',type='p',...){
+  type <- ifelse(type=='b','o',type)
+  type <- ifelse(type%in%c('l','o','p'),type,'p')
+  locator(type=type,col=col,...)
+}
+
+Calibrate = function(data,calpoints,x1,x2,y1,y2){
+  x 		<- calpoints$x[c(1,2)]
+  y 		<- calpoints$y[c(3,4)]
+  
+  cx <- lm(formula = c(x1,x2) ~ c(x))$coeff
+  cy <- lm(formula = c(y1,y2) ~ c(y))$coeff
+  
+  data$x <- data$x*cx[2]+cx[1]
+  data$y <- data$y*cy[2]+cy[1]
+  
+  return(as.data.frame(data))
+}
+
+
+#### Steps ####
+
+# ReadAndCal opens the jpeg in a plotting window and lets you define points on the x and y axes. You must start by clicking on the left-most x-axis point, then the right-most axis point, followed by the lower y-axis point and finally the upper y-axis point. You don’t need to choose the end points of the axis, only two points on the axis that you know the x or y value for. As you click on each of the 4 points, the coordinates are saved in the object cal.
+
+# DigitData returns you to the figure window, and now you can click on each of the data points you’re interested in retrieving values for. The function will place a dot (colored red in this case) over each point you click on, and the raw x,y coordinates of that point will be saved to the data.points list. When you’re finished clicking points, you need to hit stop/Finish or right-click to stop the data point collection.
+
+# Calibrate converts those raw x,y coordinates into the same scale as the original graph. Feed the function your data.point list, the ReadAndCal list that contains your 4 control points from the first step, and then 4 numeric values that represent the 4 original points you clicked on the x and y axes. These values should be in the original scale of the figure (i.e. read the values off the graph’s tick marks).
+
+
+#### Digitize figures ####
+
+# Mattsson et al. 1991 4A
+(cal_ma91_4a = ReadAndCal("data/Mattsson_etal_1991_4A.jpg"))
+(data_ma91_4a = DigitData(col = 'red'))
+df_ma91_4a = Calibrate(data_ma91_4a, cal_ma91_4a, 0, 0.2, 0, 100)
+df_ma91_4a <- df_ma91_4a %>%
+  rename(RA = x, Vmax = y) %>%
+  mutate(variety = c("Laevigatum", "Golf", "Mette"),
+         RA = round(RA, 2),
+         Vmax = round(Vmax, 2))
+
+# Mattsson et al. 1991 2B
+(cal_ma91_2b = ReadAndCal("data/Mattsson_etal_1991_2B.jpg"))
+(data_ma91_2b = DigitData(col = 'red'))
+df_ma91_2b = Calibrate(data_ma91_2b, cal_ma91_2b, 0, 0.2, 0, 0.7)
+df_ma91_2b <- df_ma91_2b %>%
+  rename(RA = x, rootTot = y) %>%
+  mutate(variety = c("Laevigatum", "Golf", "Mette"),
+         RA = round(RA, 2),
+         rootTot = round(rootTot, 2))
+
+# Vmax for total biomass
+# convert from mg to g
+df_ma91_vmax <- df_ma91_4a %>%
+  full_join(df_ma91_2b) %>%
+  mutate(VmaxTot = Vmax * rootTot,
+         VmaxTot_g = VmaxTot * 0.001)
+
+# average across varieties
+mean(df_ma91_vmax$VmaxTot_g)
+
+# Mattsson et al. 1991 4B
+(cal_ma91_4b = ReadAndCal("data/Mattsson_etal_1991_4B.jpg"))
+(data_ma91_4b = DigitData(col = 'red'))
+df_ma91_4b = Calibrate(data_ma91_4b, cal_ma91_4b, 0, 0.2, 0, 60)
+df_ma91_4b <- df_ma91_4b %>%
+  rename(RA = x, Km = y) %>%
+  mutate(variety = c("Laevigatum", "Golf", "Mette"),
+         RA = round(RA, 2),
+         Km = round(Km, 2),
+         Km_g_pot = Km * 0.0140067 / 1000 * 0.1233)
+
+# half-saturation constant
+mean(df_ma91_4b$Km)
+mean(df_ma91_4b$Km_g_pot)
