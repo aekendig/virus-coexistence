@@ -86,6 +86,9 @@ df_ma91_vmax <- df_ma91_4a %>%
   mutate(VmaxTot = Vmax * rootTot,
          VmaxTot_g = VmaxTot * 0.001)
 
+# save data
+write_csv(df_ma91_vmax, "intermediate-data/Mattsson_etal_1991_vmax.csv")
+
 # average across varieties
 mean(df_ma91_vmax$VmaxTot_g)
 
@@ -100,6 +103,33 @@ df_ma91_4b <- df_ma91_4b %>%
          Km = round(Km, 2),
          Km_g_pot = Km * 0.0140067 / 1000 * 0.1233)
 
+# save data
+write_csv(df_ma91_4b, "intermediate-data/Mattsson_etal_1991_4b.csv")
+
 # half-saturation constant
 mean(df_ma91_4b$Km)
 mean(df_ma91_4b$Km_g_pot)
+
+# Mattsson et al. 1991 5A (Qmin)
+(cal_ma91_5a = ReadAndCal("data/Mattsson_etal_1991_5A.jpg"))
+(data_ma91_5a = DigitData(col = 'red'))
+df_ma91_5a = Calibrate(data_ma91_5a, cal_ma91_5a, 0, 60, 0, 0.2)
+df_ma91_5a <- df_ma91_5a %>%
+  rename(N_conc_mg = x, plant_rg = y) %>%
+  mutate(N_conc_g = N_conc_mg * 0.001,
+         Q_recip = 1 / N_conc_g)
+
+# save data
+write_csv(df_ma91_5a, "intermediate-data/Mattsson_etal_1991_5A.csv")
+
+# look at relationship
+df_ma91_5a %>%
+  ggplot(aes(Q_recip, plant_rg)) +
+  geom_point() +
+  geom_smooth(method = "lm", formula = y ~ x)
+
+# fit regression
+mod_ma91_5a <- lm(plant_rg ~ Q_recip, data = df_ma91_5a)
+
+# Qmin (when m is negligible)
+-1 * coef(mod_ma91_5a)[2]/coef(mod_ma91_5a)[1]
