@@ -110,7 +110,7 @@ write_csv(df_ma91_4b, "intermediate-data/Mattsson_etal_1991_4b.csv")
 mean(df_ma91_4b$Km)
 mean(df_ma91_4b$Km_g_pot)
 
-# Mattsson et al. 1991 5A (Qmin)
+# Mattsson et al. 1991 5A (Qmin for N)
 (cal_ma91_5a = ReadAndCal("data/Mattsson_etal_1991_5A.jpg"))
 (data_ma91_5a = DigitData(col = 'red'))
 df_ma91_5a = Calibrate(data_ma91_5a, cal_ma91_5a, 0, 60, 0, 0.2)
@@ -133,3 +133,9 @@ mod_ma91_5a <- lm(plant_rg ~ Q_recip, data = df_ma91_5a)
 
 # Qmin (when m is negligible)
 -1 * coef(mod_ma91_5a)[2]/coef(mod_ma91_5a)[1]
+
+# Ullrich-Eberius et al. 1981 6 (Qmin for P)
+(cal_ue81_6 = ReadAndCal("data/Ullrich-Eberius_etal_1981_6.jpg"))
+(data_ue81_6 = DigitData(col = 'red'))
+df_ue81_6 = Calibrate(data_ue81_6, cal_ue81_6, 0, 16, 0, 30)
+# y value is Qmin estimate
