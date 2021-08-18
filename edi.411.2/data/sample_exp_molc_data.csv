@@ -1,0 +1,721 @@
+round,time,inoc,nutrient,replicate,high_N,high_P,material,shoot_mass_g,root_mass_g,leaf_area_mm2,leaf_perim_mm,leaves,mass_saved_g,aphid_mass_g,trans_N,trans_P,trans_NP,trans_L,exp_notes,ext_group,ext_date,extractors,mass_ext_mg,ext_group_notes,ext_sample_notes,RT_date,PCR_date,gel_date,molc_notes,RTPCR_PAV,RTPCR_RPV
+1,1,coinfection,low,1,0,0,shoot,0.1597,0.0128,798.214,583.878,2,0.0927,0.067,1,1,1,1,"transmission plants 10 days old, some transmission plants received nutrient treatment 2 days late, soil may have had more vermiculite",7,10/18/14,AK,47.5,NA,NA,NA,NA,NA,NA,NA,NA
+1,1,coinfection,low,2,0,0,shoot,0.1532,0.0133,746.368,526.766,2,0.092,0.0612,1,1,1,1,"transmission plants 10 days old, some transmission plants received nutrient treatment 2 days late, soil may have had more vermiculite",18,11/5/14,"AK, EB",45.4,NA,NA,NA,NA,NA,NA,NA,NA
+1,1,coinfection,N,1,1,0,shoot,0.2075,0.0193,1071.933,708.898,2,0.1387,0.0688,1,1,1,1,"transmission plants 10 days old, some transmission plants received nutrient treatment 2 days late, soil may have had more vermiculite",10,10/21/14,AK,47.3,extra incubation times (see notebook),NA,NA,NA,NA,NA,NA,NA
+1,1,coinfection,N,2,1,0,shoot,0.1319,0.011,642.632,453.558,2,0.082,0.0499,0,1,1,1,"transmission plants 10 days old, some transmission plants received nutrient treatment 2 days late",12,10/23/14,"TP, AK",50.2,extra incubation before heating,NA,NA,NA,NA,NA,NA,NA
+1,1,coinfection,N+P,1,1,1,shoot,0.1049,0.0067,497.974,329.764,1,0.077,0.0279,1,1,1,1,"transmission plants 10 days old, some transmission plants received nutrient treatment 2 days late",17,11/4/14,"AK, TP",47.3,NA,NA,NA,NA,NA,NA,NA,NA
+1,1,coinfection,N+P,2,1,1,shoot,0.1795,0.0111,883.895,456.198,2,0.1146,0.0649,1,1,1,1,"transmission plants 10 days old, some transmission plants received nutrient treatment 2 days late, 4 aphids for transmission to NP",9,10/20/14,AK,47.9,NA,NA,NA,NA,NA,NA,NA,NA
+1,1,coinfection,P,1,0,1,shoot,0.1564,0.0115,707.601,493.881,2,0.088,0.0684,1,1,1,0,"transmission plants 10 days old, some transmission plants received nutrient treatment 2 days late",15,10/29/14,"AK,TP",48.7,4 min incubation after Trizol transfer,NA,NA,NA,NA,NA,NA,NA
+1,1,coinfection,P,2,0,1,shoot,0.1427,0.0117,737.51,537.046,2,0.0845,0.0582,1,1,0,0,"transmission plants 10 days old, some transmission plants received nutrient treatment 2 days late",15,10/29/14,"AK,TP",47.7,4 min incubation after Trizol transfer,NA,NA,NA,NA,NA,NA,NA
+1,1,healthy,low,1,0,0,shoot,0.1649,0.0206,972.532,678.657,2,0.1649,0,NA,NA,NA,NA,"transmission plants 10 days old, some transmission plants received nutrient treatment 2 days late",8,10/19/14,AK,48.4,NA,centrifuged after Trizol transfer,3/24/15,4/21/15,4/21/15,NA,0,0
+1,1,healthy,low,2,0,0,shoot,0.0616,0.0106,289.392,273.404,1,0.0616,0,NA,NA,NA,NA,"transmission plants 10 days old, some transmission plants received nutrient treatment 2 days late, leaf broken when IAP stopped",15,10/29/14,"AK,TP",47.3,4 min incubation after Trizol transfer,used all tissue,3/3/15,3/5/15,3/10/15,NA,0,0
+1,1,healthy,N,1,1,0,shoot,0.1295,0.0117,NA,525.56,2,0.1295,0,NA,NA,NA,NA,"transmission plants 10 days old, some transmission plants received nutrient treatment 2 days late",13,10/24/14,AK,47.6,frozen after chloroform transfer,NA,3/3/15,3/5/15,3/10/15,NA,0,0.5
+1,1,healthy,N,2,1,0,shoot,0.1301,0.0131,668.186,448.841,2,0.1301,0,NA,NA,NA,NA,"transmission plants 10 days old, some transmission plants received nutrient treatment 2 days late",3,10/1/14,"AK,EB,TP",49.3,Frozen after chloroform transfer,NA,2/10/16,2/10/16,2/10/16,NA,0,0
+1,1,healthy,N+P,1,1,1,shoot,0.1808,0.0181,920.963,639.304,2,0.1808,0,NA,NA,NA,NA,"transmission plants 10 days old, some transmission plants received nutrient treatment 2 days late",6,10/17/14,AK,49.5,NA,NA,3/24/15,4/21/15,4/21/15,NA,0,0
+1,1,healthy,N+P,2,1,1,shoot,0.1683,0.0145,798.999,658.247,2,0.1683,0,NA,NA,NA,NA,"transmission plants 10 days old, some transmission plants received nutrient treatment 2 days late, soil may have had more vermiculite",2,9/25/14,"AK, EB, TP",49.7,15 min isopropanol incubation,NA,2/10/16,2/10/16,2/10/16,NA,0,0
+1,1,healthy,P,1,0,1,shoot,0.1321,0.0145,508.827,378.019,2,0.1321,0,NA,NA,NA,NA,"transmission plants 10 days old, some transmission plants received nutrient treatment 2 days late",19,11/6/14,"AK, TP",48.8,"tubes flipped after isoproponal addition, frozen after ethanol addition","some sample lost, try to re-do in 21",2/24/15,3/4/15,3/4/15,NA,0.5,0
+1,1,healthy,P,2,0,1,shoot,0.0994,0.0122,517.315,438.84,2,0.0994,0,NA,NA,NA,NA,"transmission plants 10 days old, some transmission plants received nutrient treatment 2 days late",20,11/10/14,"AK, EB, TP",52.4,"frozen after chloroform transfer, frozen after ethanol addition",NA,2/19/15,3/9/15,3/10/15,NA,0,0
+1,1,PAV,low,1,0,0,shoot,0.1331,0.0124,709.894,559.625,2,0.0819,0.0512,1,1,1,1,"transmission plants 10 days old, some transmission plants received nutrient treatment 2 days late",7,10/18/14,AK,47.8,NA,NA,6/25/15,6/26/15,7/2/15,NA,1,0
+1,1,PAV,low,2,0,0,shoot,0.04,0.0026,206.837,208.309,1,0.025,0.015,1,0,1,1,"transmission plants 10 days old, some transmission plants received nutrient treatment 2 days late",16,10/30/14,"AK,TP",16.2,"frozen after chlorophyll transfer, no 5 min air dry before adding water",used all tissue,6/25/15,6/26/15,7/2/15,NA,1,0
+1,1,PAV,N,1,1,0,shoot,0.1343,0.0166,749.404,545.159,2,0.0741,0.0602,1,1,1,1,"transmission plants 10 days old, some transmission plants received nutrient treatment 2 days late",5,10/16/14,"AK, TP, KR",46,2.0 ml tubes for final set,used all tissue,6/25/15,6/26/15,7/2/15,NA,1,0
+1,1,PAV,N,2,1,0,shoot,0.0811,0.0035,416.166,294.056,1,0.0529,0.0282,1,0,1,1,"transmission plants 10 days old, some transmission plants received nutrient treatment 2 days late, NP leaf broken when trans IAP stopped",5,10/16/14,"AK, TP, KR",42.2,2.0 ml tubes for final set,used all tissue,7/23/15,7/24/15,7/30/15,NA,1,0
+1,1,PAV,N+P,1,1,1,shoot,0.1906,0.0123,798.141,602.121,2,0.1212,0.0694,1,1,1,1,"transmission plants 10 days old, some transmission plants received nutrient treatment 2 days late, L leaf broken when trans IAP stopped",3,10/1/14,"AK,EB,TP",51.9,Frozen after chloroform transfer,NA,8/19/15,8/21/15,8/21/15,NA,1,0
+1,1,PAV,N+P,2,1,1,shoot,0.1466,0.0113,580.05,556.094,2,0.0872,0.0594,1,1,1,0,"transmission plants 10 days old, some transmission plants received nutrient treatment 2 days late",16,10/30/14,"AK,TP",51.6,"frozen after chlorophyll transfer, no 5 min air dry before adding water",NA,6/25/15,6/26/15,7/2/15,NA,1,0
+1,1,PAV,P,1,0,1,shoot,0.0434,0.0026,203.617,213.843,1,0.0313,0.0121,1,1,1,1,"transmission plants 10 days old, some transmission plants received nutrient treatment 2 days late",5,10/16/14,"AK, TP, KR",22.8,2.0 ml tubes for final set,used all tissue,7/8/15,7/9/15,7/13/15,NA,1,0
+1,1,PAV,P,2,0,1,shoot,0.1333,0.0108,616.449,476.685,2,0.0793,0.054,1,1,1,1,"transmission plants 10 days old, some transmission plants received nutrient treatment 2 days late, soil may have had more vermiculite",8,10/19/14,AK,48.8,NA,centrifuged after Trizol transfer,6/25/15,6/26/15,7/2/15,NA,1,0
+1,1,RPV,low,1,0,0,shoot,0.1303,0.0129,547.398,444.203,2,0.0823,0.048,1,1,1,1,"transmission plants 10 days old, some transmission plants received nutrient treatment 2 days late",8,10/19/14,AK,48.6,NA,NA,NA,NA,NA,NA,NA,NA
+1,1,RPV,low,2,0,0,shoot,0.1173,0.0197,549.329,444.642,2,0.0739,0.0434,1,1,1,1,"transmission plants 10 days old, some transmission plants received nutrient treatment 2 days late, L leaf broken when trans IAP stopped",2,9/25/14,"AK, EB, TP",43.2,15 min isopropanol incubation,All mass used,NA,NA,NA,NA,NA,NA
+1,1,RPV,N,1,1,0,shoot,0.0566,0.0066,289.26,299.462,1,0.0388,0.0178,1,1,1,1,"transmission plants 10 days old, some transmission plants received nutrient treatment 2 days late",20,11/10/14,"AK, EB, TP",14.1,"frozen after chloroform transfer, frozen after ethanol addition",used all tissue,4/8/16,4/9/16,4/9/16,NA,0,1
+1,1,RPV,N,2,1,0,shoot,0.1824,0.0183,907.212,675.489,2,0.1218,0.0606,1,0,0,1,"transmission plants 10 days old, some transmission plants received nutrient treatment 2 days late, soil may have had more vermiculite",20,11/10/14,"AK, EB, TP",54.6,"frozen after chloroform transfer, frozen after ethanol addition",NA,7/23/15,7/24/15,7/30/15,NA,0,1
+1,1,RPV,N+P,1,1,1,shoot,0.1479,0.0147,624.97,542.267,2,0.0874,0.0605,1,1,1,1,"transmission plants 10 days old, some transmission plants received nutrient treatment 2 days late",12,10/23/14,"TP, AK",50.4,extra incubation before heating,NA,4/8/16,4/9/16,4/9/16,NA,0,1
+1,1,RPV,N+P,2,1,1,shoot,0.0993,0.0142,515.447,383.979,1,0.0655,0.0338,1,1,1,1,"transmission plants 10 days old, some transmission plants received nutrient treatment 2 days late",8,10/19/14,AK,46.9,NA,NA,4/8/16,4/9/16,4/9/16,NA,0,1
+1,1,RPV,P,1,0,1,shoot,0.1233,0.0149,598.165,380.204,2,0.079,0.0443,1,1,1,1,"transmission plants 10 days old, some transmission plants received nutrient treatment 2 days late",13,10/24/14,AK,46.1,frozen after chloroform transfer,NA,4/22/16,4/30/16,4/30/16,NA,0,1
+1,1,RPV,P,2,0,1,shoot,0.1071,0.0155,476.107,335.858,2,0.0688,0.0383,1,1,1,1,"transmission plants 10 days old, some transmission plants received nutrient treatment 2 days late",4,10/15/14,AK,48.3,2.0 ml tubes for final set,NA,NA,NA,NA,NA,NA,NA
+1,2,coinfection,low,1,0,0,shoot,0.1659,0.0382,328.334,372.843,1,0.1251,0.0408,0,1,1,1,"transmission plants 10 days old, soil may have had more vermiculite, 2 aphids for transmission to P, L leaf broken when trans IAP stopped",7,10/18/14,AK,49.7,NA,used all tissue,NA,NA,NA,NA,NA,NA
+1,2,coinfection,low,2,0,0,shoot,0.0778,0.0791,991.742,686.498,2,0.0592,0.0186,0,0,1,0,transmission plants 10 days old,1,9/22/14-9/24/14,"AK, EB, TP",49.4,"Air dry 7 min, sit 5 min, frozen after chloroform transfer",NA,NA,NA,NA,NA,NA,NA
+1,2,coinfection,N,1,1,0,shoot,0.1858,0.0373,1158.226,778.762,2,0.1404,0.0454,1,0,1,1,"transmission plants 10 days old, 4 adults and 2 babies for transmission to P",2,9/25/14,"AK, EB, TP",48.8,15 min isopropanol incubation,NA,NA,NA,NA,NA,NA,NA
+1,2,coinfection,N+P,1,1,1,shoot,0.1832,0.0472,1054.471,738.436,2,0.1078,0.0754,1,0,1,1,transmission plants 10 days old,17,11/4/14,"AK, TP",48.1,NA,NA,NA,NA,NA,NA,NA,NA
+1,2,coinfection,P,1,0,1,shoot,0.1392,0.0409,865.919,665.356,2,0.1074,0.0318,1,1,1,1,transmission plants 10 days old,10,10/21/14,AK,46.8,extra incubation times (see notebook),may have lost pellet,NA,NA,NA,NA,NA,NA
+1,2,coinfection,P,2,0,1,shoot,0.0504,0.0096,280.923,272.648,1,0.0391,0.0113,0,0,1,0,transmission plants 10 days old,6,10/17/14,AK,30.3,NA,used all tissue,NA,NA,NA,NA,NA,NA
+1,2,healthy,low,1,0,0,shoot,0.0536,0.0066,275.069,293.909,2,0.0365,0.0171,NA,NA,NA,NA,transmission plants 10 days old,12,10/23/14,"TP, AK",21,extra incubation before heating,used all tissue,3/3/15,3/5/15,3/10/15,NA,0,0
+1,2,healthy,low,2,0,0,shoot,0.1016,0.0131,543.717,416.843,2,0.0769,0.0247,NA,NA,NA,NA,transmission plants 10 days old,15,10/29/14,"AK,TP",47.5,4 min incubation after Trizol transfer,NA,6/3/15,6/12/15,6/12/15,NA,0,0
+1,2,healthy,N,1,1,0,shoot,0.1864,0.0204,1167.452,852.51,2,0.1404,0.046,NA,NA,NA,NA,"transmission plants 10 days old, soil may have had more vermiculite",13,10/24/14,AK,48.7,frozen after chloroform transfer,NA,3/3/15,3/5/15,3/10/15,NA,0,0
+1,2,healthy,N,2,1,0,shoot,0.1685,0.0213,1029.819,746.354,2,0.1255,0.043,NA,NA,NA,NA,transmission plants 10 days old,10,10/21/14,AK,46.9,extra incubation times (see notebook),NA,3/24/15,4/21/15,4/21/15,NA,0,0
+1,2,healthy,N+P,1,1,1,shoot,0.1423,0.0223,818.274,643.552,2,0.0845,0.0578,NA,NA,NA,NA,transmission plants 10 days old,19,11/6/14,"AK, TP",32.8,"tubes flipped after isoproponal addition, frozen after ethanol addition","used all mass, some sample lost",2/24/15,3/4/15,3/4/15,NA,0.5,0
+1,2,healthy,N+P,2,1,1,shoot,0.1663,0.029,904.453,645.061,2,0.0999,0.0664,NA,NA,NA,NA,transmission plants 10 days old,19,11/6/14,"AK, TP",49.4,"tubes flipped after isoproponal addition, frozen after ethanol addition","some sample lost, ext in 15 probably same plant",2/24/15,3/4/15,3/4/15,"Extracted Twice, information for other sample on ""problem dataset""",0.5,0
+1,2,healthy,P,1,0,1,shoot,0.1236,0.0202,730.169,644.568,2,0.0941,0.0295,NA,NA,NA,NA,transmission plants 10 days old,16,10/30/14,"AK,TP",21.6,"frozen after chlorophyll transfer, no 5 min air dry before adding water",used all tissue,2/24/15,3/4/15,3/4/15,NA,0,0
+1,2,healthy,P,2,0,1,shoot,0.0775,0.0066,440.918,338.367,1,0.0586,0.0189,NA,NA,NA,NA,"transmission plants 10 days old, soil may have had more vermiculite",9,10/20/14,AK,45.2,NA,NA,3/24/15,4/21/15,4/21/15,NA,0,0
+1,2,PAV,low,1,0,0,shoot,0.1433,0.0175,780.449,572.157,2,0.1081,0.0352,0,0,1,1,"transmission plants 10 days old, soil may have had more vermiculite, 3 aphids for transmission to L",17,11/4/14,"AK, TP",47.4,NA,NA,7/8/15,7/9/15,7/13/15,NA,1,0
+1,2,PAV,low,2,0,0,shoot,0.1013,0.0163,570.053,458.86,2,0.0778,0.0235,0,0,0,0,transmission plants 10 days old,17,11/4/14,"AK, TP",49.2,NA,NA,7/8/15,7/9/15,7/13/15,NA,0,0
+1,2,PAV,N,1,1,0,shoot,0.2734,0.0232,1649.779,1122.732,2,0.2051,0.0683,1,0,1,0,"transmission plants 10 days old, N leaf broken when trans IAP stopped",11,10/22/14,"AK, EB",49.1,NA,NA,6/25/15,6/26/15,7/2/15,NA,1,0
+1,2,PAV,N,2,1,0,shoot,0.1683,0.0293,1066.163,763.161,2,0.1211,0.0472,0,0,0,0,transmission plants 10 days old,12,10/23/14,"TP, AK",50.4,extra incubation before heating,NA,6/25/15,6/26/15,7/2/15,NA,1,0
+1,2,PAV,N+P,1,1,1,shoot,0.0235,8.00E-04,111.448,195.649,0,0.0235,0,0,0,1,0,transmission plants 10 days old,8,10/19/14,AK,22.8,NA,used all tissue,7/8/15,7/9/15,7/13/15,NA,1,0
+1,2,PAV,N+P,2,1,1,shoot,0.0902,0.0066,501.947,443.277,2,0.0563,0.0339,0,0,1,0,"transmission plants 10 days old, soil may have had more vermiculite, 3 aphids for transmission to NP, NP leaf broken when trans IAP stopped",5,10/16/14,"AK, TP, KR",46.5,2.0 ml tubes for final set,NA,6/25/15,6/26/15,7/2/15,NA,1,0
+1,2,PAV,P,1,0,1,shoot,0.1688,0.0177,987.201,773.897,2,0.1269,0.0419,0,1,1,0,"transmission plants 10 days old, soil may have had more vermiculite",2,9/25/14,"AK, EB, TP",49.2,15 min isopropanol incubation,NA,NA,NA,NA,NA,NA,NA
+1,2,PAV,P,1,0,1,root,0.1688,0.0177,987.201,773.897,2,0.1269,0.0419,NA,NA,NA,NA,"transmission plants 10 days old, soil may have had more vermiculite",NA,8/18/15,NA,16.3,NA,UAT,NA,NA,NA,NA,NA,NA
+1,2,PAV,P,2,0,1,shoot,0.0673,0.0124,407.183,346.675,1,0.0427,0.0246,0,0,0,0,"transmission plants 10 days old, soil may have had more vermiculite",18,11/5/14,"AK, EB",26.6,NA,used all tissue,6/25/15,6/26/15,7/2/15,NA,1,0
+1,2,RPV,low,1,0,0,shoot,0.109,0.0111,432.066,369.901,2,0.081,0.028,0,1,1,1,"transmission plants 10 days old, leaf broken when IAP stopped, 4 aphids for transmission to N",9,10/20/14,AK,45.8,NA,NA,2/1/16,2/1/16,2/1/16,NA,0,0
+1,2,RPV,low,2,0,0,shoot,0.0919,0.0151,477.714,345.615,2,0.0684,0.0235,0,0,1,0,transmission plants 10 days old,18,11/5/14,"AK, EB",46.9,NA,NA,2/1/16,2/1/16,2/1/16,NA,0,1
+1,2,RPV,N,1,1,0,shoot,0.2257,0.0204,1306.745,888.845,2,0.1651,0.0606,1,1,1,1,"transmission plants 10 days old, soil may have had more vermiculite, 4 aphids for transmission to P",10,10/21/14,AK,46.5,extra incubation times (see notebook),NA,NA,NA,NA,NA,NA,NA
+1,2,RPV,N,2,1,0,shoot,0.1593,0.011,854.083,665.418,2,0.1182,0.0411,0,0,0,0,transmission plants 10 days old,15,10/29/14,"AK,TP",50.1,4 min incubation after Trizol transfer,NA,NA,NA,NA,NA,NA,NA
+1,2,RPV,N+P,1,1,1,shoot,0.1509,0.0231,935.258,705.916,2,0.0907,0.0602,1,1,1,0,transmission plants 10 days old,14,10/28/14,"AK, EB",49,frozen after chlororophyll transfer,NA,4/22/16,4/30/16,4/30/16,NA,0,1
+1,2,RPV,N+P,2,1,1,shoot,0.1214,0.0153,669.243,522.099,2,0.0739,0.0475,0,0,1,0,"transmission plants 10 days old, P leaf broken when trans IAP stopped",6,10/17/14,AK,48.2,NA,NA,4/8/16,4/9/16,4/9/16,NA,0,1
+1,2,RPV,P,1,0,1,shoot,0.0716,0.0126,495.738,406.143,2,0.0542,0.0174,1,1,1,0,"transmission plants 10 days old, soil may have had more vermiculite, 2 adults and 3 babies for transmission to NP, N and P leaves broken when trans IAP stopped",19,11/6/14,"AK, TP",45.1,"tubes flipped after isoproponal addition, frozen after ethanol addition","used all mass, some sample lost",NA,NA,NA,NA,NA,NA
+1,2,RPV,P,2,0,1,shoot,0.2276,0.0442,1158.353,824.757,2,0.1698,0.0578,0,0,1,0,"transmission plants 10 days old, soil may have had more vermiculite",4,10/15/14,AK,48.9,2.0 ml tubes for final set,NA,NA,NA,NA,NA,NA,NA
+1,3,coinfection,low,1,0,0,shoot,0.1457,0.027,939.023,761.096,2,0.1108,0.0349,1,1,1,1,NA,16,10/30/14,"AK,TP",47.4,"frozen after chlorophyll transfer, no 5 min air dry before adding water",NA,NA,NA,NA,NA,NA,NA
+1,3,coinfection,low,2,0,0,shoot,0.2257,0.0272,1268.303,923.464,2,0.1763,0.0494,1,NA,NA,1,3 adults and 2 babies for transmission to L,15,10/29/14,"AK,TP",47.9,4 min incubation after Trizol transfer,NA,NA,NA,NA,NA,NA,NA
+1,3,coinfection,N,1,1,0,shoot,0.2397,0.0161,1488.013,967.528,2,0.186,0.0537,1,1,1,1,NA,14,10/28/14,"AK, EB",48.3,frozen after chlororophyll transfer,NA,NA,NA,NA,NA,NA,NA
+1,3,coinfection,N,2,1,0,shoot,0.1425,0.0132,1058.803,793.293,2,0.1111,0.0314,1,NA,NA,1,NA,13,10/24/14,AK,47.4,frozen after chloroform transfer,NA,NA,NA,NA,NA,NA,NA
+1,3,coinfection,N+P,1,1,1,shoot,0.203,0.0218,1133.213,967.654,2,0.1552,0.0478,1,1,1,1,4 adults and 1 baby for transmission to P,20,11/10/14,"AK, EB, TP",52.7,"frozen after chloroform transfer, frozen after ethanol addition",NA,NA,NA,NA,NA,NA,NA
+1,3,coinfection,N+P,2,1,1,shoot,0.1252,0.0157,763.612,672.334,3,0.0968,0.0284,NA,1,1,NA,NA,20,11/10/14,"AK, EB, TP",48,"frozen after chloroform transfer, frozen after ethanol addition",NA,NA,NA,NA,NA,NA,NA
+1,3,coinfection,P,1,0,1,shoot,0.0787,0.0028,494.312,398.037,2,0.0594,0.0193,1,1,1,1,NA,8,10/19/14,AK,46.3,NA,NA,NA,NA,NA,NA,NA,NA
+1,3,coinfection,P,2,0,1,shoot,0.0914,0.0199,411.81,426.669,1,0.0686,0.0228,1,1,NA,NA,NA,9,10/20/14,AK,45.9,NA,NA,NA,NA,NA,NA,NA,NA
+1,3,healthy,low,1,0,0,shoot,0.1031,0.006,691.828,636.956,1,0.1031,0,NA,NA,NA,NA,NA,16,10/30/14,"AK,TP",49.3,"frozen after chlorophyll transfer, no 5 min air dry before adding water",NA,2/24/15,3/4/15,3/4/15,NA,0,0
+1,3,healthy,low,2,0,0,shoot,0.1315,0.0151,961.157,986.902,2,0.1315,0,NA,NA,NA,NA,NA,2,9/25/14,"AK, EB, TP",49.2,15 min isopropanol incubation,NA,3/4/16,3/5/16,3/5/16,NA,0,0
+1,3,healthy,N,1,1,0,shoot,0.1279,0.0087,723.496,658.766,2,0.1279,0,NA,NA,NA,NA,NA,1,9/22/14-9/24/14,"AK, EB, TP",49.3,"Air dry 7 min, sit 5 min, frozen after chloroform transfer",NA,3/11/16,3/13/16,3/13/16,NA,0,1
+1,3,healthy,N,2,1,0,shoot,0.0912,0.0074,700.924,668.28,2,0.0912,0,NA,NA,NA,NA,NA,17,11/4/14,"AK, TP",48.1,NA,NA,2/24/15,3/4/15,3/4/15,NA,0,0
+1,3,healthy,N+P,1,1,1,shoot,0.2337,0.0116,1483.239,1124.969,2,0.2337,0,NA,NA,NA,NA,NA,6,10/17/14,AK,52,NA,NA,3/24/15,4/21/15,4/21/15,NA,0,0
+1,3,healthy,N+P,2,1,1,shoot,0.1674,0.0085,986.607,808.168,2,0.1674,0,NA,NA,NA,NA,NA,4,10/15/14,AK,49,2.0 ml tubes for final set,NA,3/24/15,4/21/15,4/21/15,NA,0,0
+1,3,healthy,P,1,0,1,shoot,0.1698,0.0326,912.403,855.683,3,0.1698,0,NA,NA,NA,NA,NA,15,10/29/14,"AK,TP",50,4 min incubation after Trizol transfer,NA,3/3/15,3/5/15,3/10/15,NA,0,1
+1,3,healthy,P,2,0,1,shoot,0.3216,0.0176,1651.959,1367.428,2,0.3216,0,NA,NA,NA,NA,NA,9,10/20/14,AK,53.2,NA,NA,3/24/15,4/21/15,4/21/15,NA,0,1
+1,3,PAV,low,1,0,0,shoot,0.0676,0.0231,442.22,525.095,1,0.0502,0.0174,1,1,1,1,NA,7,10/18/14,AK,39.5,NA,used all tissue,6/25/15,6/26/15,7/2/15,NA,1,0
+1,3,PAV,low,2,0,0,shoot,0.1351,0.0307,1014.796,783.944,2,0.1007,0.0344,0,0,1,1,2 adults and 3 babies for transmission to L,17,11/4/14,"AK, TP",46.5,NA,NA,7/8/15,7/9/15,7/13/15,NA,1,0
+1,3,PAV,N,1,1,0,shoot,0.2357,0.0175,1669.571,1104.955,3,0.1822,0.0535,1,1,1,1,N leaf broken when killing aphids,13,10/24/14,AK,47.4,frozen after chloroform transfer,NA,7/8/15,7/9/15,7/13/15,mis-labelled extraction vial as 13RN1,1,0
+1,3,PAV,N,2,1,0,shoot,0.0785,0.051,513.195,545.509,1,0.0603,0.0182,1,0,0,1,NA,12,10/23/14,"TP, AK",48.1,extra incubation before heating,NA,6/25/15,6/26/15,7/2/15,NA,1,0
+1,3,PAV,N+P,1,1,1,shoot,0.2365,0.0291,1557.79,997.575,3,0.1796,0.0569,1,1,1,1,NA,22,1/11/15,AK,49.6,samples went in fridge after grinding for ~15 min,Ext 21,6/25/15,6/26/15,7/2/15,NA,1,0
+1,3,PAV,N+P,2,1,1,shoot,0.202,0.0252,1309.048,977.182,2,0.1585,0.0435,0,1,1,0,NA,8,10/19/14,AK,48.9,NA,NA,6/25/15,6/26/15,7/2/15,NA,1,0
+1,3,PAV,P,1,0,1,shoot,0.2439,0.0409,1495.55,1107.334,2,0.1184,0.1255,1,1,1,1,NA,3,10/1/14,"AK,EB,TP",50.2,Frozen after chloroform transfer,NA,8/19/15,8/21/15,8/21/15,NA,1,0
+1,3,PAV,P,2,0,1,shoot,0.1932,0.0303,1156.034,892.19,2,0.1483,0.0449,1,1,0,0,NA,12,10/23/14,"TP, AK",49.6,extra incubation before heating,NA,6/25/15,6/26/15,7/2/15,NA,1,0
+1,3,RPV,low,1,0,0,shoot,0.1656,0.012,1423.18,988.545,2,0.1289,0.0367,1,1,1,1,NA,17,11/4/14,"AK, TP",46.9,NA,NA,NA,NA,NA,NA,NA,NA
+1,3,RPV,low,2,0,0,root,0.2009,0.0133,419.435,NA,2,0.1546,0.0463,NA,NA,NA,NA,2 adults and 3 babies for transmission to L,NA,8/18/15,NA,12.9,NA,UAT,NA,NA,NA,NA,NA,NA
+1,3,RPV,low,2,0,0,shoot,0.2009,0.0133,419.435,NA,2,0.1546,0.0463,0,0,0,1,2 adults and 3 babies for transmission to L,22,1/11/15,AK,48.8,samples went in fridge after grinding for ~15 min,Ext 21,7/23/15,7/24/15,7/30/15,NA,0,1
+1,3,RPV,N,1,1,0,shoot,NA,0.0021,NA,NA,NA,NA,NA,1,1,1,1,plant died,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+1,3,RPV,N,2,1,0,shoot,0.2467,0.0236,1692.686,1102.2,2,0.1907,0.056,1,0,0,1,NA,3,10/1/14,"AK,EB,TP",49.2,Frozen after chloroform transfer,NA,4/8/16,4/9/16,4/9/16,NA,0,1
+1,3,RPV,N+P,1,1,1,shoot,0.2149,0.0176,1353.534,1099.052,2,0.1693,0.0456,1,1,1,1,transmission plants accidentally inoculated with RPV N in addition to RPV NP except NP RPV NP 3,7,10/18/14,AK,51.3,NA,NA,4/8/16,4/9/16,4/9/16,NA,0,1
+1,3,RPV,N+P,2,1,1,shoot,0.064,0.0012,923.736,922.41,2,0.0503,0.0137,0,1,2,0,"transmission plants accidentally inoculated with RPV N in addition to RPV NP except NP RPV NP 3, 2 adults and 3 babies for transmission to NP 2",18,11/5/14,"AK, EB",39.6,NA,used all tissue,4/8/16,4/9/16,4/9/16,NA,0,1
+1,3,RPV,P,1,0,1,shoot,0.0456,0.0012,354.655,316.466,2,0.0345,0.0111,1,1,1,1,3 aphids for transmission to P,16,10/30/14,"AK,TP",26.1,"frozen after chlorophyll transfer, no 5 min air dry before adding water",used all tissue,4/8/16,4/9/16,4/9/16,NA,0,0
+1,3,RPV,P,2,0,1,shoot,0.0673,0.003,423.5,460.682,2,0.0526,0.0147,1,1,0,0,NA,12,10/23/14,"TP, AK",41.4,extra incubation before heating,used all tissue,4/8/16,4/9/16,4/9/16,NA,0,1
+1,4,coinfection,low,1,0,0,shoot,0.193,0.0175,1171.31,827.652,2,0.193,0,NA,NA,NA,NA,NA,22,1/11/15,AK,45.2,samples went in fridge after grinding for ~15 min,Ext 21,NA,NA,NA,NA,NA,NA
+1,4,coinfection,low,2,0,0,shoot,0.3299,0.0285,1503.965,1034.044,3,0.3299,0,NA,NA,NA,NA,NA,9,10/20/14,AK,48.8,NA,NA,NA,NA,NA,NA,NA,NA
+1,4,coinfection,N,1,1,0,shoot,0.1879,0.0112,1183.528,878.959,2,0.1879,0,NA,NA,NA,NA,NA,10,10/21/14,AK,49,extra incubation times (see notebook),NA,NA,NA,NA,NA,NA,NA
+1,4,coinfection,N,2,1,0,shoot,0.1954,0.0165,1107.498,774.92,2,0.1954,0,NA,NA,NA,NA,NA,16,10/30/14,"AK,TP",51.1,"frozen after chlorophyll transfer, no 5 min air dry before adding water",NA,NA,NA,NA,NA,NA,NA
+1,4,coinfection,N+P,1,1,1,shoot,0.0747,0.0047,556.33,597.806,2,0.0747,0,NA,NA,NA,NA,NA,13,10/24/14,AK,45.7,frozen after chloroform transfer,NA,NA,NA,NA,NA,NA,NA
+1,4,coinfection,N+P,2,1,1,shoot,0.2163,0.0172,1225.169,885.733,2,0.2163,0,NA,NA,NA,NA,NA,12,10/23/14,"TP, AK",48.5,extra incubation before heating,NA,NA,NA,NA,NA,NA,NA
+1,4,coinfection,P,1,0,1,shoot,0.162,0.0177,1013.252,734.376,3,0.162,0,NA,NA,NA,NA,NA,15,10/29/14,"AK,TP",49,4 min incubation after Trizol transfer,NA,NA,NA,NA,NA,NA,NA
+1,4,coinfection,P,2,0,1,shoot,0.2148,0.0143,1269.182,875.09,2,0.2148,0,NA,NA,NA,NA,NA,12,10/23/14,"TP, AK",50.4,extra incubation before heating,NA,NA,NA,NA,NA,NA,NA
+1,4,healthy,low,1,0,0,shoot,0.3481,0.0247,1526.75,1190.402,3,0.3481,0,NA,NA,NA,NA,NA,2,9/25/14,"AK, EB, TP",51.3,15 min isopropanol incubation,NA,3/4/16,3/5/16,3/5/16,NA,0,0
+1,4,healthy,low,2,0,0,shoot,0.0823,0.007,570.126,627.173,2,0.0823,0,NA,NA,NA,NA,NA,4,10/15/14,AK,46.5,2.0 ml tubes for final set,used all tissue,3/24/15,4/21/15,4/21/15,NA,0,0
+1,4,healthy,N,1,1,0,shoot,0.2697,0.0075,1453.598,1103.733,3,0.2697,0,NA,NA,NA,NA,NA,1,9/22/14-9/24/14,"AK, EB, TP",49,"Air dry 7 min, sit 5 min, frozen after chloroform transfer",used white label screw cap tube,3/4/16,3/5/16,3/5/16,NA,0,0
+1,4,healthy,N,2,1,0,shoot,0.2825,0.0197,1461.941,1104.098,3,0.2825,0,NA,NA,NA,NA,NA,3,10/1/14,"AK,EB,TP",50.1,Frozen after chloroform transfer,NA,3/4/16,3/5/16,3/5/16,NA,0,0
+1,4,healthy,N+P,1,1,1,shoot,0.1374,0.0094,829.554,722.744,3,0.1374,0,NA,NA,NA,NA,NA,8,10/19/14,AK,48.4,NA,NA,3/24/15,4/21/15,4/21/15,NA,1,1
+1,4,healthy,N+P,2,1,1,shoot,0.0354,0.0095,115.23,223.946,1,0.0354,0,NA,NA,NA,NA,NA,13,10/24/14,AK,30.6,frozen after chloroform transfer,used all tissue,3/3/15,3/5/15,3/10/15,NA,0.5,0
+1,4,healthy,P,1,0,1,shoot,0.3216,0.0213,1594.502,1180.74,3,0.3216,0,NA,NA,NA,NA,NA,20,11/10/14,"AK, EB, TP",47.7,"frozen after chloroform transfer, frozen after ethanol addition",NA,2/19/15,3/9/15,3/10/15,NA,0,0
+1,4,healthy,P,2,0,1,shoot,0.2345,0.0163,1381.386,961.038,2,0.2345,0,NA,NA,NA,NA,leaf broken when IAP stopped,11,10/22/14,"AK, EB",48.4,NA,NA,3/3/15,3/5/15,3/10/15,NA,0,0
+1,4,PAV,low,1,0,0,shoot,0.2673,0.016,1320.048,1083.909,2,0.2673,0,NA,NA,NA,NA,NA,9,10/20/14,AK,52.1,NA,NA,7/8/15,7/9/15,7/13/15,NA,1,0
+1,4,PAV,low,2,0,0,shoot,0.1659,0.0128,1033.327,762.188,2,0.1659,0,NA,NA,NA,NA,NA,6,10/17/14,AK,52.8,NA,NA,6/25/15,6/26/15,7/2/15,NA,1,0
+1,4,PAV,N,1,1,0,shoot,0.3526,0.019,1686.697,1304.748,3,0.3526,0,NA,NA,NA,NA,NA,2,9/25/14,"AK, EB, TP",51.2,15 min isopropanol incubation,NA,NA,NA,NA,NA,NA,NA
+1,4,PAV,N,2,1,0,shoot,0.2391,0.0143,1477.746,949.236,2,0.2391,0,NA,NA,NA,NA,NA,13,10/24/14,AK,47.7,frozen after chloroform transfer,NA,6/25/15,6/26/15,7/2/15,NA,1,0
+1,4,PAV,N+P,1,1,1,shoot,0.2577,0.0025,1476.05,849.332,2,0.2577,0,NA,NA,NA,NA,NA,3,10/1/14,"AK,EB,TP",48.6,Frozen after chloroform transfer,NA,8/19/15,8/21/15,8/21/15,NA,0,0
+1,4,PAV,N+P,2,1,1,shoot,0.0248,0.0194,104.02,117.467,0,0.0248,0,NA,NA,NA,NA,leaf broken when IAP stopped,14,10/28/14,"AK, EB",19.4,frozen after chlororophyll transfer,used all tissue,7/8/15,7/9/15,7/13/15,NA,0,0
+1,4,PAV,P,1,0,1,shoot,0.31,0.0225,1534.957,1106.268,3,0.31,0,NA,NA,NA,NA,NA,10,10/21/14,AK,48.8,extra incubation times (see notebook),NA,6/25/15,6/26/15,7/2/15,NA,1,0
+1,4,PAV,P,2,0,1,shoot,0.2613,0.0135,1316.942,1046.234,3,0.2613,0,NA,NA,NA,NA,NA,15,10/29/14,"AK,TP",46.4,4 min incubation after Trizol transfer,NA,6/25/15,6/26/15,7/2/15,NA,1,0
+1,4,RPV,low,1,0,0,shoot,0.2302,0.0218,1104.163,962.006,3,0.2302,0,NA,NA,NA,NA,NA,18,11/5/14,"AK, EB",53.5,NA,NA,2/1/16,2/1/16,2/1/16,NA,1,1
+1,4,RPV,low,2,0,0,shoot,0.0798,0.0088,570.738,566.406,2,0.0798,0,NA,NA,NA,NA,NA,15,10/29/14,"AK,TP",46.1,4 min incubation after Trizol transfer,NA,NA,NA,NA,NA,NA,NA
+1,4,RPV,N,1,1,0,shoot,0.2769,0.0253,1516.308,1165.381,2,0.2769,0,NA,NA,NA,NA,NA,4,10/15/14,AK,52.2,2.0 ml tubes for final set,NA,NA,NA,NA,NA,NA,NA
+1,4,RPV,N,2,1,0,shoot,0.1802,0.0206,815.334,680.823,2,0.1802,0,NA,NA,NA,NA,leaf broken when IAP stopped,8,10/19/14,AK,48.6,NA,NA,2/1/16,2/1/16,2/1/16,NA,1,0
+1,4,RPV,N+P,1,1,1,shoot,0.31,0.0279,1703.328,1334.679,3,0.31,0,NA,NA,NA,NA,NA,12,10/23/14,"TP, AK",50.2,extra incubation before heating,NA,NA,NA,NA,NA,NA,NA
+1,4,RPV,N+P,2,1,1,shoot,0.2215,0.0162,1143.57,945.292,3,0.2215,0,NA,NA,NA,NA,NA,13,10/24/14,AK,48.6,frozen after chloroform transfer,NA,4/22/16,4/30/16,4/30/16,NA,0,1
+1,4,RPV,P,1,0,1,shoot,0.2226,0.025,1157.499,964.859,3,0.2226,0,NA,NA,NA,NA,NA,13,10/24/14,AK,47.7,frozen after chloroform transfer,NA,NA,NA,NA,NA,NA,NA
+1,4,RPV,P,2,0,1,shoot,0.1823,0.0137,1039.827,775.66,2,0.1823,0,NA,NA,NA,NA,NA,10,10/21/14,AK,47.6,extra incubation times (see notebook),NA,NA,NA,NA,NA,NA,NA
+1,5,coinfection,low,1,0,0,shoot,0.2519,0.0135,1257.161,1122.014,3,0.2014,0.0505,1,1,1,1,"Half of the aphid mass was put in freezer because there weren't enough aphids. An ""AdditionalMassToSave"" column was added (see full data). The MassSaved column here may be an underestimate, all Co's and N PAV's roots weighed on a different scale than rest of samples",5,10/16/14,"AK, TP, KR",38.9,2.0 ml tubes for final set,used all tissue,NA,NA,NA,NA,NA,NA
+1,5,coinfection,low,2,0,0,shoot,0.2142,0.0176,1082.657,849.67,2,0.171,0.0432,0,0,0,0,"Half of the aphid mass was put in freezer because there weren't enough aphids. An ""AdditionalMassToSave"" column was added (see full data). The MassSaved column here may be an underestimate, all Co's and N PAV's roots weighed on a different scale than rest of samples",6,10/17/14,AK,48.5,NA,NA,NA,NA,NA,NA,NA,NA
+1,5,coinfection,N,1,1,0,shoot,0.3568,0.0292,1794.872,1225.153,3,0.2599,0.0969,1,1,1,1,"Half of the aphid mass was put in freezer because there weren't enough aphids. An ""AdditionalMassToSave"" column was added (see full data). The MassSaved column here may be an underestimate, all Co's and N PAV's roots weighed on a different scale than rest of samples, less than 5 aphids for transmission to NP",14,10/28/14,"AK, EB",51,frozen after chlororophyll transfer,NA,NA,NA,NA,NA,NA,NA
+1,5,coinfection,N,2,1,0,shoot,0.3287,0.0252,1626.58,1124.566,3,0.2576,0.0711,0,0,0,0,"Half of the aphid mass was put in freezer because there weren't enough aphids. An ""AdditionalMassToSave"" column was added (see full data). The MassSaved column here may be an underestimate, all Co's and N PAV's roots weighed on a different scale than rest of samples",13,10/24/14,AK,52,frozen after chloroform transfer,NA,NA,NA,NA,NA,NA,NA
+1,5,coinfection,N+P,1,1,1,shoot,0.1527,0.0153,937.393,704.921,2,0.122,0.0307,1,1,1,1,"Half of the aphid mass was put in freezer because there weren't enough aphids. An ""AdditionalMassToSave"" column was added (see full data). The MassSaved column here may be an underestimate, leaf broken when IAP stopped, all Co's and N PAV's roots weighed on a different scale than rest of samples, 3 aphids for transmission to P",20,11/10/14,"AK, EB, TP",17.6,"frozen after chloroform transfer, frozen after ethanol addition","used all tissue, may have lost pellet",NA,NA,NA,NA,NA,NA
+1,5,coinfection,N+P,2,1,1,shoot,0.0775,0.0135,404.834,537.994,1,0.0617,0.0158,0,0,0,0,"Half of the aphid mass was put in freezer because there weren't enough aphids. An ""AdditionalMassToSave"" column was added (see full data). The MassSaved column here may be an underestimate, leaf broken when IAP stopped, all Co's and N PAV's roots weighed on a different scale than rest of samples",11,10/22/14,"AK, EB",10.8,NA,used all tissue,NA,NA,NA,NA,NA,NA
+1,5,coinfection,P,1,0,1,shoot,0.1601,0.0129,859.282,841.999,2,0.1175,0.0426,1,1,1,1,"Half of the aphid mass was put in freezer because there weren't enough aphids. An ""AdditionalMassToSave"" column was added (see full data). The MassSaved column here may be an underestimate, all Co's and N PAV's roots weighed on a different scale than rest of samples",10,10/21/14,AK,17.2,extra incubation times (see notebook),used all tissue,NA,NA,NA,NA,NA,NA
+1,5,coinfection,P,2,0,1,shoot,0.1343,0.0112,830.27,826.965,2,0.10189,0.03241,0,0,0,0,"Half of the aphid mass was put in freezer because there weren't enough aphids. An ""AdditionalMassToSave"" column was added (see full data). The MassSaved column here may be an underestimate, all Co's and N PAV's roots weighed on a different scale than rest of samples",11,10/22/14,"AK, EB",15.1,NA,used all tissue,NA,NA,NA,NA,NA,NA
+1,5,healthy,low,1,0,0,shoot,0.1023,0.0018,751.9,712.225,2,0.1023,0,NA,NA,NA,NA,all Co's and N PAV's roots weighed on a different scale than rest of samples,20,11/10/14,"AK, EB, TP",52.8,"frozen after chloroform transfer, frozen after ethanol addition",NA,2/19/15,3/9/15,3/10/15,NA,0,0
+1,5,healthy,low,2,0,0,shoot,0.3639,0.0157,1320.493,1102.612,3,0.3639,0,NA,NA,NA,NA,all Co's and N PAV's roots weighed on a different scale than rest of samples,12,10/23/14,"TP, AK",51.2,extra incubation before heating,NA,3/24/15,4/21/15,4/21/15,"Originally done with PCR on 3/5/15, but lost in PCR plate. Re-done with 4/21/15 PCR",0,0
+1,5,healthy,N,1,1,0,shoot,0.45,0.0146,2286.803,1537.604,3,0.45,0,NA,NA,NA,NA,all Co's and N PAV's roots weighed on a different scale than rest of samples,5,10/16/14,"AK, TP, KR",49.9,2.0 ml tubes for final set,NA,3/24/15,4/21/15,4/21/15,NA,1,0
+1,5,healthy,N,2,1,0,shoot,0.4863,0.0207,2452,1744.97,3,0.4863,0,NA,NA,NA,NA,all Co's and N PAV's roots weighed on a different scale than rest of samples,5,10/16/14,"AK, TP, KR",51,2.0 ml tubes for final set,NA,3/24/15,4/21/15,4/21/15,NA,1,0
+1,5,healthy,N+P,1,1,1,shoot,0.3472,0.0233,1788.177,1162.503,3,0.3472,0,NA,NA,NA,NA,all Co's and N PAV's roots weighed on a different scale than rest of samples,1,9/22/14-9/24/14,"AK, EB, TP",50,"Air dry 7 min, sit 5 min, frozen after chloroform transfer",used white label screw cap tube,3/4/16,3/5/16,3/5/16,NA,0,0
+1,5,healthy,N+P,2,1,1,shoot,0.1109,0.0051,187.156,283.759,2,0.1109,0,NA,NA,NA,NA,all Co's and N PAV's roots weighed on a different scale than rest of samples,2,9/25/14,"AK, EB, TP",51.4,15 min isopropanol incubation,NA,3/4/16,3/5/16,3/5/16,NA,0,0
+1,5,healthy,P,1,0,1,shoot,0.1593,0.0139,1785.796,1505.993,2,0.1593,0,NA,NA,NA,NA,all Co's and N PAV's roots weighed on a different scale than rest of samples,3,10/1/14,"AK,EB,TP",48.2,Frozen after chloroform transfer,NA,2/12/16,2/12/16,2/12/16,NA,0,0
+1,5,healthy,P,2,0,1,shoot,0.229,0.0234,640.993,692.058,2,0.229,0,NA,NA,NA,NA,all Co's and N PAV's roots weighed on a different scale than rest of samples,5,10/16/14,"AK, TP, KR",50.8,2.0 ml tubes for final set,NA,3/24/15,4/21/15,4/21/15,NA,0.5,0
+1,5,PAV,low,1,0,0,shoot,0.162,0.0091,927.932,863.887,3,0.13032,0.03168,1,1,1,1,"Half of the aphid mass was put in freezer because there weren't enough aphids. An ""AdditionalMassToSave"" column was added (see full data). The MassSaved column here may be an underestimate, all Co's and N PAV's roots weighed on a different scale than rest of samples",1,9/22/14-9/24/14,"AK, EB, TP",25.5,"Air dry 7 min, sit 5 min, frozen after chloroform transfer","used all tissue, used white label screw cap tube",NA,NA,NA,NA,NA,NA
+1,5,PAV,low,2,0,0,shoot,0.2094,0.0137,1332.433,958.18,3,0.1638,0.0456,0,0,0,0,"Half of the aphid mass was put in freezer because there weren't enough aphids. An ""AdditionalMassToSave"" column was added (see full data). The MassSaved column here may be an underestimate, all Co's and N PAV's roots weighed on a different scale than rest of samples",22,1/11/15,AK,44.1,samples went in fridge after grinding for ~15 min,"Ext 21, UAT",7/23/15,7/24/15,7/30/15,NA,1,0
+1,5,PAV,N,1,1,0,shoot,0.2404,0.0169,1685.634,1284.989,2,0.1924,0.048,1,1,1,1,"Half of the aphid mass was put in freezer because there weren't enough aphids. An ""AdditionalMassToSave"" column was added (see full data). The MassSaved column here may be an underestimate, all Co's and N PAV's roots weighed on a different scale than rest of samples, L leaf broken when trans IAP stopped",22,1/11/15,AK,48.1,samples went in fridge after grinding for ~15 min,Ext 21,6/25/15,6/26/15,7/2/15,NA,1,0
+1,5,PAV,N,2,1,0,shoot,0.2662,0.0162,NA,NA,3,0.2097,0.0565,0,0,0,0,"Half of the aphid mass was put in freezer because there weren't enough aphids. An ""AdditionalMassToSave"" column was added (see full data). The MassSaved column here may be an underestimate, all Co's and N PAV's roots weighed on a different scale than rest of samples, re-do leaf area and leaf perimeter estimates",12,10/23/14,"TP, AK",51.5,extra incubation before heating,NA,7/8/15,7/9/15,7/13/15,NA,1,0
+1,5,PAV,N+P,1,1,1,shoot,0.3844,0.0137,1992.143,1424.126,2,0.3059,0.0785,1,1,1,1,"Half of the aphid mass was put in freezer because there weren't enough aphids. An ""AdditionalMassToSave"" column was added (see full data). The MassSaved column here may be an underestimate, all Co's and N PAV's roots weighed on a different scale than rest of samples",15,10/29/14,"AK,TP",47.6,4 min incubation after Trizol transfer,NA,8/19/15,8/21/15,8/21/15,NA,1,0
+1,5,PAV,N+P,2,1,1,shoot,0.1988,0.0116,1214.616,928.916,3,0.1588,0.04,0,0,0,0,"Half of the aphid mass was put in freezer because there weren't enough aphids. An ""AdditionalMassToSave"" column was added (see full data). The MassSaved column here may be an underestimate, all Co's and N PAV's roots weighed on a different scale than rest of samples",2,9/25/14,"AK, EB, TP",52.2,15 min isopropanol incubation,NA,7/8/15,7/9/15,7/13/15,NA,0,0
+1,5,PAV,P,1,0,1,shoot,0.1012,0.0088,1501.926,1158.764,2,0.0807,0.0205,NA,1,1,1,"Half of the aphid mass was put in freezer because there weren't enough aphids. An ""AdditionalMassToSave"" column was added (see full data). The MassSaved column here may be an underestimate, all Co's and N PAV's roots weighed on a different scale than rest of samples",1,9/22/14-9/24/14,"AK, EB, TP",14.8,"Air dry 7 min, sit 5 min, frozen after chloroform transfer","used all tissue, pellet stuck to fiber in EtOH, removed during dissolving step, used white label screw cap tube",4/22/16,4/30/16,4/30/16,NA,0,0
+1,5,PAV,P,2,0,1,shoot,0.2781,0.0113,1993.137,1430.634,3,0.2222,0.0559,0,0,0,0,"Half of the aphid mass was put in freezer because there weren't enough aphids. An ""AdditionalMassToSave"" column was added (see full data). The MassSaved column here may be an underestimate, all Co's and N PAV's roots weighed on a different scale than rest of samples",22,1/11/15,AK,51.5,samples went in fridge after grinding for ~15 min,Ext 21,7/8/15,7/13/15,7/13/15,NA,1,0
+1,5,RPV,low,1,0,0,shoot,0.0967,0.0086,698.476,740.991,2,0.0741,0.0226,1,1,1,1,"Half of the aphid mass was put in freezer because there weren't enough aphids. An ""AdditionalMassToSave"" column was added (see full data). The MassSaved column here may be an underestimate, all Co's and N PAV's roots weighed on a different scale than rest of samples",17,11/4/14,"AK, TP",46.3,NA,NA,NA,NA,NA,NA,NA,NA
+1,5,RPV,low,2,0,0,shoot,0.1663,0.0139,1242.225,946.854,3,0.1316,0.0347,0,0,0,0,"Half of the aphid mass was put in freezer because there weren't enough aphids. An ""AdditionalMassToSave"" column was added (see full data). The MassSaved column here may be an underestimate, all Co's and N PAV's roots weighed on a different scale than rest of samples",5,10/16/14,"AK, TP, KR",20.4,2.0 ml tubes for final set,used all tissue,NA,NA,NA,NA,NA,NA
+1,5,RPV,N,1,1,0,shoot,0.2207,0.0096,1565.656,1230.889,3,0.1778,0.0429,1,1,1,1,"Half of the aphid mass was put in freezer because there weren't enough aphids. An ""AdditionalMassToSave"" column was added (see full data). The MassSaved column here may be an underestimate, all Co's and N PAV's roots weighed on a different scale than rest of samples",15,10/29/14,"AK,TP",48.5,4 min incubation after Trizol transfer,NA,4/8/16,4/9/16,4/9/16,NA,0,1
+1,5,RPV,N,2,1,0,shoot,0.3211,0.0219,1990.548,1544.658,3,0.2561,0.065,0,0,0,0,"Half of the aphid mass was put in freezer because there weren't enough aphids. An ""AdditionalMassToSave"" column was added (see full data). The MassSaved column here may be an underestimate, all Co's and N PAV's roots weighed on a different scale than rest of samples",5,10/16/14,"AK, TP, KR",47.2,2.0 ml tubes for final set,used all tissue,4/8/16,4/9/16,4/9/16,NA,0,1
+1,5,RPV,N+P,1,1,1,shoot,0.2529,0.0116,1607.799,1218.691,3,0.2036,0.0493,1,1,1,1,"Half of the aphid mass was put in freezer because there weren't enough aphids. An ""AdditionalMassToSave"" column was added (see full data). The MassSaved column here may be an underestimate, leaf broken during watering, all Co's and N PAV's roots weighed on a different scale than rest of samples, less than 5 aphids for transmission to N and P",22,1/11/15,AK,25,samples went in fridge after grinding for ~15 min,"ext 19, ext 21, UAT",4/8/16,4/9/16,4/9/16,"extracted in group 19, 48.7 g mass used",0,1
+1,5,RPV,N+P,2,1,1,shoot,0.0516,0.0055,288.92,400.48,1,0.0409,0.0107,0,0,0,0,"Half of the aphid mass was put in freezer because there weren't enough aphids. An ""AdditionalMassToSave"" column was added (see full data). The MassSaved column here may be an underestimate, leaf broken when IAP stopped, all Co's and N PAV's roots weighed on a different scale than rest of samples",14,10/28/14,"AK, EB",34.5,frozen after chlororophyll transfer,used all tissue,4/22/16,4/30/16,4/30/16,NA,0.5,0.5
+1,5,RPV,P,1,0,1,shoot,0.1616,0.0163,1046.058,931.255,3,0.1283,0.0333,1,1,1,1,"Half of the aphid mass was put in freezer because there weren't enough aphids. An ""AdditionalMassToSave"" column was added (see full data). The MassSaved column here may be an underestimate, all Co's and N PAV's roots weighed on a different scale than rest of samples",14,10/28/14,"AK, EB",48.8,frozen after chlororophyll transfer,NA,NA,NA,NA,NA,NA,NA
+1,5,RPV,P,2,0,1,shoot,0.2384,0.0122,1473.886,1172.608,3,0.1902,0.0482,0,0,0,0,"Half of the aphid mass was put in freezer because there weren't enough aphids. An ""AdditionalMassToSave"" column was added (see full data). The MassSaved column here may be an underestimate, all Co's and N PAV's roots weighed on a different scale than rest of samples",17,11/4/14,"AK, TP",46.8,NA,NA,4/8/16,4/9/16,4/9/16,NA,0,0
+1,6,coinfection,low,1,0,0,shoot,0.1947,0.0182,1133.031,923.852,3,0.1544,0.0403,1,1,1,1,NA,20,11/10/14,"AK, EB, TP",52.3,"frozen after chloroform transfer, frozen after ethanol addition",NA,NA,NA,NA,NA,NA,NA
+1,6,coinfection,low,2,0,0,shoot,0.2055,0.0195,1348.436,1033.043,2,0.1646,0.0409,0,0,0,0,NA,22,1/11/15,AK,34.1,samples went in fridge after grinding for ~15 min,"ext 19, ext 21, UAT",NA,NA,NA,"extracted in group 19, 48.7 g mass used",NA,NA
+1,6,coinfection,N,1,1,0,shoot,0.2521,0.0287,1613.971,1190.478,3,0.2027,0.0494,1,1,1,1,NA,20,11/10/14,"AK, EB, TP",49.5,"frozen after chloroform transfer, frozen after ethanol addition",NA,NA,NA,NA,NA,NA,NA
+1,6,coinfection,N,2,1,0,shoot,0.091,0.0195,743.513,692.345,1,0.0732,0.0178,0,0,0,0,NA,2,9/25/14,"AK, EB, TP",51.3,15 min isopropanol incubation,NA,NA,NA,NA,NA,NA,NA
+1,6,coinfection,N+P,1,1,1,shoot,0.2624,0.018,1433.619,1176.596,3,0.2096,0.0528,1,1,1,1,NA,5,10/16/14,"AK, TP, KR",50.1,2.0 ml tubes for final set,NA,NA,NA,NA,NA,NA,NA
+1,6,coinfection,N+P,2,1,1,shoot,0.1953,0.0143,1094.93,863.769,2,0.1564,0.0389,0,0,1,0,4 aphids for transmission to NP,1,9/22/14-9/24/14,"AK, EB, TP",50.1,"Air dry 7 min, sit 5 min, frozen after chloroform transfer",used white label screw cap tube,NA,NA,NA,NA,NA,NA
+1,6,coinfection,P,1,0,1,shoot,0.1583,0.0158,1093.582,907.534,2,0.1269,0.0314,1,1,1,1,NA,22,1/11/15,AK,43.7,samples went in fridge after grinding for ~15 min,"Ext 21, UAT",NA,NA,NA,NA,NA,NA
+1,6,coinfection,P,2,0,1,shoot,0.0741,0.0062,613.284,652.023,2,0.0601,0.014,0,1,0,0,4 aphids for transmission to P,15,10/29/14,"AK,TP",49.1,4 min incubation after Trizol transfer,used all tissue,NA,NA,NA,NA,NA,NA
+1,6,healthy,low,1,0,0,shoot,0.394,0.0236,2151.334,1332.344,3,0.394,0,NA,NA,NA,NA,NA,20,11/10/14,"AK, EB, TP",52.7,"frozen after chloroform transfer, frozen after ethanol addition",NA,2/24/15,3/4/15,3/4/15,NA,0.5,0
+1,6,healthy,low,2,0,0,shoot,0.3321,0.0387,1796.446,1215.928,2,0.3321,0,NA,NA,NA,NA,NA,4,10/15/14,AK,50.9,2.0 ml tubes for final set,NA,3/24/15,4/21/15,4/21/15,NA,0,0
+1,6,healthy,N,1,1,0,shoot,0.5236,0.0388,2759.14,1709.849,3,0.5236,0,NA,NA,NA,NA,NA,14,10/28/14,"AK, EB",50.6,frozen after chlororophyll transfer,NA,3/3/15,3/5/15,3/10/15,NA,0,0
+1,6,healthy,N,2,1,0,shoot,0.3754,0.0324,2081.253,1461.576,3,0.3754,0,NA,NA,NA,NA,watered with control in addiiton to treatment once,7,10/18/14,AK,49.6,NA,NA,3/24/15,4/21/15,4/21/15,NA,0,0
+1,6,healthy,N+P,1,1,1,shoot,0.4708,0.0479,2323.079,1733.03,3,0.4708,0,NA,NA,NA,NA,NA,15,10/29/14,"AK,TP",47.7,4 min incubation after Trizol transfer,NA,3/3/15,3/5/15,3/10/15,NA,0.5,0
+1,6,healthy,N+P,2,1,1,shoot,0.7855,0.029,3531.806,2151.962,4,0.7855,0,NA,NA,NA,NA,NA,1,9/22/14-9/24/14,"AK, EB, TP",50.5,"Air dry 7 min, sit 5 min, frozen after chloroform transfer",used white label screw cap tube,3/4/16,3/5/16,3/5/16,NA,0,0
+1,6,healthy,P,1,0,1,shoot,0.5668,0.0462,2834.745,1812.518,3,0.5668,0,NA,NA,NA,NA,NA,7,10/18/14,AK,48.6,NA,NA,3/24/15,4/21/15,4/21/15,NA,0,0
+1,6,healthy,P,2,0,1,shoot,0.3982,0.0404,1951.875,1461.226,3,0.3982,0,NA,NA,NA,NA,NA,15,10/29/14,"AK,TP",54.7,4 min incubation after Trizol transfer,NA,3/3/15,3/5/15,3/10/15,NA,0.5,0.5
+1,6,PAV,low,1,0,0,shoot,0.2859,0.028,1441.097,1343.896,3,0.2288,0.0571,1,1,1,1,NA,4,10/15/14,AK,48.1,2.0 ml tubes for final set,NA,7/8/15,7/9/15,7/13/15,NA,0,0
+1,6,PAV,low,2,0,0,shoot,0.2463,0.038,1415.534,1170.04,3,0.1979,0.0484,0,0,0,0,NA,11,10/22/14,"AK, EB",48.2,NA,NA,6/25/15,6/26/15,7/2/15,NA,0,0
+1,6,PAV,N,1,1,0,shoot,0.3686,0.0077,1680.799,1275.945,3,0.2947,0.0739,1,1,1,1,NA,18,11/5/14,"AK, EB",50.2,NA,NA,7/8/15,7/9/15,7/13/15,NA,0,0
+1,6,PAV,N,2,1,0,shoot,0.184,0.0107,965.022,898.805,3,0.1475,0.0365,0,0,0,0,NA,3,10/1/14,"AK,EB,TP",48.9,Frozen after chloroform transfer,NA,8/19/15,8/21/15,8/21/15,NA,0,0
+1,6,PAV,N+P,1,1,1,shoot,0.388,0.0296,2179.416,1410.835,3,0.3089,0.0791,1,1,1,1,NA,10,10/21/14,AK,50.8,extra incubation times (see notebook),NA,7/8/15,7/9/15,7/13/15,NA,1,0
+1,6,PAV,N+P,2,1,1,shoot,0.2017,0.0251,1034.384,787.27,2,0.1611,0.0406,0,0,0,0,NA,10,10/21/14,AK,49.3,extra incubation times (see notebook),NA,7/8/15,7/9/15,7/13/15,NA,1,0
+1,6,PAV,P,1,0,1,shoot,0.2158,0.0112,1146.027,994.229,3,0.1722,0.0436,1,1,1,1,2 adults and 3 babies for transmission to N,10,10/21/14,AK,49.4,extra incubation times (see notebook),NA,7/8/15,7/13/15,7/13/15,NA,1,0
+1,6,PAV,P,2,0,1,shoot,0.1274,0.0211,882.505,800.574,2,0.1015,0.0259,0,0,0,0,NA,18,11/5/14,"AK, EB",47.5,NA,NA,6/25/15,6/26/15,7/2/15,NA,1,0
+1,6,RPV,low,1,0,0,shoot,0.1901,0.0188,1004.273,979.006,3,0.1518,0.0383,1,1,1,1,NA,13,10/24/14,AK,47.3,frozen after chloroform transfer,NA,NA,NA,NA,NA,NA,NA
+1,6,RPV,low,2,0,0,shoot,0.1294,0.0153,847.55,819.218,3,0.1043,0.0251,0,0,0,1,4 aphids for transmission to L,11,10/22/14,"AK, EB",45.6,NA,NA,NA,NA,NA,NA,NA,NA
+1,6,RPV,N,1,1,0,shoot,0.2938,0.0134,1872.059,1250.599,3,0.234,0.0598,1,1,1,1,NA,8,10/19/14,AK,50.9,NA,NA,2/1/16,2/1/16,2/1/16,NA,0,0
+1,6,RPV,N,2,1,0,shoot,0.1788,0.0144,1077.273,948.886,3,0.1446,0.0342,0,0,0,0,NA,8,10/19/14,AK,50.7,NA,NA,4/22/16,4/30/16,4/30/16,NA,0,1
+1,6,RPV,N+P,1,1,1,shoot,0.2706,0.0253,1589.097,1115.985,2,0.2171,0.0535,1,1,1,1,NA,17,11/4/14,"AK, TP",49.7,NA,NA,4/8/16,4/9/16,4/9/16,NA,0,1
+1,6,RPV,N+P,2,1,1,shoot,0.1458,0.0051,922.883,889.723,2,0.116,0.0298,0,0,0,0,NA,16,10/30/14,"AK,TP",48.8,"frozen after chlorophyll transfer, no 5 min air dry before adding water",NA,4/8/16,4/9/16,4/9/16,NA,0,1
+1,6,RPV,P,1,0,1,shoot,0.2093,0.0192,1126.791,926.67,3,0.1655,0.0438,1,1,1,1,Tested in July for RT-PCR and came up negative for both PAV and RPV so it was re-tested in August,20,11/10/14,"AK, EB, TP",48,"frozen after chloroform transfer, frozen after ethanol addition",NA,8/19/15,8/21/15,8/21/15,NA,0,0.5
+1,6,RPV,P,2,0,1,shoot,0.2842,0.0223,1394.232,1120.008,3,0.2266,0.0576,0,1,0,0,4 aphids for transmission to P,22,1/11/15,AK,49.1,samples went in fridge after grinding for ~15 min,"ext 19, ext 21",4/22/16,4/30/16,4/30/16,"extracted in group 19, 51.8 g mass used",0,0
+1,7,coinfection,low,1,0,0,shoot,0.1862,0.0154,1135.967,1108.034,3,0.1122,0.074,1,1,1,1,plant not used for transmission,17,11/4/14,"AK, TP",48.9,NA,NA,NA,NA,NA,NA,NA,NA
+1,7,coinfection,low,2,0,0,shoot,0.0724,0.0077,637.053,675.482,3,0.0441,0.0283,1,1,1,NA,NA,3,10/1/14,"AK,EB,TP",35.5,Frozen after chloroform transfer,All tissue used,NA,NA,NA,NA,NA,NA
+1,7,coinfection,N,1,1,0,shoot,0.4312,0.015,2108.524,1525.327,3,0.2593,0.1719,1,1,1,1,NA,6,10/17/14,AK,50.4,NA,NA,NA,NA,NA,NA,NA,NA
+1,7,coinfection,N,2,1,0,shoot,0.2045,0.0141,1036.465,857.358,3,0.1218,0.0827,2,1,1,1,N leaf broken when trans IAP stopped,16,10/30/14,"AK,TP",47.2,"frozen after chlorophyll transfer, no 5 min air dry before adding water",NA,NA,NA,NA,NA,NA,NA
+1,7,coinfection,N+P,1,1,1,shoot,0.218,0.0159,1101.798,956.141,3,0.1298,0.0882,1,1,1,0,NA,11,10/22/14,"AK, EB",46.2,NA,NA,NA,NA,NA,NA,NA,NA
+1,7,coinfection,N+P,2,1,1,shoot,0.2392,0.028,1449.097,1052.114,3,0.1445,0.0947,1,1,0,0,"leaf broken when IAP stopped, 1 adult and 3 babies for transmission to N",12,10/23/14,"TP, AK",49.1,extra incubation before heating,NA,NA,NA,NA,NA,NA,NA
+1,7,coinfection,P,1,0,1,shoot,0.1031,0.0119,826.695,770.08,2,0.0632,0.0399,1,1,1,1,NA,20,11/10/14,"AK, EB, TP",51.4,"frozen after chloroform transfer, frozen after ethanol addition",used all tissue,NA,NA,NA,NA,NA,NA
+1,7,coinfection,P,2,0,1,shoot,0.1927,0.0231,1285.973,1177.113,2,0.1169,0.0758,2,1,0,0,NA,4,10/15/14,AK,51,2.0 ml tubes for final set,"took NP Co T7 2 out by accident, but put back in VCE1 T7 bag",NA,NA,NA,NA,NA,NA
+1,7,healthy,low,1,0,0,shoot,0.9344,0.0461,4425.199,2730.863,4,0.9344,0,NA,NA,NA,NA,may have had fewer than 10 aphids,4,10/15/14,AK,52.3,2.0 ml tubes for final set,NA,3/24/15,4/21/15,4/21/15,NA,0,0
+1,7,healthy,low,2,0,0,shoot,0.534,0.022,2812.683,1673.461,4,0.534,0,NA,NA,NA,NA,may have had fewer than 10 aphids,4,10/15/14,AK,50.7,2.0 ml tubes for final set,NA,3/24/15,4/21/15,4/21/15,NA,0,0
+1,7,healthy,N,1,1,0,shoot,0.3395,0.0108,2376.9,1951.998,3,0.3395,0,NA,NA,NA,NA,may have had fewer than 10 aphids,22,1/11/15,AK,52.3,samples went in fridge after grinding for ~15 min,Ext 21,2/19/15,3/9/15,3/10/15,NA,0.5,0
+1,7,healthy,N,2,1,0,shoot,0.4508,0.0164,2480.108,2091.655,4,0.4508,0,NA,NA,NA,NA,may have had fewer than 10 aphids,9,10/20/14,AK,49.6,NA,NA,3/24/15,4/21/15,4/21/15,NA,0,0
+1,7,healthy,N+P,1,1,1,shoot,0.1473,0.0041,860.735,1101.159,3,0.1473,0,NA,NA,NA,NA,"may have had fewer than 10 aphids, leaf broken during watering",14,10/28/14,"AK, EB",48.1,frozen after chlororophyll transfer,NA,3/3/15,3/5/15,3/10/15,NA,0,0
+1,7,healthy,N+P,2,1,1,shoot,0.9124,0.034,4155.959,2263.349,4,0.9124,0,NA,NA,NA,NA,may have had fewer than 10 aphids,19,11/6/14,"AK, TP",50.1,"tubes flipped after isoproponal addition, frozen after ethanol addition","some sample lost, try to re-do in 21",2/24/15,3/4/15,3/4/15,"Sample done in extraction 19, but some sample lost, sample re-done in extraction 22, but pellet may have been lost (came up as negative for both) - use 19 results. Mass extracted for 22 was 46.1 g.",1,0.5
+1,7,healthy,P,1,0,1,shoot,0.0948,0.0169,511.77,714.698,2,0.0948,0,NA,NA,NA,NA,"leaf broken when IAP stopped, may have had fewer than 10 aphids",19,11/6/14,"AK, TP",49.3,"tubes flipped after isoproponal addition, frozen after ethanol addition","some sample lost, try to re-do in 21",2/24/15,3/4/15,3/4/15,NA,1,0
+1,7,healthy,P,2,0,1,shoot,0.2436,0.0152,1468.339,1288.861,3,0.2436,0,NA,NA,NA,NA,may have had fewer than 10 aphids,17,11/4/14,"AK, TP",47.6,NA,NA,2/24/15,3/4/15,3/4/15,NA,0,0
+1,7,PAV,low,1,0,0,shoot,0.343,0.0288,1455.601,1358.322,3,0.2053,0.1377,1,1,1,1,NA,5,10/16/14,"AK, TP, KR",50.6,2.0 ml tubes for final set,NA,7/8/15,7/9/15,7/13/15,NA,0,0
+1,7,PAV,low,2,0,0,shoot,0.1176,0.0083,689.789,709.03,3,0.0718,0.0458,0,1,1,2,L leaf broken when trans IAP stopped,10,10/21/14,AK,45,extra incubation times (see notebook),NA,7/23/15,7/24/15,7/30/15,NA,1,0
+1,7,PAV,N,1,1,0,shoot,NA,0,NA,NA,NA,NA,NA,1,1,1,1,"leaf broken when IAP stopped, P leaf broken when trans IAP stopped",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+1,7,PAV,N,2,1,0,shoot,0.2389,0.017,1422.621,1407.845,3,0.1434,0.0955,1,1,1,1,NA,3,10/1/14,"AK,EB,TP",53.7,Frozen after chloroform transfer,NA,8/19/15,8/21/15,8/21/15,NA,0,0
+1,7,PAV,N+P,1,1,1,shoot,0.2478,0.0249,1276.715,935.008,4,0.1504,0.0974,1,1,1,1,NA,22,1/11/15,AK,16.8,samples went in fridge after grinding for ~15 min,"ext 19, ext 21, UAT",7/8/15,7/9/15,7/13/15,"extracted in group 19, 49.8 g mass used",1,0
+1,7,PAV,N+P,2,1,1,shoot,0.3897,0.014,2045.455,1436.901,3,0.2339,0.1558,0,1,2,1,NP (3) leaf broken when trans IAP stopped,18,11/5/14,"AK, EB",50.1,NA,NA,7/8/15,7/9/15,7/13/15,NA,1,0
+1,7,PAV,P,1,0,1,shoot,0.1183,0.0076,682.646,912.09,3,0.0707,0.0476,1,1,1,1,NA,15,10/29/14,"AK,TP",49.3,4 min incubation after Trizol transfer,NA,7/8/15,7/13/15,7/13/15,NA,0.5,0
+1,7,PAV,P,2,0,1,shoot,0.2841,0.0171,1550.161,1389.755,3,0.1714,0.1127,0,1,1,1,3 adults and 2 babies for transmission to N,1,9/22/14-9/24/14,"AK, EB, TP",48.8,"Air dry 7 min, sit 5 min, frozen after chloroform transfer",NA,NA,NA,NA,NA,NA,NA
+1,7,RPV,low,1,0,0,shoot,0.3501,0.0311,1924.751,1709.833,3,0.2117,0.1384,1,1,1,1,NP leaf broken when trans IAP stopped,11,10/22/14,"AK, EB",47.5,NA,NA,NA,NA,NA,NA,NA,NA
+1,7,RPV,low,2,0,0,shoot,0.1915,0.0182,1065.005,1114.453,3,0.1146,0.0769,0,0,1,1,L leaf broken when trans IAP stopped,10,10/21/14,AK,46.3,extra incubation times (see notebook),NA,NA,NA,NA,NA,NA,NA
+1,7,RPV,N,1,1,0,shoot,0.2974,0.0152,1888.821,1732.916,3,0.1778,0.1196,1,1,1,1,4 adults and 1 baby for transmission to L,15,10/29/14,"AK,TP",49.3,4 min incubation after Trizol transfer,NA,4/8/16,4/9/16,4/9/16,NA,0,0
+1,7,RPV,N,2,1,0,shoot,0.282,0.0225,1961.701,1567.63,3,0.1692,0.1128,0,0,1,1,plant not used for transmission,4,10/15/14,AK,52.4,2.0 ml tubes for final set,NA,4/22/16,4/30/16,4/30/16,NA,0,1
+1,7,RPV,N+P,1,1,1,shoot,0.3255,0.0122,1584.147,1155.332,3,0.1963,0.1292,1,1,1,1,NA,20,11/10/14,"AK, EB, TP",52,"frozen after chloroform transfer, frozen after ethanol addition",NA,7/23/15,7/24/15,7/30/15,NA,0,1
+1,7,RPV,N+P,2,1,1,shoot,0.1432,0.0047,783.226,960.543,3,0.0852,0.058,0,0,1,1,L leaf broken when killing aphids,17,11/4/14,"AK, TP",48.2,NA,part of pellet may have been lost,4/22/16,4/30/16,4/30/16,NA,0,1
+1,7,RPV,P,1,0,1,shoot,0.1633,0.0147,1305.656,1263.677,3,0.0982,0.0651,1,1,1,1,plant not used for transmission,5,10/16/14,"AK, TP, KR",48.5,2.0 ml tubes for final set,NA,4/22/16,4/30/16,4/30/16,NA,0,0
+1,7,RPV,P,2,0,1,shoot,0.1652,0.0125,1002.369,1082.745,3,0.0991,0.0661,0,0,1,1,NA,2,9/25/14,"AK, EB, TP",52.4,15 min isopropanol incubation,NA,3/4/16,3/5/16,3/5/16,NA,0,0
+1,8,coinfection,low,1,0,0,shoot,0.0538,0.0027,514.796,712.713,2,0.032,0.0218,1,1,1,1,L leaf broken when trans IAP stopped,20,11/10/14,"AK, EB, TP",30.2,"frozen after chloroform transfer, frozen after ethanol addition",used all tissue,NA,NA,NA,NA,NA,NA
+1,8,coinfection,low,2,0,0,shoot,0.1421,0.0127,1000.814,845.78,3,0.0855,0.0566,1,1,1,1,NA,2,9/25/14,"AK, EB, TP",50.9,15 min isopropanol incubation,NA,NA,NA,NA,NA,NA,NA
+1,8,coinfection,N,1,1,0,shoot,0.1127,0.0068,807.925,982.322,3,0.0678,0.0449,1,1,1,1,NA,18,11/5/14,"AK, EB",46.7,NA,NA,NA,NA,NA,NA,NA,NA
+1,8,coinfection,N,2,1,0,shoot,0.4163,0.0145,2285.887,1741.757,3,0.2497,0.1666,1,1,1,1,NA,7,10/18/14,AK,52.3,NA,NA,NA,NA,NA,NA,NA,NA
+1,8,coinfection,N+P,1,1,1,shoot,0.4274,0.0179,2246.529,1760.957,3,0.2562,0.1712,1,1,1,1,NA,8,10/19/14,AK,52.5,NA,NA,NA,NA,NA,NA,NA,NA
+1,8,coinfection,N+P,2,1,1,shoot,0.2812,0.01,1764.674,1515.714,4,0.1695,0.1117,1,1,1,1,NA,11,10/22/14,"AK, EB",49,NA,NA,NA,NA,NA,NA,NA,NA
+1,8,coinfection,P,1,0,1,shoot,0.231,0.0174,1125.936,961.187,2,0.1385,0.0925,1,1,1,1,NA,22,1/11/15,AK,7.2,samples went in fridge after grinding for ~15 min,"ext 19, ext 21, UAT, didn't see pellet",NA,NA,NA,"extracted in group 19, 51.6 g mass used",NA,NA
+1,8,coinfection,P,2,0,1,shoot,0.1368,0.0148,919.097,976.751,2,0.0818,0.055,1,1,1,1,N leaf broken when trans IAP stopped,16,10/30/14,"AK,TP",46.1,"frozen after chlorophyll transfer, no 5 min air dry before adding water",NA,NA,NA,NA,NA,NA,NA
+1,8,healthy,low,1,0,0,shoot,0.5374,0.0254,2604.294,1373.073,4,0.5374,0,NA,NA,NA,NA,"may have had fewer than 10 aphids, watered with a little NP in addition to treatment",17,11/4/14,"AK, TP",51.8,NA,NA,2/24/15,3/4/15,3/4/15,NA,0,0
+1,8,healthy,low,2,0,0,shoot,0.4916,0.032,2911.819,1655.29,4,0.4916,0,NA,NA,NA,NA,may have had fewer than 10 aphids,14,10/28/14,"AK, EB",49.8,frozen after chlororophyll transfer,tiny pellet,3/3/15,3/5/15,3/10/15,NA,0,0
+1,8,healthy,N,1,1,0,shoot,0.5558,0.0189,2962.009,1904.301,4,0.5558,0,NA,NA,NA,NA,may have had fewer than 10 aphids,22,1/11/15,AK,50.9,samples went in fridge after grinding for ~15 min,Ext 21,2/19/15,3/9/15,3/10/15,NA,0.5,0.5
+1,8,healthy,N,2,1,0,shoot,0.557,0.01,2584.89,1602.724,4,0.557,0,NA,NA,NA,NA,may have had fewer than 10 aphids,20,11/10/14,"AK, EB, TP",52.8,"frozen after chloroform transfer, frozen after ethanol addition",NA,2/24/15,3/4/15,3/4/15,NA,0.5,0.5
+1,8,healthy,N+P,1,1,1,shoot,0.7182,0.0193,3466.788,2213.541,4,0.7182,0,NA,NA,NA,NA,may have had fewer than 10 aphids,6,10/17/14,AK,50,NA,NA,3/24/15,4/21/15,4/21/15,NA,1,0
+1,8,healthy,N+P,2,1,1,shoot,0.968,0.0171,4439.516,2761.417,5,0.968,0,NA,NA,NA,NA,may have had fewer than 10 aphids,13,10/24/14,AK,52.4,frozen after chloroform transfer,NA,3/3/15,3/5/15,3/10/15,NA,0,0
+1,8,healthy,P,1,0,1,shoot,0.3423,0.0109,2096.272,1688.45,4,0.3423,0,NA,NA,NA,NA,may have had fewer than 10 aphids,18,11/5/14,"AK, EB",46.7,NA,NA,2/24/15,3/4/15,3/4/15,NA,0,0.5
+1,8,healthy,P,2,0,1,shoot,0.3358,0.0111,1832.51,1553.572,4,0.3358,0,NA,NA,NA,NA,may have had fewer than 10 aphids,15,10/29/14,"AK,TP",49.1,4 min incubation after Trizol transfer,NA,3/3/15,3/5/15,3/10/15,NA,0.5,1
+1,8,PAV,low,1,0,0,shoot,NA,9.00E-04,NA,NA,NA,NA,NA,1,1,1,1,plant died,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+1,8,PAV,low,2,0,0,shoot,0.289,0.0334,1749.601,1608.898,4,0.1761,0.1129,1,1,1,1,NA,22,1/11/15,AK,29.8,samples went in fridge after grinding for ~15 min,"ext 19, ext 21, UAT",7/8/15,7/13/15,7/13/15,"extracted in group 19, 50 g mass used",1,0
+1,8,PAV,N,1,1,0,shoot,0.3193,0.0117,1875.744,1616.023,4,0.1914,0.1279,1,1,1,1,Trans NP got watered twice one day,11,10/22/14,"AK, EB",48,NA,NA,7/8/15,7/9/15,7/13/15,NA,1,0.5
+1,8,PAV,N,2,1,0,shoot,0.2616,0.0034,1691.001,1612.192,3,0.1562,0.1054,1,1,1,0,NA,4,10/15/14,AK,50.6,2.0 ml tubes for final set,NA,7/8/15,7/9/15,7/13/15,NA,1,0
+1,8,PAV,N+P,1,1,1,shoot,0.4409,0.0098,2401.724,1818.29,4,0.2644,0.1765,2,1,1,1,NA,16,10/30/14,"AK,TP",49.3,"frozen after chlorophyll transfer, no 5 min air dry before adding water",NA,7/8/15,7/9/15,7/13/15,NA,0.5,0.5
+1,8,PAV,N+P,2,1,1,shoot,0.3794,0.00147,2304.306,1905.613,4,0.2285,0.1509,0,1,1,0,NA,2,9/25/14,"AK, EB, TP",50.6,15 min isopropanol incubation,NA,NA,NA,NA,NA,NA,NA
+1,8,PAV,P,1,0,1,shoot,0.25,0.019,1378.126,1294.725,3,0.1501,0.0999,1,1,1,1,NA,8,10/19/14,AK,47.1,NA,NA,6/25/15,6/26/15,7/2/15,NA,0,0
+1,8,PAV,P,2,0,1,shoot,0.0985,0.0067,732.151,1003.011,3,0.0595,0.039,1,1,1,0,P leaf broken when trans IAP stopped,9,10/20/14,AK,48.3,NA,NA,7/23/15,7/24/15,7/30/15,NA,1,0
+1,8,RPV,low,1,0,0,shoot,0.2318,0.0101,1327.734,1310.772,3,0.1405,0.0913,0,1,1,1,NA,14,10/28/14,"AK, EB",46.9,frozen after chlororophyll transfer,<1ml 75% EtOH,NA,NA,NA,NA,NA,NA
+1,8,RPV,low,2,0,0,shoot,0.2731,0.0118,1345.207,1254.247,3,0.163,0.1101,2,1,1,1,Tested in July for RT-PCR and came up negative for both PAV and RPV so it was re-tested in August,22,1/11/15,AK,50.2,samples went in fridge after grinding for ~15 min,Ext 21,8/19/15,8/21/15,8/21/15,NA,0,0
+1,8,RPV,N,1,1,0,shoot,0.4494,0.0217,2465.667,2010.247,4,0.2705,0.1789,1,1,1,1,NA,1,9/22/14-9/24/14,"AK, EB, TP",53.7,"Air dry 7 min, sit 5 min, frozen after chloroform transfer",NA,2/10/16,2/10/16,2/10/16,NA,0,0
+1,8,RPV,N,2,1,0,shoot,0.4868,0.0171,2531.614,2098.129,4,0.2918,0.195,1,1,1,1,NA,12,10/23/14,"TP, AK",49.4,extra incubation before heating,NA,4/8/16,4/9/16,4/9/16,NA,0,0
+1,8,RPV,N+P,1,1,1,shoot,0.3691,0.0101,2055.234,1725.81,3,0.221,0.1481,1,1,1,1,NA,11,10/22/14,"AK, EB",48.8,NA,NA,4/22/16,4/30/16,4/30/16,NA,0,1
+1,8,RPV,N+P,2,1,1,shoot,0.4327,0.0152,2352.631,2085.467,3,0.2595,0.1732,1,1,1,0,NA,4,10/15/14,AK,51.2,2.0 ml tubes for final set,NA,4/8/16,4/9/16,4/9/16,NA,0,1
+1,8,RPV,P,1,0,1,shoot,0.2455,0.0141,1335.6,1203.869,4,0.1468,0.0987,1,1,1,1,NA,11,10/22/14,"AK, EB",48.6,NA,NA,4/8/16,4/9/16,4/9/16,NA,0,0
+1,8,RPV,P,2,0,1,shoot,0.0927,0.0023,875.068,1143.008,4,0.0564,0.0363,1,1,1,1,NA,13,10/24/14,AK,46.1,frozen after chloroform transfer,NA,4/22/16,4/30/16,4/30/16,NA,0,0
+2,1,coinfection,low,3,0,0,shoot,0.134,0.0176,679.762,464.82,2,0.0806,0.0534,1,1,1,1,NA,12,10/23/14,"TP, AK",50.7,extra incubation before heating,NA,NA,NA,NA,NA,NA,NA
+2,1,coinfection,N,3,1,0,shoot,0.1361,0.0121,722.77,575.1,2,0.0815,0.0546,1,1,1,1,NA,1,9/22/14-9/24/14,"AK, EB, TP",54.8,"Air dry 7 min, sit 5 min, frozen after chloroform transfer","used all tissue, used white label screw cap tube",NA,NA,NA,NA,NA,NA
+2,1,coinfection,N+P,3,1,1,shoot,0.1683,0.0144,978.173,611.92,2,0.1003,0.068,1,1,1,1,NA,7,10/18/14,AK,46.2,NA,NA,NA,NA,NA,NA,NA,NA
+2,1,coinfection,P,3,0,1,shoot,0.0942,0.0148,622.46,443.195,1,0.0564,0.0378,1,1,1,1,NA,8,10/19/14,AK,47.2,NA,used all tissue,NA,NA,NA,NA,NA,NA
+2,1,healthy,low,3,0,0,shoot,0.114,0.0133,620.468,515.892,2,0.114,0,NA,NA,NA,NA,NA,18,11/5/14,"AK, EB",54.6,NA,NA,2/24/15,3/4/15,3/4/15,NA,0.5,0
+2,1,healthy,N,3,1,0,shoot,0.1049,0.0071,564.088,512.708,2,0.1049,0,NA,NA,NA,NA,NA,19,11/6/14,"AK, TP",48.9,"tubes flipped after isoproponal addition, frozen after ethanol addition","some sample lost, try to re-do in 21",2/24/15,3/4/15,3/4/15,NA,0.5,0
+2,1,healthy,N+P,3,1,1,shoot,0.2017,0.0167,1185.298,778.824,2,0.2017,0,NA,NA,NA,NA,NA,16,10/30/14,"AK,TP",47.44,"frozen after chlorophyll transfer, no 5 min air dry before adding water",NA,2/24/15,3/4/15,3/4/15,NA,0,0
+2,1,healthy,P,3,0,1,shoot,0.1639,0.0196,840.051,684.092,2,0.1639,0,NA,NA,NA,NA,NA,7,10/18/14,AK,50.2,NA,NA,3/24/15,4/21/15,4/21/15,NA,0.5,0
+2,1,PAV,low,3,0,0,shoot,0.1859,0.0193,979.905,629.529,2,0.1099,0.076,1,1,1,1,NA,1,9/22/14-9/24/14,"AK, EB, TP",53.4,"Air dry 7 min, sit 5 min, frozen after chloroform transfer",NA,NA,NA,NA,NA,NA,NA
+2,1,PAV,N,3,1,0,shoot,0.0931,0.0083,502.888,402.572,1,0.0552,0.0379,1,1,1,1,NA,6,10/17/14,AK,41.4,NA,used all tissue,6/25/15,6/26/15,7/2/15,NA,1,0
+2,1,PAV,N+P,3,1,1,shoot,0.1842,0.0261,937.815,547.003,2,0.1102,0.074,1,1,1,1,NA,1,9/22/14-9/24/14,"AK, EB, TP",50.3,"Air dry 7 min, sit 5 min, frozen after chloroform transfer",NA,NA,NA,NA,NA,NA,NA
+2,1,PAV,P,3,0,1,shoot,0.1894,0.0211,938.849,707.244,2,0.1128,0.0766,1,1,1,1,NA,6,10/17/14,AK,48.9,NA,NA,6/25/15,6/26/15,7/2/15,NA,1,0
+2,1,RPV,low,3,0,0,shoot,0.1505,0.0128,913.221,621.274,2,0.0899,0.0606,1,1,1,1,IAP cage broken - may have not been inoculated,14,10/28/14,"AK, EB",48,frozen after chlororophyll transfer,NA,NA,NA,NA,NA,NA,NA
+2,1,RPV,N,3,1,0,shoot,0.1314,0.0121,666.606,405.118,2,0.0788,0.0526,1,1,1,1,NA,5,10/16/14,"AK, TP, KR",47.8,2.0 ml tubes for final set,NA,NA,NA,NA,NA,NA,NA
+2,1,RPV,N+P,3,1,1,shoot,0.0469,0.0163,951.777,613.69,2,0.0284,0.0185,1,1,1,1,4 aphids for transmission to L,12,10/23/14,"TP, AK",16.5,extra incubation before heating,used all tissue,4/22/16,4/30/16,4/30/16,NA,0,0
+2,1,RPV,P,3,0,1,shoot,0.1469,0.0137,102.547,126.254,1,0.0878,0.0591,1,1,1,1,leaf broken when IAP stopped,6,10/17/14,AK,50.7,NA,NA,NA,NA,NA,NA,NA,NA
+2,2,coinfection,low,3,0,0,shoot,0.1629,0.0279,827.857,627.571,2,0.0976,0.0653,1,1,1,1,NA,20,11/10/14,"AK, EB, TP",51.7,"frozen after chloroform transfer, frozen after ethanol addition",NA,NA,NA,NA,NA,NA,NA
+2,2,coinfection,N,3,1,0,shoot,0.206,0.0203,924.273,730.797,2,0.1233,0.0827,1,1,1,1,4 aphids for transmission to N,18,11/5/14,"AK, EB",49.3,NA,NA,NA,NA,NA,NA,NA,NA
+2,2,coinfection,N+P,3,1,1,shoot,0.1972,0.0253,1026.76,701.62,2,0.1189,0.0783,1,1,1,1,NA,3,10/1/14,"AK,EB,TP",49.5,Frozen after chloroform transfer,NA,NA,NA,NA,NA,NA,NA
+2,2,coinfection,P,3,0,1,shoot,0.1011,0.0101,466.961,434.521,2,0.0604,0.0407,1,1,1,1,NA,7,10/18/14,AK,48.1,NA,NA,NA,NA,NA,NA,NA,NA
+2,2,healthy,low,3,0,0,shoot,0.1342,0.0119,718.923,609.74,2,0.1342,0,NA,NA,NA,NA,NA,12,10/23/14,"TP, AK",50.6,extra incubation before heating,NA,3/3/15,3/5/15,3/10/15,NA,0.5,0
+2,2,healthy,N,3,1,0,shoot,0.0529,0.0133,201.332,273.603,1,0.0529,0,NA,NA,NA,NA,leaf broken when IAP stopped,6,10/17/14,AK,44.9,NA,used all tissue,3/24/15,4/21/15,4/21/15,NA,0,0
+2,2,healthy,N+P,3,1,1,shoot,0.2135,0.0177,1116.323,680.325,2,0.2135,0,NA,NA,NA,NA,NA,18,11/5/14,"AK, EB",53.3,NA,NA,2/24/15,3/4/15,3/4/15,NA,0,0
+2,2,healthy,P,3,0,1,shoot,0.0692,0.0116,361.872,360.372,2,0.0692,0,NA,NA,NA,NA,NA,14,10/28/14,"AK, EB",46.9,frozen after chlororophyll transfer,NA,3/3/15,3/5/15,3/10/15,NA,0,0
+2,2,PAV,low,3,0,0,shoot,0.1912,0.023,936.232,590.772,2,0.114,0.0772,1,1,1,2,NA,12,10/23/14,"TP, AK",50.5,extra incubation before heating,NA,7/23/15,7/24/15,7/30/15,NA,1,0
+2,2,PAV,N,3,1,0,shoot,0.2127,0.0128,964.634,827.761,2,0.1279,0.0848,1,1,1,1,NA,19,11/6/14,"AK, TP",49.6,"tubes flipped after isoproponal addition, frozen after ethanol addition","some sample lost, try to re-do in 21",7/23/15,7/24/15,7/30/15,NA,1,0
+2,2,PAV,N+P,3,1,1,shoot,0.2538,0.0208,1299.052,798.552,2,0.152,0.1018,1,1,1,1,NA,14,10/28/14,"AK, EB",50.3,frozen after chlororophyll transfer,>1ml 75% EtOH,6/25/15,6/26/15,7/2/15,NA,1,0
+2,2,PAV,P,3,0,1,shoot,0.1243,0.0198,610.418,565.542,2,0.0748,0.0495,1,1,1,1,NA,11,10/22/14,"AK, EB",46.8,NA,NA,7/8/15,7/13/15,7/13/15,NA,1,0
+2,2,RPV,low,3,0,0,shoot,0.2339,0.0239,1122.259,775.565,2,0.14,0.0939,1,1,1,0,NA,11,10/22/14,"AK, EB",46.4,NA,NA,NA,NA,NA,NA,NA,NA
+2,2,RPV,N,3,1,0,shoot,0.2552,0.0204,1299.664,857.824,2,0.1529,0.1023,1,1,1,1,NA,18,11/5/14,"AK, EB",50.9,NA,NA,4/8/16,4/9/16,4/9/16,NA,0,0
+2,2,RPV,N+P,3,1,1,shoot,0.0483,0.011,104.752,159.096,1,0.0286,0.0197,0,0,1,0,"leaf broken when IAP stopped, 3 aphids for transmission to NP",11,10/22/14,"AK, EB",20,NA,used all tissue,4/22/16,4/30/16,4/30/16,"Issues with PCR mean that this sample could have had light RPV band that wasn't detected, but fairly certain it didn't have a strong RPV band",0,0
+2,2,RPV,P,3,0,1,shoot,0.2217,0.0244,1098.683,749.576,2,0.1339,0.0878,1,1,1,1,NA,5,10/16/14,"AK, TP, KR",49.3,2.0 ml tubes for final set,NA,NA,NA,NA,NA,NA,NA
+2,3,coinfection,low,3,0,0,shoot,0.1491,0.0118,932.578,721.559,2,0.0897,0.0594,1,1,1,1,4 aphids for transmission to N,20,11/10/14,"AK, EB, TP",49.8,"frozen after chloroform transfer, frozen after ethanol addition",NA,NA,NA,NA,NA,NA,NA
+2,3,coinfection,N,3,1,0,shoot,0.1062,0.0122,705.32,825.031,2,0.0637,0.0425,1,0,0,1,3 aphids for transmission to L,19,11/6/14,"AK, TP",45.5,"tubes flipped after isoproponal addition, frozen after ethanol addition",NA,NA,NA,NA,NA,NA,NA
+2,3,coinfection,N+P,3,1,1,shoot,0.2483,0.016,1436.058,897.417,3,0.1494,0.0989,1,1,1,1,NA,13,10/24/14,AK,48.7,frozen after chloroform transfer,NA,NA,NA,NA,NA,NA,NA
+2,3,coinfection,P,3,0,1,shoot,0.1376,0.0099,899.94,743.518,2,0.0828,0.0548,1,1,1,1,NA,4,10/15/14,AK,50.7,2.0 ml tubes for final set,NA,NA,NA,NA,NA,NA,NA
+2,3,healthy,low,3,0,0,shoot,0.1375,0.007,856.038,631.45,2,0.1375,0,NA,NA,NA,NA,NA,1,9/22/14-9/24/14,"AK, EB, TP",50.6,"Air dry 7 min, sit 5 min, frozen after chloroform transfer",NA,3/4/16,3/5/16,3/5/16,NA,0,0
+2,3,healthy,N,3,1,0,shoot,0.0499,0.0052,247.234,289.956,1,0.0499,0,NA,NA,NA,NA,leaf broken when IAP stopped,6,10/17/14,AK,34.3,NA,used all tissue,3/24/15,4/21/15,4/21/15,NA,0,0
+2,3,healthy,N+P,3,1,1,shoot,0.3119,0.015,1679.772,NA,2,0.3119,0,NA,NA,NA,NA,NA,16,10/30/14,"AK,TP",51.5,"frozen after chlorophyll transfer, no 5 min air dry before adding water",NA,2/24/15,3/4/15,3/4/15,NA,0,0
+2,3,healthy,P,3,0,1,shoot,0.2504,0.022,1275.694,882.876,2,0.2504,0,NA,NA,NA,NA,NA,19,11/6/14,"AK, TP",51.1,"tubes flipped after isoproponal addition, frozen after ethanol addition",NA,2/24/15,3/4/15,3/4/15,NA,1,1
+2,3,PAV,low,3,0,0,shoot,0.1096,0.0074,636.745,538.384,2,0.0658,0.0438,1,1,1,1,Couldn't find sample for extraction,NA,NA,NA,NA,NA,Couldn't find sample for extraction,NA,NA,NA,NA,NA,NA
+2,3,PAV,N,3,1,0,shoot,0.2339,0.0119,1299.984,899.866,2,0.1403,0.0936,1,1,1,1,NA,7,10/18/14,AK,52,NA,may have lost pellet,7/8/15,7/13/15,7/13/15,NA,1,1
+2,3,PAV,N+P,3,1,1,shoot,0.0778,0.0119,449.288,445.246,1,0.0474,0.0304,1,1,1,0,"leaf broken when IAP stopped, 3 aphids for transmission to N",3,10/1/14,"AK,EB,TP",35.4,Frozen after chloroform transfer,All tissue used,8/19/15,8/21/15,8/21/15,NA,0,0
+2,3,PAV,P,3,0,1,shoot,0.2215,0.0136,1294.632,890.221,2,0.1333,0.0882,1,1,1,1,NA,17,11/4/14,"AK, TP",48.1,NA,NA,7/23/15,7/24/15,7/30/15,NA,1,0
+2,3,RPV,low,3,0,0,shoot,0.0759,0.0066,481.829,419.141,2,0.0452,0.0307,1,1,1,1,NA,20,11/10/14,"AK, EB, TP",28.8,"frozen after chloroform transfer, frozen after ethanol addition",used all tissue,7/23/15,7/24/15,7/30/15,NA,0.5,1
+2,3,RPV,N,3,1,0,shoot,0.2204,0.0138,1270.531,973.245,2,0.1317,0.0887,1,1,1,1,4 aphids for transmission to N,15,10/29/14,"AK,TP",53.2,4 min incubation after Trizol transfer,NA,NA,NA,NA,NA,NA,NA
+2,3,RPV,N+P,3,1,1,shoot,0.2699,0.017,1620.304,1082.817,3,0.1614,0.1085,1,1,1,1,NA,18,11/5/14,"AK, EB",48,NA,NA,4/8/16,4/9/16,4/9/16,NA,0,1
+2,3,RPV,P,3,0,1,shoot,0.2498,0.0194,1365.852,953.988,2,0.1496,0.1002,1,1,1,1,N leaf broken when killing aphids,22,1/11/15,AK,50,samples went in fridge after grinding for ~15 min,Ext 19,4/22/16,4/30/16,4/30/16,"extracted in group 19, 50.8 g mass used",0,1
+2,4,coinfection,low,3,0,0,shoot,0.2307,0.0219,1318.572,905.504,2,0.1382,0.0925,1,1,1,1,NA,7,10/18/14,AK,48,NA,NA,NA,NA,NA,NA,NA,NA
+2,4,coinfection,N,3,1,0,shoot,0.1457,0.208,726.109,650.878,1,0.0875,0.0582,1,0,1,1,"leaf broken when IAP stopped, 4 aphids for transmission to NP",17,11/4/14,"AK, TP",45.9,NA,NA,NA,NA,NA,NA,NA,NA
+2,4,coinfection,N+P,3,1,1,shoot,0.1276,0.0199,826.153,588.589,2,0.0766,0.051,1,1,1,0,NA,14,10/28/14,"AK, EB",47.9,frozen after chlororophyll transfer,NA,NA,NA,NA,NA,NA,NA
+2,4,coinfection,P,3,0,1,shoot,0.2406,0.0303,1371.648,1029.22,2,0.145,0.0956,1,1,1,1,NA,6,10/17/14,AK,47.8,NA,NA,NA,NA,NA,NA,NA,NA
+2,4,healthy,low,3,0,0,shoot,0.1048,0.0096,521.778,56,1,0.1048,0,NA,NA,NA,NA,leaf broken when IAP stopped,4,10/15/14,AK,48.1,2.0 ml tubes for final set,NA,3/24/15,4/21/15,4/21/15,NA,1,0
+2,4,healthy,N,3,1,0,shoot,0.1408,0.0238,871.56,791.906,2,0.1408,0,NA,NA,NA,NA,NA,5,10/16/14,"AK, TP, KR",49.8,2.0 ml tubes for final set,NA,3/24/15,4/21/15,4/21/15,NA,0.5,0
+2,4,healthy,N+P,3,1,1,shoot,0.2065,0.0131,1262.547,1000.745,3,0.2065,0,NA,NA,NA,NA,NA,7,10/18/14,AK,48.9,NA,NA,3/24/15,4/21/15,4/21/15,NA,1,0
+2,4,healthy,P,3,0,1,shoot,0.17,0.0223,941.649,835.253,2,0.17,0,NA,NA,NA,NA,NA,17,11/4/14,"AK, TP",51.4,NA,NA,2/24/15,3/4/15,3/4/15,NA,1,0
+2,4,PAV,low,3,0,0,shoot,0.1641,0.0217,881.772,815.245,3,0.0987,0.0654,1,1,1,1,NA,8,10/19/14,AK,47.6,NA,NA,6/25/15,6/26/15,7/2/15,NA,1,0
+2,4,PAV,N,3,1,0,shoot,0.0378,0.0046,100.158,163.212,1,0.0378,0,0,0,0,0,leaf broken when IAP stopped,6,10/17/14,AK,29.6,NA,used all tissue,6/25/15,6/26/15,7/2/15,NA,1,0
+2,4,PAV,N+P,3,1,1,shoot,0.3888,0.1044,1875.257,1429.595,3,0.234,0.1548,1,1,1,1,NA,8,10/19/14,AK,53.6,NA,NA,6/25/15,6/26/15,7/2/15,NA,1,0
+2,4,PAV,N+P,3,1,1,root,0.3888,0.1044,1875.257,1429.595,3,0.234,0.1548,NA,NA,NA,NA,NA,NA,8/18/15,NA,51.5,NA,NA,NA,NA,NA,NA,NA,NA
+2,4,PAV,P,3,0,1,shoot,0.1953,0.0275,1125.444,947.525,2,0.1178,0.0775,1,1,1,1,NA,4,10/15/14,AK,52.6,2.0 ml tubes for final set,NA,4/8/16,4/9/16,4/9/16,"did RT/PCR twice, first time in July 2015",1,1
+2,4,RPV,low,3,0,0,shoot,0.1066,0.0145,603.204,597.82,3,0.0639,0.0427,1,1,1,1,NA,14,10/28/14,"AK, EB",45.3,frozen after chlororophyll transfer,NA,NA,NA,NA,NA,NA,NA
+2,4,RPV,N,3,1,0,shoot,0.1138,0.0198,508.632,505.4,1,0.0683,0.0455,1,0,0,1,"leaf broken when IAP stopped, Couldn't find sample for extraction",NA,NA,NA,NA,NA,Couldn't find sample for extraction,NA,NA,NA,NA,NA,NA
+2,4,RPV,N+P,3,1,1,shoot,0.2813,0.0198,1614.629,1125.611,3,0.1684,0.1129,1,1,1,1,NA,17,11/4/14,"AK, TP",48.7,NA,NA,4/22/16,4/30/16,4/30/16,NA,0,0
+2,4,RPV,P,3,0,1,shoot,0.1515,0.0197,878.534,775.529,2,0.0902,0.0613,1,1,1,1,NA,22,1/11/15,AK,19.3,samples went in fridge after grinding for ~15 min,"Ext 19, UAT",NA,NA,NA,"extracted in group 19, 49.9 g mass used",NA,NA
+2,5,coinfection,low,3,0,0,shoot,0.0877,0.0116,644.579,704.172,2,0.0524,0.0353,0,1,1,1,2 aphids for transmission to P,15,10/29/14,"AK,TP",41.3,4 min incubation after Trizol transfer,used all tissue,NA,NA,NA,NA,NA,NA
+2,5,coinfection,N,3,1,0,shoot,0.27,0.0166,1425.823,1090.945,2,0.1624,0.1076,1,0,0,1,3 aphids for transmission to L,16,10/30/14,"AK,TP",47.2,"frozen after chlorophyll transfer, no 5 min air dry before adding water",NA,NA,NA,NA,NA,NA,NA
+2,5,coinfection,N+P,3,1,1,shoot,0.2225,0.0204,1378.179,845.751,2,0.1334,0.0891,1,1,1,1,4 aphids for transmission to L,20,11/10/14,"AK, EB, TP",46.4,"frozen after chloroform transfer, frozen after ethanol addition",NA,NA,NA,NA,NA,NA,NA
+2,5,coinfection,P,3,0,1,shoot,0.1852,0.015,1033.626,774.222,2,0.1115,0.0737,1,1,1,1,4 aphids for transmission to P,3,10/1/14,"AK,EB,TP",47.1,Frozen after chloroform transfer,NA,NA,NA,NA,NA,NA,NA
+2,5,healthy,low,3,0,0,shoot,0.248,0.0208,1482.651,1207.814,3,0.248,0,NA,NA,NA,NA,NA,1,9/22/14-9/24/14,"AK, EB, TP",51.1,"Air dry 7 min, sit 5 min, frozen after chloroform transfer",NA,3/4/16,3/5/16,3/5/16,NA,0.5,1
+2,5,healthy,N,3,1,0,shoot,0.3844,0.0179,1964.29,1511.692,3,0.3844,0,NA,NA,NA,NA,NA,13,10/24/14,AK,46.3,frozen after chloroform transfer,NA,3/3/15,3/5/15,3/10/15,NA,0,0
+2,5,healthy,N+P,3,1,1,shoot,0.243,0.0148,1490.102,1236.337,3,0.243,0,NA,NA,NA,NA,NA,3,10/1/14,"AK,EB,TP",47.7,Frozen after chloroform transfer,NA,3/4/16,3/5/16,3/5/16,NA,0,0
+2,5,healthy,P,3,0,1,shoot,0.2826,0.0192,1590.474,1345.941,3,0.2826,0,NA,NA,NA,NA,NA,1,9/22/14-9/24/14,"AK, EB, TP",48.4,"Air dry 7 min, sit 5 min, frozen after chloroform transfer",NA,3/4/16,3/5/16,3/5/16,NA,0.5,0.5
+2,5,PAV,low,3,0,0,shoot,0.1407,0.0116,876.405,866.011,2,0.084,0.0567,1,1,1,1,4 aphids for transmission to N,9,10/20/14,AK,49,NA,NA,7/23/15,7/24/15,7/30/15,NA,1,0
+2,5,PAV,N,3,1,0,shoot,0.4071,0.0243,2048.928,1653.767,3,0.2445,0.1626,1,1,1,1,"4 aphids for transmission to P, 2 adults and 3 babies for transmission to L, 4 adults and 1 baby for transmission to N (I think it's this initial plant - notebook unclear)",22,1/11/15,AK,50.2,samples went in fridge after grinding for ~15 min,Ext 19,7/8/15,7/9/15,7/13/15,"extracted in group 19, 50.2 g mass used",1,0
+2,5,PAV,N+P,3,1,1,shoot,0.3521,0.0204,1860.981,1231.556,3,0.2114,0.1407,1,1,1,1,NA,15,10/29/14,"AK,TP",51.2,4 min incubation after Trizol transfer,NA,6/25/15,6/26/15,7/2/15,NA,1,0
+2,5,PAV,P,3,0,1,shoot,0.1431,0.0197,966.031,845.811,2,0.0855,0.0576,1,1,1,1,2 aphids for transmission to NP,8,10/19/14,AK,45.9,NA,NA,6/25/15,6/26/15,7/2/15,NA,1,0
+2,5,RPV,low,3,0,0,shoot,0.2786,0.0196,1507.983,1217.445,3,0.1675,0.1111,1,1,1,1,3 aphids for transmission to N,22,1/11/15,AK,47.2,samples went in fridge after grinding for ~15 min,Ext 21,7/23/15,7/24/15,7/30/15,NA,1,1
+2,5,RPV,N,3,1,0,root,0.1947,0.0109,947.595,950.668,3,0.1166,0.0781,NA,NA,NA,NA,2 aphids for transmission to L,NA,8/18/15,NA,10.3,NA,UAT,NA,NA,NA,NA,NA,NA
+2,5,RPV,N,3,1,0,shoot,0.1947,0.0109,947.595,950.668,3,0.1166,0.0781,1,0,0,1,2 aphids for transmission to L,12,10/23/14,"TP, AK",48.9,extra incubation before heating,NA,NA,NA,NA,NA,NA,NA
+2,5,RPV,N+P,3,1,1,shoot,0.104,0.0083,566.967,548.877,2,0.0622,0.0418,0,0,1,0,NA,9,10/20/14,AK,46.7,NA,NA,NA,NA,NA,NA,NA,NA
+2,5,RPV,P,3,0,1,shoot,0.1861,0.0142,1059.067,914.836,2,0.1115,0.0746,1,1,1,1,"a few babies used in transmission to N, L, and NP",2,9/25/14,"AK, EB, TP",52.4,15 min isopropanol incubation,NA,2/19/16,2/19/16,2/19/16,NA,0,1
+2,6,coinfection,low,3,0,0,shoot,0.0955,0.0032,713.82,679.924,2,0.0575,0.038,1,1,1,1,2 aphids for transmission to N,12,10/23/14,"TP, AK",50.5,extra incubation before heating,used all tissue,NA,NA,NA,NA,NA,NA
+2,6,coinfection,N,3,1,0,shoot,0.209,0.0241,1047.282,902.388,2,0.1252,0.0838,1,0,1,1,NA,10,10/21/14,AK,51.3,extra incubation times (see notebook),NA,NA,NA,NA,NA,NA,NA
+2,6,coinfection,N+P,3,1,1,shoot,0.1356,0.009,925.125,676.309,3,0.0819,0.0537,1,1,1,1,NA,20,11/10/14,"AK, EB, TP",49.5,"frozen after chloroform transfer, frozen after ethanol addition",NA,NA,NA,NA,NA,NA,NA
+2,6,coinfection,P,3,0,1,shoot,0.1829,0.0341,1074.156,874.904,2,0.1099,0.073,1,1,0,1,"watered N trans with NP once, 4 aphids for transmission to P",8,10/19/14,AK,47,NA,NA,NA,NA,NA,NA,NA,NA
+2,6,healthy,low,3,0,0,shoot,0.1305,0.0096,708.821,978.178,3,0.1305,0,NA,NA,NA,NA,NA,1,9/22/14-9/24/14,"AK, EB, TP",50.9,"Air dry 7 min, sit 5 min, frozen after chloroform transfer",used white label screw cap tube,3/4/16,3/5/16,3/5/16,NA,0,0
+2,6,healthy,N,3,1,0,shoot,0.1347,0.0087,853.773,897.366,3,0.1347,0,NA,NA,NA,NA,NA,7,10/18/14,AK,49.6,NA,may have lost pellet,3/24/15,4/21/15,4/21/15,NA,1,0
+2,6,healthy,N+P,3,1,1,shoot,0.2931,0.0177,1909.504,1577.323,3,0.2931,0,NA,NA,NA,NA,NA,7,10/18/14,AK,48.1,NA,NA,3/24/15,4/21/15,4/21/15,NA,1,1
+2,6,healthy,P,3,0,1,shoot,0.1589,0.0167,889.872,820.605,2,0.1589,0,NA,NA,NA,NA,NA,17,11/4/14,"AK, TP",46.6,NA,NA,2/24/15,3/4/15,3/4/15,NA,0.5,0
+2,6,PAV,low,3,0,0,shoot,0.164,0.0193,1028.083,849.637,2,0.0987,0.0653,1,0,1,1,P leaf broken when trans IAP stopped,14,10/28/14,"AK, EB",49.8,frozen after chlororophyll transfer,NA,6/25/15,6/26/15,7/2/15,NA,1,0
+2,6,PAV,N,3,1,0,shoot,0.225,0.0081,1263.482,1032.426,2,0.1345,0.0905,1,1,1,1,NA,17,11/4/14,"AK, TP",49.7,NA,NA,7/23/15,7/24/15,7/30/15,NA,0,0
+2,6,PAV,N+P,3,1,1,shoot,0.3242,0.0168,1809.757,1497.158,3,0.1948,0.1294,1,1,1,0,3 aphids for transmission to N,5,10/16/14,"AK, TP, KR",49.5,2.0 ml tubes for final set,NA,7/8/15,7/9/15,7/13/15,NA,1,0
+2,6,PAV,P,3,0,1,shoot,0.1909,0.0311,1067.832,905.99,2,0.1147,0.0762,1,1,1,1,NA,7,10/18/14,AK,47.5,NA,NA,7/8/15,7/9/15,7/13/15,NA,0,0
+2,6,RPV,low,3,0,0,shoot,0.2776,0.0263,1350.98,1075.507,3,0.1668,0.1108,1,1,1,1,4 aphids for transmission to N,5,10/16/14,"AK, TP, KR",51.4,2.0 ml tubes for final set,NA,NA,NA,NA,NA,NA,NA
+2,6,RPV,N,3,1,0,shoot,0.1224,0.0021,696.02,837.202,3,0.0731,0.0493,1,0,0,1,NA,8,10/19/14,AK,47,NA,NA,NA,NA,NA,NA,NA,NA
+2,6,RPV,N+P,3,1,1,shoot,0.1747,0.0136,1198.243,898.764,2,0.1054,0.0693,1,1,1,1,"leaf broken when IAP stopped, 1 aphid for transmission to L",18,11/5/14,"AK, EB",49.2,NA,NA,4/8/16,4/9/16,4/9/16,NA,0.5,1
+2,6,RPV,P,3,0,1,shoot,0.1088,0.0116,549.776,549.355,1,0.0651,0.0437,1,0,1,1,"leaf broken during watering, P leaf broken when trans IAP stopped",1,9/22/14-9/24/14,"AK, EB, TP",51.2,"Air dry 7 min, sit 5 min, frozen after chloroform transfer",NA,2/10/16,2/10/16,2/10/16,NA,0,1
+2,7,coinfection,low,3,0,0,shoot,0.1309,0.0101,842.738,747.645,NA,0.0786,0.0523,1,1,1,1,3 adults and 1 baby for transmission to N,2,9/25/14,"AK, EB, TP",50.5,15 min isopropanol incubation,NA,NA,NA,NA,NA,NA,NA
+2,7,coinfection,N,3,1,0,shoot,0.1112,0.0084,591.694,576.122,NA,0.0668,0.0444,1,1,1,1,leaf broken when IAP stopped,6,10/17/14,AK,48,NA,NA,NA,NA,NA,NA,NA,NA
+2,7,coinfection,N+P,3,1,1,shoot,0.2044,NA,1449.416,1002.085,NA,0.1223,0.0821,1,1,1,1,NA,10,10/21/14,AK,47.1,extra incubation times (see notebook),NA,NA,NA,NA,NA,NA,NA
+2,7,coinfection,P,3,0,1,shoot,0.1385,0.01,779.049,773.323,NA,0.0833,0.0552,1,1,1,1,NA,1,9/22/14-9/24/14,"AK, EB, TP",49.8,"Air dry 7 min, sit 5 min, frozen after chloroform transfer",NA,NA,NA,NA,NA,NA,NA
+2,7,healthy,low,3,0,0,shoot,0.2334,0.0058,1380.99,1086.454,NA,0.2334,0,NA,NA,NA,NA,NA,16,10/30/14,"AK,TP",47.9,"frozen after chlorophyll transfer, no 5 min air dry before adding water",NA,6/3/15,6/12/15,6/12/15,NA,0,0
+2,7,healthy,N,3,1,0,shoot,0.3263,0.0144,1916.457,1363.38,NA,0.3263,0,NA,NA,NA,NA,NA,14,10/28/14,"AK, EB",46.2,frozen after chlororophyll transfer,NA,3/3/15,3/5/15,3/10/15,NA,0,0
+2,7,healthy,N+P,3,1,1,shoot,0.2034,0.0059,1376.344,1266.012,NA,0.2034,0,NA,NA,NA,NA,NA,6,10/17/14,AK,52.4,NA,NA,6/3/15,6/12/15,6/12/15,NA,0.5,0.5
+2,7,healthy,P,3,0,1,shoot,0.1739,0.0156,893.442,815.716,NA,0.1739,0,NA,NA,NA,NA,NA,4,10/15/14,AK,51.3,2.0 ml tubes for final set,NA,3/24/15,4/21/15,4/21/15,NA,1,0
+2,7,PAV,low,3,0,0,shoot,0.1918,0.012,1138.675,935.679,NA,0.1154,0.0764,1,1,1,2,NP leaf broken when trans IAP stopped,5,10/16/14,"AK, TP, KR",49.9,2.0 ml tubes for final set,NA,7/8/15,7/13/15,7/13/15,NA,0,0
+2,7,PAV,N,3,1,0,shoot,0.442,0.0215,2192.695,1765.151,NA,0.265,0.177,1,1,1,1,NA,4,10/15/14,AK,53.6,2.0 ml tubes for final set,NA,7/8/15,7/9/15,7/13/15,NA,0,0
+2,7,PAV,N+P,3,1,1,shoot,0.1677,0.0075,1071.946,797.485,NA,0.1002,0.0675,1,1,1,1,NA,22,1/11/15,AK,32.9,samples went in fridge after grinding for ~15 min,"Ext 19, UAT",7/8/15,7/13/15,7/13/15,"extracted in group 19, 49.4 g mass used",1,0
+2,7,PAV,P,3,0,1,shoot,0.1411,0.0104,827.641,852.28,NA,0.0845,0.0566,1,1,1,1,NA,3,10/1/14,"AK,EB,TP",49.5,Frozen after chloroform transfer,NA,NA,NA,NA,NA,NA,NA
+2,7,RPV,low,3,0,0,shoot,0.1726,0.0145,985.687,837.486,NA,0.104,0.0686,1,1,1,1,"leaf broken when killing aphids, 4 aphids for transmission to N",7,10/18/14,AK,50.3,NA,NA,NA,NA,NA,NA,NA,NA
+2,7,RPV,N,3,1,0,shoot,0.3165,0.0185,1734.669,1516.661,NA,0.1899,0.1266,2,1,1,1,NA,1,9/22/14-9/24/14,"AK, EB, TP",50.1,"Air dry 7 min, sit 5 min, frozen after chloroform transfer",NA,2/10/16,2/10/16,2/10/16,NA,1,1
+2,7,RPV,N+P,3,1,1,shoot,0.1615,0.0041,995.33,751.699,NA,0.0965,0.065,1,1,1,0,NA,2,9/25/14,"AK, EB, TP",49.4,15 min isopropanol incubation,NA,2/26/16,2/26/16,2/26/16,NA,0,1
+2,7,RPV,P,3,0,1,shoot,0.1479,0.006,848.158,668.83,NA,0.089,0.0589,1,1,1,1,NA,9,10/20/14,AK,47.2,NA,NA,4/22/16,4/30/16,4/30/16,NA,0,0
+2,8,coinfection,low,3,0,0,shoot,0.1232,0.0111,785.725,695.73,2,0.0736,0.0496,1,1,1,1,NA,7,10/18/14,AK,50.6,NA,NA,NA,NA,NA,NA,NA,NA
+2,8,coinfection,N,3,1,0,shoot,0.2298,0.017,1375.892,1088.565,4,0.1379,0.0919,1,1,1,1,3 adults and 1 baby for transmission to P,1,9/22/14-9/24/14,"AK, EB, TP",51,"Air dry 7 min, sit 5 min, frozen after chloroform transfer",NA,NA,NA,NA,NA,NA,NA
+2,8,coinfection,N+P,3,1,1,shoot,0.1783,0.0121,1044.037,832.796,2,0.107,0.0713,1,1,1,1,"4 aphids for transmission to P, 3 aphids for transmission to L",19,11/6/14,"AK, TP",50,"tubes flipped after isoproponal addition, frozen after ethanol addition",NA,NA,NA,NA,NA,NA,NA
+2,8,coinfection,P,3,0,1,shoot,0.0958,0.017,608.24,624.275,3,0.0578,0.038,1,1,1,1,1 aphid for transmission to NP,13,10/24/14,AK,46.5,frozen after chloroform transfer,NA,NA,NA,NA,NA,NA,NA
+2,8,healthy,low,3,0,0,shoot,0.2216,0.0212,1286.041,1287.13,3,0.2216,0,NA,NA,NA,NA,NA,16,10/30/14,"AK,TP",49.9,"frozen after chlorophyll transfer, no 5 min air dry before adding water",NA,2/24/15,3/4/15,3/4/15,NA,0,0
+2,8,healthy,N,3,1,0,shoot,0.2606,0.018,1567.393,1375.258,3,0.2606,0,NA,NA,NA,NA,NA,4,10/15/14,AK,49.2,2.0 ml tubes for final set,NA,3/24/15,4/21/15,4/21/15,NA,1,1
+2,8,healthy,N+P,3,1,1,shoot,0.2907,0.0098,1580.66,1194.199,2,0.2907,0,NA,NA,NA,NA,leaf broken when killing aphids,22,1/11/15,AK,47.6,samples went in fridge after grinding for ~15 min,Ext 21,2/19/15,3/9/15,3/10/15,NA,0,0
+2,8,healthy,P,3,0,1,shoot,0.3546,0.0075,2041.58,1389.135,3,0.3546,0,NA,NA,NA,NA,NA,16,10/30/14,"AK,TP",50,"frozen after chlorophyll transfer, no 5 min air dry before adding water",NA,2/24/15,3/4/15,3/4/15,NA,0,0
+2,8,PAV,low,3,0,0,shoot,0.2084,0.0288,1262.653,1393.548,2,0.1248,0.0836,1,1,1,1,NA,16,10/30/14,"AK,TP",52,"frozen after chlorophyll transfer, no 5 min air dry before adding water",NA,7/8/15,7/9/15,7/13/15,NA,1,0
+2,8,PAV,N,3,1,0,shoot,0.3466,0.0181,1802.201,1212.572,3,0.2077,0.1389,1,1,1,1,3 aphids for transmission to N,13,10/24/14,AK,46.3,frozen after chloroform transfer,NA,6/25/15,6/26/15,7/2/15,NA,1,0
+2,8,PAV,N+P,3,1,1,shoot,0.3615,0.0189,1992.095,1465.197,3,0.2166,0.1449,1,1,1,1,NA,9,10/20/14,AK,48.6,NA,NA,6/25/15,6/26/15,7/2/15,NA,0,0
+2,8,PAV,P,3,0,1,shoot,0.279,0.0361,1186.843,1100.349,2,0.1671,0.1119,1,1,1,1,NA,3,10/1/14,"AK,EB,TP",53.6,Frozen after chloroform transfer,NA,NA,NA,NA,NA,NA,NA
+2,8,RPV,low,3,0,0,shoot,0.1837,0.013,1191.316,1018.559,3,0.1102,0.0735,1,1,1,1,NA,11,10/22/14,"AK, EB",47.3,NA,NA,NA,NA,NA,NA,NA,NA
+2,8,RPV,N,3,1,0,shoot,0.4028,0.0308,2102.128,1726.996,3,0.2415,0.1613,1,1,1,1,NA,4,10/15/14,AK,49.4,2.0 ml tubes for final set,NA,4/22/16,4/30/16,4/30/16,NA,1,1
+2,8,RPV,N+P,3,1,1,shoot,0.381,0.0309,1791.846,1347.679,3,0.2288,0.1522,1,1,1,1,leaf broken when killing aphids,15,10/29/14,"AK,TP",46.4,4 min incubation after Trizol transfer,NA,4/22/16,4/30/16,4/30/16,NA,0,0
+2,8,RPV,P,3,0,1,shoot,0.1764,0.014,984.021,803.475,3,0.1061,0.0703,1,1,1,1,4 aphids for transmission to NP,19,11/6/14,"AK, TP",48.7,"tubes flipped after isoproponal addition, frozen after ethanol addition",NA,2/1/16,2/1/16,2/1/16,NA,1,1
+3,1,coinfection,low,4,0,0,shoot,0.2073,0.0185,1046.657,914.305,2,0.1235,0.0838,1,1,1,1,NA,1,9/22/14-9/24/14,"AK, EB, TP",52.2,"Air dry 7 min, sit 5 min, frozen after chloroform transfer",NA,NA,NA,NA,NA,NA,NA
+3,1,coinfection,N,4,1,0,shoot,0.1585,0.0111,675.06,529.745,2,0.094,0.0645,1,1,1,1,NA,6,10/17/14,AK,48.4,NA,NA,NA,NA,NA,NA,NA,NA
+3,1,coinfection,N+P,4,1,1,shoot,0.1188,0.0102,663.821,479.612,2,0.0708,0.048,1,1,1,1,NA,17,11/4/14,"AK, TP",46.2,NA,NA,NA,NA,NA,NA,NA,NA
+3,1,coinfection,P,4,0,1,shoot,0.1573,0.0129,697.557,541.161,2,0.0942,0.0631,1,1,1,1,NP leaf broken when trans IAP stopped,18,11/5/14,"AK, EB",50.2,NA,NA,NA,NA,NA,NA,NA,NA
+3,1,healthy,low,4,0,0,shoot,0.1805,0.0086,844.781,698.113,2,0.1805,0,NA,NA,NA,NA,NA,2,9/25/14,"AK, EB, TP",52,15 min isopropanol incubation,NA,3/25/16,3/25/16,3/26/16,NA,0,0
+3,1,healthy,N,4,1,0,shoot,0.1881,0.0171,920.203,743.223,2,0.1881,0,NA,NA,NA,NA,NA,2,9/25/14,"AK, EB, TP",51.6,15 min isopropanol incubation,NA,3/25/16,3/25/16,3/26/16,NA,0,0
+3,1,healthy,N+P,4,1,1,shoot,0.1373,0.014,671.264,649.429,2,0.1373,0,NA,NA,NA,NA,NA,13,10/24/14,AK,46.8,frozen after chloroform transfer,mis-labelled as 31HC,6/3/15,6/12/15,6/12/15,NA,0.5,0
+3,1,healthy,P,4,0,1,shoot,0.2247,0.032,1012.598,749.684,2,0.2247,0,NA,NA,NA,NA,NA,1,6/19/15,EB,49.5,"Air dry 7 min, sit 5 min, frozen after chloroform transfer",NA,6/25/15,6/26/15,7/2/15,"Second extraction, didn't see pellet first time (9/22/14-9/24/14)",0,0
+3,1,PAV,low,4,0,0,shoot,0.0548,0.0135,176.912,261.701,1,0.032,0.0228,1,0,1,1,leaf broken when IAP stopped,19,11/6/14,"AK, TP",19.4,"tubes flipped after isoproponal addition, frozen after ethanol addition",used all mass,7/8/15,7/9/15,7/13/15,NA,0.5,0
+3,1,PAV,N,4,1,0,shoot,0.1713,0.0181,759.716,553.208,2,0.1046,0.0667,1,1,1,1,NA,19,11/6/14,"AK, TP",48,"tubes flipped after isoproponal addition, frozen after ethanol addition",NA,8/19/15,8/21/15,8/21/15,NA,0.5,0
+3,1,PAV,N+P,4,1,1,shoot,0.2115,0.023,914.012,631.461,2,0.1249,0.0866,1,1,1,1,NA,16,10/30/14,"AK,TP",50.7,"frozen after chlorophyll transfer, no 5 min air dry before adding water",NA,6/25/15,6/26/15,7/2/15,NA,1,0
+3,1,PAV,P,4,0,1,shoot,0.1744,0.0243,886.467,752.433,2,0.1021,0.0723,1,1,1,1,NA,10,10/21/14,AK,45.8,extra incubation times (see notebook),NA,7/8/15,7/9/15,7/13/15,NA,1,0
+3,1,RPV,low,4,0,0,shoot,0.2293,0.0286,1001.273,692.807,2,0.1373,0.092,1,1,1,1,NA,14,10/28/14,"AK, EB",47.2,frozen after chlororophyll transfer,some dissolved RNA lost,NA,NA,NA,NA,NA,NA
+3,1,RPV,N,4,1,0,shoot,0.1864,0.014,787.734,695.095,2,0.1132,0.0732,1,1,1,0,NA,18,11/5/14,"AK, EB",47.2,NA,NA,2/1/16,2/1/16,2/1/16,NA,0,1
+3,1,RPV,N+P,4,1,1,shoot,0.2114,0.015,1095.521,707.035,2,0.1268,0.0846,0,1,1,0,4 aphids for transmission to NP,4,10/15/14,AK,51.6,2.0 ml tubes for final set,NA,4/8/16,4/9/16,4/9/16,NA,0,1
+3,1,RPV,P,4,0,1,shoot,0.1753,0.0094,820.212,653.275,2,0.1031,0.0722,1,1,1,1,NA,6,10/17/14,AK,49.6,NA,NA,4/22/16,4/30/16,4/30/16,NA,0,1
+3,2,coinfection,low,4,0,0,shoot,0.1955,0.018,1023.615,795.256,2,0.1173,0.0782,1,1,1,1,NA,7,10/18/14,AK,47.2,NA,NA,NA,NA,NA,NA,NA,NA
+3,2,coinfection,N,4,1,0,shoot,0.0914,0.0081,405.019,420.766,2,0.0547,0.0367,1,1,1,1,leaf broken when IAP stopped,5,10/16/14,"AK, TP, KR",43.9,2.0 ml tubes for final set,used all tissue,NA,NA,NA,NA,NA,NA
+3,2,coinfection,N+P,4,1,1,shoot,0.288,0.0229,1360.655,890.056,2,0.1727,0.1153,1,1,1,1,NA,18,11/5/14,"AK, EB",51.5,NA,may have lost pellet,NA,NA,NA,NA,NA,NA
+3,2,coinfection,P,4,0,1,shoot,0.1839,0.0166,867.683,689.071,2,0.1104,0.0735,1,1,1,1,NA,18,11/5/14,"AK, EB",48.1,NA,NA,NA,NA,NA,NA,NA,NA
+3,2,healthy,low,4,0,0,shoot,0.2581,0.0204,1212.37,897.384,2,0.2581,0,NA,NA,NA,NA,NA,8,10/19/14,AK,51.2,NA,NA,3/24/15,4/21/15,4/21/15,NA,1,1
+3,2,healthy,N,4,1,0,shoot,0.1835,0.0132,924.746,561.667,2,0.1835,0,NA,NA,NA,NA,NA,7,10/18/14,AK,50.8,NA,NA,3/24/15,4/21/15,4/21/15,NA,1,0
+3,2,healthy,N+P,4,1,1,shoot,0.2215,0.0107,965.777,678.031,2,0.2215,0,NA,NA,NA,NA,NA,7,10/18/14,AK,48.1,NA,didn't see pellet,3/24/15,4/21/15,4/21/15,NA,0,0
+3,2,healthy,P,4,0,1,shoot,0.728,0.0143,199.031,242.401,1,0.728,0,NA,NA,NA,NA,leaf broken when IAP stopped,2,9/25/14,"AK, EB, TP",44.2,15 min isopropanol incubation,All mass used,3/25/16,3/25/16,3/26/16,NA,0,0
+3,2,PAV,low,4,0,0,shoot,0.1617,0.0151,722.582,572.295,2,0.0968,0.0649,1,1,1,1,3 aphids for transmission to P,11,10/22/14,"AK, EB",47.8,NA,NA,7/8/15,7/9/15,7/13/15,NA,1,0
+3,2,PAV,N,4,1,0,shoot,0.239,0.0195,1136.941,833.193,2,0.1429,0.0961,1,1,1,1,NA,11,10/22/14,"AK, EB",47.4,NA,NA,7/8/15,7/9/15,7/13/15,NA,1,0
+3,2,PAV,N+P,4,1,1,shoot,0.1662,0.0129,794.221,647.608,2,0.0993,0.0669,1,1,1,1,4 aphids for transmission to N,8,10/19/14,AK,47.3,NA,NA,7/23/15,7/24/15,7/30/15,NA,1,0
+3,2,PAV,P,4,0,1,shoot,0.1446,0.0106,706.147,590.372,2,0.0865,0.0581,1,1,1,1,4 aphids for transmission to NP,17,11/4/14,"AK, TP",46.4,NA,NA,6/25/15,6/26/15,7/2/15,NA,1,0
+3,2,RPV,low,4,0,0,shoot,0.3012,0.0359,1391.601,886.539,2,0.1806,0.1206,1,1,1,1,NA,19,11/6/14,"AK, TP",48.4,"tubes flipped after isoproponal addition, frozen after ethanol addition",NA,2/1/16,2/1/16,2/1/16,NA,0,1
+3,2,RPV,N,4,1,0,shoot,0.2068,0.0198,874.299,663.877,2,0.1237,0.0831,1,1,1,1,NA,6,10/17/14,AK,50.1,NA,NA,7/23/15,7/24/15,7/30/15,NA,0,1
+3,2,RPV,N+P,4,1,1,shoot,0.2798,0.0195,1426.244,992.063,2,0.1678,0.112,1,1,1,1,NA,18,11/5/14,"AK, EB",46.4,NA,NA,4/8/16,4/9/16,4/9/16,NA,0,1
+3,2,RPV,P,4,0,1,shoot,0.1436,0.0168,693.582,602.591,2,0.0859,0.0577,1,1,1,1,NA,13,10/24/14,AK,50,frozen after chloroform transfer,NA,NA,NA,NA,NA,NA,NA
+3,3,coinfection,low,4,0,0,shoot,0.2131,0.0176,954.625,759.499,2,0.1281,0.085,1,1,1,1,NA,15,10/29/14,"AK,TP",49.2,4 min incubation after Trizol transfer,NA,NA,NA,NA,NA,NA,NA
+3,3,coinfection,N,4,1,0,shoot,0.2223,0.0178,1027.073,794.11,2,0.133,0.0893,1,1,1,1,NA,13,10/24/14,AK,49.3,frozen after chloroform transfer,NA,NA,NA,NA,NA,NA,NA
+3,3,coinfection,N+P,4,1,1,shoot,0.35,0.0198,1796.25,1123.075,2,0.2097,0.1403,1,1,1,1,NA,10,10/21/14,AK,48.3,extra incubation times (see notebook),NA,NA,NA,NA,NA,NA,NA
+3,3,coinfection,P,4,0,1,shoot,0.2382,0.0199,1080.44,880.325,2,0.1433,0.0949,1,1,1,1,NA,11,10/22/14,"AK, EB",50,NA,very small pellet,NA,NA,NA,NA,NA,NA
+3,3,healthy,low,4,0,0,shoot,0.3206,0.0332,1434.225,978.326,3,0.3206,0,NA,NA,NA,NA,NA,9,10/20/14,AK,47.9,NA,NA,3/24/15,4/21/15,4/21/15,NA,0.5,0
+3,3,healthy,N,4,1,0,shoot,0.1319,0.0076,656.004,688.494,2,0.1319,0,NA,NA,NA,NA,NA,6,10/17/14,AK,51,NA,NA,3/24/15,4/21/15,4/21/15,NA,0,0
+3,3,healthy,N+P,4,1,1,shoot,0.2245,0.0174,1122.009,843.762,2,0.2245,0,NA,NA,NA,NA,NA,2,9/25/14,"AK, EB, TP",50.3,15 min isopropanol incubation,NA,3/25/16,3/25/16,3/26/16,NA,0,0
+3,3,healthy,P,4,0,1,shoot,0.2613,0.0256,1097.822,931.462,2,0.2613,0,NA,NA,NA,NA,NA,18,11/5/14,"AK, EB",50.5,NA,NA,2/24/15,3/4/15,3/4/15,NA,0.5,0.5
+3,3,PAV,low,4,0,0,shoot,0.2916,0.0278,1281.934,830.464,2,0.1753,0.1163,1,1,1,1,NA,15,10/29/14,"AK,TP",48.1,4 min incubation after Trizol transfer,NA,7/23/15,7/24/15,7/30/15,NA,1,0
+3,3,PAV,N,4,1,0,shoot,0.2477,0.0188,1278.679,887.262,2,0.1485,0.0992,1,1,1,1,NA,2,9/25/14,"AK, EB, TP",48.6,15 min isopropanol incubation,NA,NA,NA,NA,NA,NA,NA
+3,3,PAV,N+P,4,1,1,shoot,0.3769,0.0217,1785.921,1024.696,3,0.226,0.1509,1,1,1,1,NA,3,10/1/14,"AK,EB,TP",48.3,Frozen after chloroform transfer,NA,NA,NA,NA,NA,NA,NA
+3,3,PAV,P,4,0,1,shoot,0.1765,0.0147,886.403,807.996,2,0.1061,0.0704,1,1,1,1,NA,8,10/19/14,AK,47,NA,NA,7/8/15,7/9/15,7/13/15,NA,1,0
+3,3,RPV,low,4,0,0,shoot,0.0557,0.0113,151.228,224.608,1,0.0557,0,0,0,0,0,leaf broken when IAP stopped,14,10/28/14,"AK, EB",47.3,frozen after chlororophyll transfer,used all tissue,NA,NA,NA,NA,NA,NA
+3,3,RPV,N,4,1,0,shoot,0.3909,0.0225,1611.074,1114.024,3,0.2351,0.1558,1,1,1,1,NA,1,9/22/14-9/24/14,"AK, EB, TP",50.5,"Air dry 7 min, sit 5 min, frozen after chloroform transfer",> 1 ml EtOH used,2/10/16,2/10/16,2/10/16,NA,0,1
+3,3,RPV,N+P,4,1,1,shoot,0.3355,0.0333,1629.445,1041.509,3,0.2012,0.1343,1,1,1,1,NA,6,10/17/14,AK,48.6,NA,NA,NA,NA,NA,NA,NA,NA
+3,3,RPV,N+P,4,1,1,root,0.3355,0.0333,1629.445,1041.509,3,0.2012,0.1343,NA,NA,NA,NA,NA,NA,8/18/15,NA,33.9,NA,UAT,NA,NA,NA,NA,NA,NA
+3,3,RPV,P,4,0,1,shoot,0.2181,0.0303,1054.644,840.949,2,0.1302,0.0879,1,1,1,1,NA,17,11/4/14,"AK, TP",47.6,NA,NA,NA,NA,NA,NA,NA,NA
+3,5,coinfection,low,4,0,0,shoot,0.1933,0.0331,1173.328,825.518,2,0.1164,0.0769,1,1,1,1,NA,16,10/30/14,"AK,TP",46.1,"frozen after chlorophyll transfer, no 5 min air dry before adding water",NA,NA,NA,NA,NA,NA,NA
+3,5,coinfection,N,4,1,0,shoot,0.478,0.0505,2368.149,1520.71,3,0.2871,0.1909,1,1,0,1,3 aphids for transmission to L,9,10/20/14,AK,51.2,NA,NA,NA,NA,NA,NA,NA,NA
+3,5,coinfection,N+P,4,1,1,shoot,0.2597,0.0144,1475.075,1151.462,3,0.1563,0.1034,1,1,1,1,NA,2,9/25/14,"AK, EB, TP",50.3,15 min isopropanol incubation,NA,NA,NA,NA,NA,NA,NA
+3,5,coinfection,P,4,0,1,shoot,0.215,0.0372,1032.775,722.432,2,0.1295,0.0855,1,1,1,1,4 aphids for transmission to N,18,11/5/14,"AK, EB",50.3,NA,NA,NA,NA,NA,NA,NA,NA
+3,5,healthy,low,4,0,0,shoot,0.3291,0.0272,1764.781,1206.429,3,0.3291,0,NA,NA,NA,NA,NA,18,11/5/14,"AK, EB",47.8,NA,NA,2/24/15,3/4/15,3/4/15,NA,0.5,0.5
+3,5,healthy,N,4,1,0,shoot,0.2459,0.0159,1152.338,1144.612,3,0.2459,0,NA,NA,NA,NA,NA,7,10/18/14,AK,48,NA,NA,3/24/15,4/21/15,4/21/15,NA,0.5,0
+3,5,healthy,N+P,4,1,1,shoot,0.4531,0.0414,2459.743,1342.79,3,0.4531,0,NA,NA,NA,NA,NA,9,10/20/14,AK,51.3,NA,may have lost pellet,3/24/15,4/21/15,4/21/15,NA,0.5,0
+3,5,healthy,P,4,0,1,shoot,0.1576,0.013,793.623,779.412,2,0.1576,0,NA,NA,NA,NA,NA,11,10/22/14,"AK, EB",46,NA,very small pellet,3/3/15,3/5/15,3/10/15,NA,0,0
+3,5,PAV,low,4,0,0,shoot,0.2697,0.035,1674.236,1212.682,3,0.1625,0.1072,1,1,1,1,4 aphids for transmission to P,14,10/28/14,"AK, EB",46.6,frozen after chlororophyll transfer,NA,7/8/15,7/9/15,7/13/15,NA,1,0
+3,5,PAV,N,4,1,0,root,0.3647,0.0264,1447.076,1121.132,3,0.2188,0.1459,NA,NA,NA,NA,4 aphids for transmission to L,NA,8/18/15,NA,12.6,NA,UAT,NA,NA,NA,NA,NA,NA
+3,5,PAV,N,4,1,0,shoot,0.3647,0.0264,1447.076,1121.132,3,0.2188,0.1459,1,1,1,1,4 aphids for transmission to L,6,10/17/14,AK,51,NA,may have lost pellet,6/25/15,6/26/15,7/2/15,NA,1,0
+3,5,PAV,N+P,4,1,1,shoot,0.3474,0.0454,1668.304,1097.532,3,0.2085,0.1389,1,0,1,1,4 aphids for transmission to N,16,10/30/14,"AK,TP",50.1,"frozen after chlorophyll transfer, no 5 min air dry before adding water",NA,7/23/15,7/24/15,7/30/15,NA,1,0.5
+3,5,PAV,P,4,0,1,shoot,0.2651,0.025,1343.182,1098.657,3,0.1597,0.1054,1,1,1,1,N leaf broken when trans IAP stopped,8,10/19/14,AK,46.9,NA,NA,6/25/15,6/26/15,7/2/15,NA,1,0
+3,5,RPV,low,4,0,0,shoot,0.4053,0.0766,1974.938,1252.522,3,0.2428,0.1625,1,1,1,1,NA,6,10/17/14,AK,48.7,NA,NA,NA,NA,NA,NA,NA,NA
+3,5,RPV,N,4,1,0,shoot,0.2792,0.0255,1478.787,1050.986,3,0.1677,0.1115,1,1,1,1,3 aphids for transmission to L,20,11/10/14,"AK, EB, TP",49.7,"frozen after chloroform transfer, frozen after ethanol addition",NA,7/23/15,7/24/15,7/30/15,NA,0,1
+3,5,RPV,N+P,4,1,1,shoot,0.4132,0.0393,2035.398,1233.428,4,0.2473,0.1659,1,1,1,1,4 aphids for transmission to N,1,9/22/14-9/24/14,"AK, EB, TP",51,"Air dry 7 min, sit 5 min, frozen after chloroform transfer",NA,2/10/16,2/10/16,2/10/16,NA,0,1
+3,5,RPV,P,4,0,1,shoot,0.202,0.024,1004.836,945.592,3,0.122,0.08,1,1,1,1,NA,3,10/1/14,"AK,EB,TP",52.2,Frozen after chloroform transfer,NA,4/8/16,4/9/16,4/9/16,NA,0,0
+3,6,coinfection,low,4,0,0,shoot,0.2835,0.022,1308.247,879.397,2,0.1709,0.1126,0,1,1,1,2 aphids for transmission to P,1,9/22/14-9/24/14,"AK, EB, TP",53,"Air dry 7 min, sit 5 min, frozen after chloroform transfer",used white label screw cap tube,NA,NA,NA,NA,NA,NA
+3,6,coinfection,N,4,1,0,shoot,0.3525,0.0177,1614.618,1110.077,3,0.211,0.1415,1,1,1,1,3 aphids for transmission to P,3,10/1/14,"AK,EB,TP",49,Frozen after chloroform transfer,NA,NA,NA,NA,NA,NA,NA
+3,6,coinfection,N+P,4,1,1,shoot,0.3025,0.0128,1340.312,949.535,2,0.1813,0.1212,1,1,1,1,4 aphids for transmission to N,7,10/18/14,AK,51.2,NA,NA,NA,NA,NA,NA,NA,NA
+3,6,coinfection,P,4,0,1,shoot,0.2432,0.0236,1442.258,1122.488,2,0.1455,0.0977,1,1,1,1,NA,16,10/30/14,"AK,TP",48.6,"frozen after chlorophyll transfer, no 5 min air dry before adding water",NA,NA,NA,NA,NA,NA,NA
+3,6,healthy,low,4,0,0,shoot,0.3919,0.017,2050.146,1308.172,3,0.3919,0,NA,NA,NA,NA,mock inoculation only had 5 aphids per plant,13,10/24/14,AK,47.6,frozen after chloroform transfer,NA,3/3/15,3/5/15,3/10/15,NA,0.5,0
+3,6,healthy,N,4,1,0,shoot,0.4005,0.0059,2079.188,1487.121,3,0.4005,0,NA,NA,NA,NA,mock inoculation only had 5 aphids per plant,16,10/30/14,"AK,TP",46.8,"frozen after chlorophyll transfer, no 5 min air dry before adding water",NA,2/24/15,3/4/15,3/4/15,NA,1,0
+3,6,healthy,N+P,4,1,1,shoot,0.4312,0.0189,2416.688,1573.125,3,0.4312,0,NA,NA,NA,NA,mock inoculation only had 5 aphids per plant,11,10/22/14,"AK, EB",45.2,NA,NA,3/24/15,4/21/15,4/21/15,NA,1,0
+3,6,healthy,P,4,0,1,shoot,0.3267,0.0051,1572.467,1148.16,3,0.3267,0,NA,NA,NA,NA,mock inoculation only had 5 aphids per plant,15,10/29/14,"AK,TP",48.6,4 min incubation after Trizol transfer,NA,3/3/15,3/5/15,3/10/15,NA,0.5,0
+3,6,PAV,low,4,0,0,shoot,0.3005,0.0344,1567.004,1187.598,3,0.18,0.1205,1,1,1,1,1 aphid for transmission to P,6,10/17/14,AK,48.9,NA,NA,7/8/15,7/9/15,7/13/15,NA,1,0
+3,6,PAV,N,4,1,0,shoot,0.2229,0.012,1255.516,721.403,2,0.134,0.0889,1,1,0,1,2 aphids for transmission to L,14,10/28/14,"AK, EB",49,frozen after chlororophyll transfer,NA,7/23/15,7/24/15,7/30/15,NA,1,0
+3,6,PAV,N+P,4,1,1,shoot,0.3325,0.0146,1724.169,1246.978,3,0.199,0.1335,1,0,1,1,NA,4,10/15/14,AK,50.7,2.0 ml tubes for final set,NA,7/8/15,7/9/15,7/13/15,NA,1,0
+3,6,PAV,P,4,0,1,shoot,0.232,0.0156,1414.789,1029.584,3,0.1396,0.0924,1,1,1,1,3 aphids for transmission to N,7,10/18/14,AK,49.2,NA,NA,7/8/15,7/9/15,7/13/15,NA,1,0
+3,6,RPV,low,4,0,0,shoot,0.3929,0.0328,1903.823,1392.399,3,0.2364,0.1565,0,1,1,1,NA,3,10/1/14,"AK,EB,TP",49.8,Frozen after chloroform transfer,NA,NA,NA,NA,NA,NA,NA
+3,6,RPV,N,4,1,0,shoot,0.3949,0.0183,2255.199,1456.874,3,0.2363,0.1586,1,1,0,1,4 aphids for transmission to P,12,10/23/14,"TP, AK",51.2,extra incubation before heating,NA,NA,NA,NA,NA,NA,NA
+3,6,RPV,N+P,4,1,1,shoot,0.362,0.012,2111.353,1261.991,3,0.2172,0.1448,1,0,1,1,NA,16,10/30/14,"AK,TP",46.2,"frozen after chlorophyll transfer, no 5 min air dry before adding water",NA,4/8/16,4/9/16,4/9/16,NA,0,1
+3,6,RPV,P,4,0,1,shoot,0.2546,0.0157,1391.402,1210.99,3,0.1526,0.102,1,1,1,1,4 aphids for transmission to N,10,10/21/14,AK,47.3,extra incubation times (see notebook),NA,NA,NA,NA,NA,NA,NA
+3,7,coinfection,low,4,0,0,shoot,0.3327,0.0259,1379.624,1090.621,2,0.1999,0.1328,0,1,1,1,maybe 4 aphids for transmission to P,16,10/30/14,"AK,TP",47.8,"frozen after chlorophyll transfer, no 5 min air dry before adding water",NA,NA,NA,NA,NA,NA,NA
+3,7,coinfection,N,4,1,0,shoot,0.3544,0.0236,1327.705,1188.367,3,0.2122,0.1422,1,1,1,1,NA,2,9/25/14,"AK, EB, TP",50.4,15 min isopropanol incubation,NA,NA,NA,NA,NA,NA,NA
+3,7,coinfection,N+P,4,1,1,shoot,0.4907,0.0228,2539.619,1507.983,4,0.2944,0.1963,1,1,1,1,1 adult aphid and 1 baby for transmission to N,3,10/1/14,"AK,EB,TP",52.1,Frozen after chloroform transfer,NA,NA,NA,NA,NA,NA,NA
+3,7,coinfection,P,4,0,1,shoot,0.2341,0.023,1173.426,939.926,3,0.1404,0.0937,1,1,1,1,2 aphids for transmission to NP,14,10/28/14,"AK, EB",52.5,frozen after chlororophyll transfer,NA,NA,NA,NA,NA,NA,NA
+3,7,healthy,low,4,0,0,shoot,0.4757,0.0252,2333.731,1516.334,4,0.4757,0,NA,NA,NA,NA,NA,11,10/22/14,"AK, EB",48.4,NA,NA,3/24/15,4/21/15,4/21/15,NA,1,0
+3,7,healthy,N,4,1,0,shoot,0.3912,0.0146,1758.921,1219.45,3,0.3912,0,NA,NA,NA,NA,leaf broken when sampling T5,9,10/20/14,AK,50.7,NA,NA,3/24/15,4/21/15,4/21/15,NA,0.5,0
+3,7,healthy,N+P,4,1,1,shoot,0.5503,0.0279,2535.915,1762.334,4,0.5503,0,NA,NA,NA,NA,NA,10,10/21/14,AK,51.1,extra incubation times (see notebook),NA,3/24/15,4/21/15,4/21/15,NA,0,0
+3,7,healthy,P,4,0,1,shoot,0.1227,0.0077,771.823,813.908,3,0.1227,0,NA,NA,NA,NA,NA,2,9/25/14,"AK, EB, TP",50.9,15 min isopropanol incubation,NA,4/1/16,4/1/16,4/4/16,NA,0.5,1
+3,7,PAV,low,4,0,0,shoot,0.2521,0.0213,1394.47,1216.919,3,0.1511,0.101,1,1,1,1,NA,11,10/22/14,"AK, EB",46.1,NA,very small pellet,6/25/15,6/26/15,7/2/15,NA,1,0
+3,7,PAV,N,4,1,0,shoot,0.3547,0.0252,1916.202,1330.606,3,0.2126,0.1421,1,0,0,1,NA,7,10/18/14,AK,50.1,NA,NA,6/25/15,6/26/15,7/2/15,NA,1,0
+3,7,PAV,N+P,4,1,1,shoot,0.2528,0.0139,1439.386,1026.456,3,0.1513,0.1015,1,0,1,1,2 aphids for transmission to L,10,10/21/14,AK,45.6,extra incubation times (see notebook),NA,7/8/15,7/9/15,7/13/15,NA,1,1
+3,7,PAV,P,4,0,1,shoot,0.23332,0.0194,1403.458,855.639,2,0.1405,0.09282,1,1,1,0,NA,11,10/22/14,"AK, EB",48.6,NA,very small pellet,7/8/15,7/9/15,7/13/15,NA,1,0.5
+3,7,RPV,low,4,0,0,shoot,0.4642,0.033,2116.196,1483.645,4,0.279,0.1852,0,1,1,1,2 aphids for transmission to P,15,10/29/14,"AK,TP",47.7,4 min incubation after Trizol transfer,NA,NA,NA,NA,NA,NA,NA
+3,7,RPV,N,4,1,0,shoot,0.5378,0.0271,2395.257,1513.809,4,0.3228,0.215,1,1,1,1,NA,9,10/20/14,AK,54.7,NA,NA,NA,NA,NA,NA,NA,NA
+3,7,RPV,N+P,4,1,1,shoot,0.6471,0.0336,2899.173,2021.556,4,0.3876,0.2595,1,1,1,1,"2 adults and 1 baby for transmission to L, 2 aphids for transmission to N",13,10/24/14,AK,48.2,frozen after chloroform transfer,mis-labelled as 31RNP,NA,NA,NA,NA,NA,NA
+3,7,RPV,P,4,0,1,shoot,0.1979,0.014,1152.702,1130.439,3,0.1183,0.0796,1,1,1,1,2 aphids for transmission to NP,10,10/21/14,AK,48,extra incubation times (see notebook),NA,4/22/16,4/30/16,4/30/16,NA,0,1
+3,8,coinfection,low,4,0,0,shoot,0.3377,0.0368,1364.437,1165.902,3,0.2039,0.1338,1,1,1,1,NA,18,11/5/14,"AK, EB",50.4,NA,NA,NA,NA,NA,NA,NA,NA
+3,8,coinfection,N,4,1,0,shoot,0.4762,0.0381,2213.329,1517.531,3,0.2866,0.1896,1,1,1,1,NA,17,11/4/14,"AK, TP",47.9,NA,NA,NA,NA,NA,NA,NA,NA
+3,8,coinfection,N+P,4,1,1,shoot,0.2041,0.0259,997.098,980.897,3,0.1226,0.0815,1,1,1,1,"leaf broken when IAP stopped, 2 aphids for transmission to N",3,10/1/14,"AK,EB,TP",52.6,Frozen after chloroform transfer,NA,NA,NA,NA,NA,NA,NA
+3,8,coinfection,P,4,0,1,shoot,0.3429,0.0445,1787.92,1251.571,4,0.2053,0.1376,1,1,1,1,NA,17,11/4/14,"AK, TP",51.4,NA,NA,NA,NA,NA,NA,NA,NA
+3,8,healthy,low,4,0,0,shoot,0.3415,0.0217,1823.777,1537.611,4,0.3415,0,NA,NA,NA,NA,NA,4,10/15/14,AK,49.6,2.0 ml tubes for final set,NA,3/24/15,4/21/15,4/21/15,NA,1,0
+3,8,healthy,N,4,1,0,shoot,0.6307,0.0263,3516.907,2414.234,4,0.6307,0,NA,NA,NA,NA,NA,6,10/17/14,AK,51.8,NA,NA,3/24/15,4/21/15,4/21/15,NA,1,0
+3,8,healthy,N+P,4,1,1,shoot,0.5035,0.0194,2630.223,1955.203,4,0.5035,0,NA,NA,NA,NA,NA,6,10/17/14,AK,50.5,NA,NA,3/24/15,4/21/15,4/21/15,NA,1,0
+3,8,healthy,P,4,0,1,shoot,0.3551,0.0257,1807.258,1371.011,3,0.3551,0,NA,NA,NA,NA,NA,8,10/19/14,AK,53.4,NA,NA,3/24/15,4/21/15,4/21/15,NA,0.5,0
+3,8,PAV,low,4,0,0,shoot,0.1886,0.0118,1109.323,1137.623,3,0.1139,0.0747,1,1,0,1,3 aphids for transmission to P,7,10/18/14,AK,52.1,NA,NA,7/23/15,7/24/15,7/30/15,NA,1,1
+3,8,PAV,N,4,1,0,shoot,0.2702,0.0108,1627.662,1496.496,3,0.1622,0.108,1,1,NA,1,3 aphids for transmission to L,9,10/20/14,AK,47.5,NA,NA,6/25/15,6/26/15,7/2/15,NA,1,1
+3,8,PAV,N+P,4,1,1,shoot,0.212,0.0167,1102.244,1116.179,2,0.1279,0.0841,1,1,1,1,4 aphids for transmission to P,14,10/28/14,"AK, EB",48.2,frozen after chlororophyll transfer,NA,6/25/15,6/26/15,7/2/15,NA,1,0
+3,8,PAV,P,4,0,1,shoot,0.2902,0.0162,1449.429,1328.53,3,0.1749,0.1153,1,1,1,1,3 aphids for transmission to NP,19,11/6/14,"AK, TP",52,"tubes flipped after isoproponal addition, frozen after ethanol addition",NA,6/25/15,6/26/15,7/2/15,NA,1,0.5
+3,8,RPV,low,4,0,0,shoot,0.3552,0.0254,1770.229,1514.443,4,0.2128,0.1424,1,1,0,0,NA,19,11/6/14,"AK, TP",51.6,"tubes flipped after isoproponal addition, frozen after ethanol addition",NA,NA,NA,NA,NA,NA,NA
+3,8,RPV,N,4,1,0,shoot,0.4673,0.0265,2267.766,1994.809,4,0.2806,0.1867,1,1,1,1,NA,2,9/25/14,"AK, EB, TP",48.8,15 min isopropanol incubation,NA,NA,NA,NA,NA,NA,NA
+3,8,RPV,N+P,4,1,1,shoot,0.5115,0.0262,2500.647,1968.379,4,0.3067,0.2048,1,1,1,1,3 aphids for transmission to N,4,10/15/14,AK,48.2,2.0 ml tubes for final set,NA,4/22/16,4/30/16,4/30/16,NA,0,1
+3,8,RPV,P,4,0,1,shoot,0.3281,0.0324,1782.715,1462.474,4,0.1967,0.1314,1,1,1,1,NA,5,10/16/14,"AK, TP, KR",50.4,2.0 ml tubes for final set,NA,4/8/16,4/9/16,4/9/16,NA,0,1
+4,1,PAV,low,5,0,0,shoot,0.2343,0.0397,919.39,651.039,2,0.1405,0.0938,NA,NA,NA,NA,NA,9,10/20/14,AK,49.1,NA,NA,6/25/15,6/26/15,7/2/15,NA,1,0
+4,1,PAV,N,5,1,0,shoot,0.2206,0.03,901.95,674.817,2,0.1321,0.0885,NA,NA,NA,NA,NA,19,11/6/14,"AK, TP",49.9,"tubes flipped after isoproponal addition, frozen after ethanol addition",NA,7/8/15,7/9/15,7/13/15,NA,0.5,0.5
+4,1,PAV,N+P,5,1,1,shoot,0.2165,0.0188,890.048,628.93,2,0.1296,0.0869,NA,NA,NA,NA,NA,15,10/29/14,"AK,TP",49.4,4 min incubation after Trizol transfer,NA,7/23/15,7/24/15,7/30/15,NA,1,0
+4,1,PAV,P,5,0,1,shoot,0.2299,0.0248,1045.082,745.061,2,0.1376,0.0923,NA,NA,NA,NA,NA,2,6/19/15,EB,42,NA,used all tissue,6/25/15,6/26/15,7/2/15,Extracted a second time because pellet may have been lost first time (9/25/14),1,0
+4,1,RPV,low,5,0,0,shoot,0.1859,0.0294,870.225,646.792,2,0.1115,0.0744,NA,NA,NA,NA,NA,4,10/15/14,AK,48.4,2.0 ml tubes for final set,NA,NA,NA,NA,NA,NA,NA
+4,1,RPV,N,5,1,0,shoot,0.2922,0.0726,1133.15,836.338,2,0.1751,0.1171,NA,NA,NA,NA,NA,5,10/16/14,"AK, TP, KR",49.1,2.0 ml tubes for final set,NA,2/1/16,2/1/16,2/1/16,NA,1,1
+4,1,RPV,N+P,5,1,1,shoot,0.1301,0.0107,589.12,536.513,2,0.0782,0.0519,NA,NA,NA,NA,NA,3,10/1/14,"AK,EB,TP",49.6,Frozen after chloroform transfer,All tissue used,NA,NA,NA,NA,NA,NA
+4,1,RPV,P,5,0,1,shoot,0.135,0.0183,512.488,446.821,2,0.0813,0.0537,NA,NA,NA,NA,NA,16,10/30/14,"AK,TP",48.5,"frozen after chlorophyll transfer, no 5 min air dry before adding water",NA,NA,NA,NA,NA,NA,NA
+4,2,coinfection,low,5,0,0,shoot,0.3019,0.0174,1515.234,1119.131,2,0.1809,0.121,1,1,1,1,NA,13,10/24/14,AK,46.3,frozen after chloroform transfer,pellet almost lost,NA,NA,NA,NA,NA,NA
+4,2,coinfection,N,5,1,0,shoot,0.1014,0.0033,419.192,425.76,2,0.0604,0.041,1,0,1,1,NA,5,10/16/14,"AK, TP, KR",50.8,2.0 ml tubes for final set,used all tissue,NA,NA,NA,NA,NA,NA
+4,2,coinfection,N+P,5,1,1,shoot,0.3639,0.023,1657.85,989.548,2,0.2185,0.1454,1,1,1,1,2 aphids for transmission to N,5,10/16/14,"AK, TP, KR",48.6,2.0 ml tubes for final set,NA,NA,NA,NA,NA,NA,NA
+4,2,coinfection,P,5,0,1,shoot,0.2698,0.018,1122.714,859.758,2,0.1623,0.1075,1,1,0,0,3 aphids for transmission to N,18,11/5/14,"AK, EB",48.5,NA,NA,NA,NA,NA,NA,NA,NA
+4,2,healthy,low,5,0,0,shoot,0.1843,0.0053,960.264,726.372,2,0.1843,0,NA,NA,NA,NA,NA,9,10/20/14,AK,50,NA,NA,3/24/15,4/21/15,4/21/15,NA,0,0
+4,2,healthy,N,5,1,0,shoot,0.2755,0.0155,1216.127,891.865,2,0.2755,0,NA,NA,NA,NA,NA,5,10/16/14,"AK, TP, KR",49.4,2.0 ml tubes for final set,NA,3/24/15,4/21/15,4/21/15,NA,0.5,0
+4,2,healthy,N+P,5,1,1,shoot,0.3111,0.0174,1538.128,963.452,2,0.3111,0,NA,NA,NA,NA,NA,16,10/30/14,"AK,TP",48.6,"frozen after chlorophyll transfer, no 5 min air dry before adding water",NA,3/3/15,3/5/15,3/10/15,NA,0.5,0
+4,2,healthy,P,5,0,1,shoot,0.0533,0.0113,118.947,162.975,1,0.0533,0,NA,NA,NA,NA,leaf broken when IAP stopped,18,11/5/14,"AK, EB",37.3,NA,used all tissue,2/24/15,3/4/15,3/4/15,NA,0.5,0
+4,2,PAV,low,5,0,0,shoot,0.1886,0.0178,954.602,664.226,2,0.1132,0.0754,1,1,1,1,NA,4,10/15/14,AK,52.4,2.0 ml tubes for final set,NA,7/23/15,7/24/15,7/30/15,NA,1,0
+4,2,PAV,N,5,1,0,shoot,0.3362,0.0198,1495.364,875.785,2,0.2018,0.1344,1,1,1,1,NA,9,10/20/14,AK,48.8,NA,NA,6/25/15,6/26/15,7/2/15,NA,1,0
+4,2,PAV,N+P,5,1,1,shoot,0.3881,0.0241,1721.396,876.958,2,0.2326,0.1555,1,1,1,1,NA,11,10/22/14,"AK, EB",52.2,NA,NA,7/8/15,7/9/15,7/13/15,mis-labelled extraction vial as 42RNP,1,0
+4,2,PAV,P,5,0,1,shoot,0.2177,0.0185,1100.71,802.943,2,0.1307,0.087,1,1,1,1,NA,10,10/21/14,AK,47.7,extra incubation times (see notebook),NA,7/8/15,7/9/15,7/13/15,NA,1,0
+4,2,RPV,low,5,0,0,shoot,0.2187,0.0146,1157.4,821.136,2,0.1314,0.0873,1,1,1,1,2 aphids for transmission to NP,17,11/4/14,"AK, TP",47.3,NA,NA,NA,NA,NA,NA,NA,NA
+4,2,RPV,N,5,1,0,shoot,0.2899,0.017,1351.688,909.843,2,0.1733,0.1166,1,1,1,1,3 aphids for transmission to P,20,11/10/14,"AK, EB, TP",52,"frozen after chloroform transfer, frozen after ethanol addition",NA,7/23/15,7/24/15,7/30/15,NA,0,1
+4,2,RPV,N+P,5,1,1,shoot,0.2578,0.0229,1091.112,758.033,2,0.1544,0.1034,1,1,1,1,NA,3,10/1/14,"AK,EB,TP",52.8,Frozen after chloroform transfer,NA,NA,NA,NA,NA,NA,NA
+4,2,RPV,P,5,0,1,shoot,0.275,0.0176,1359.636,992.774,2,0.1655,0.1095,1,1,1,1,NA,1,9/22/14-9/24/14,"AK, EB, TP",47.7,"Air dry 7 min, sit 5 min, frozen after chloroform transfer",used white label screw cap tube,4/8/16,4/9/16,4/9/16,NA,0,1
+4,3,coinfection,low,5,0,0,shoot,0.1822,0.0113,964.051,793.72,2,0.109,0.0732,1,1,1,1,NA,14,10/28/14,"AK, EB",48.4,frozen after chlororophyll transfer,NA,NA,NA,NA,NA,NA,NA
+4,3,coinfection,N,5,1,0,shoot,0.3304,0.0153,1597.927,1028.867,2,0.1982,0.1322,1,1,1,1,trans plants may have received NP once,8,10/19/14,AK,48.3,NA,NA,NA,NA,NA,NA,NA,NA
+4,3,coinfection,N+P,5,1,1,shoot,0.0744,0.0077,267.79,308.35,1,0.045,0.0294,1,1,1,1,"leaf broken when IAP stopped, 4 aphids for transmission to N, 2 aphids for transmission to P",12,10/23/14,"TP, AK",23.7,extra incubation before heating,used all tissue,NA,NA,NA,NA,NA,NA
+4,3,coinfection,P,5,0,1,shoot,0.1172,0.0071,552.845,579.029,2,0.0701,0.0471,1,1,1,1,NA,12,10/23/14,"TP, AK",48.5,extra incubation before heating,NA,NA,NA,NA,NA,NA,NA
+4,3,healthy,low,5,0,0,shoot,0.282,0.0144,1538.605,1018.259,3,0.282,0,NA,NA,NA,NA,NA,15,10/29/14,"AK,TP",49,4 min incubation after Trizol transfer,NA,3/3/15,3/5/15,3/10/15,NA,0.5,0
+4,3,healthy,N,5,1,0,shoot,0.4202,0.0161,1862.803,1433.702,3,0.4202,0,NA,NA,NA,NA,trans plants may have received NP once,13,10/24/14,AK,48.6,frozen after chloroform transfer,NA,3/3/15,3/5/15,3/10/15,NA,0,0
+4,3,healthy,N+P,5,1,1,shoot,0.2502,0.0192,1278.356,1138.16,3,0.2502,0,NA,NA,NA,NA,NA,10,10/21/14,AK,49.9,extra incubation times (see notebook),NA,3/24/15,4/21/15,4/21/15,NA,0,0
+4,3,healthy,P,5,0,1,shoot,0.194,0.019,1213.779,981.651,2,0.194,0,NA,NA,NA,NA,NA,18,11/5/14,"AK, EB",51.1,NA,NA,2/24/15,3/4/15,3/4/15,NA,0.5,0.5
+4,3,PAV,low,5,0,0,shoot,0.179,0.0124,988.205,895.309,2,0.1072,0.0718,1,1,1,1,NA,16,10/30/14,"AK,TP",47.1,"frozen after chlorophyll transfer, no 5 min air dry before adding water",NA,7/23/15,7/24/15,7/30/15,NA,1,0
+4,3,PAV,N,5,1,0,shoot,0.4489,0.0234,1869.207,1134.198,3,0.2697,0.1792,1,1,1,1,trans plants may have received NP once,5,10/16/14,"AK, TP, KR",49.7,2.0 ml tubes for final set,NA,6/25/15,6/26/15,7/2/15,NA,1,0
+4,3,PAV,N+P,5,1,1,shoot,0.4052,0.0206,1754.098,1135.098,3,0.2437,0.1615,1,1,1,1,NA,9,10/20/14,AK,51.3,NA,NA,7/8/15,7/9/15,7/13/15,NA,1,0
+4,3,PAV,P,5,0,1,shoot,0.1925,0.0169,1199.598,906.827,2,0.1156,0.0769,1,1,1,1,NA,5,10/16/14,"AK, TP, KR",49,2.0 ml tubes for final set,NA,6/25/15,6/26/15,7/2/15,NA,1,0
+4,3,RPV,low,5,0,0,shoot,0.3448,0.0231,1700.155,1087.661,2,0.206,0.1388,1,1,1,1,2 aphids for transmission to P,11,10/22/14,"AK, EB",48.2,NA,NA,NA,NA,NA,NA,NA,NA
+4,3,RPV,N,5,1,0,shoot,0.437,0.0189,2009.409,1302.267,2,0.2628,0.1742,1,1,1,1,trans plants may have received NP once,9,10/20/14,AK,49.3,NA,NA,4/22/16,4/30/16,4/30/16,NA,0,1
+4,3,RPV,N+P,5,1,1,shoot,0.1904,0.0094,980.05,757.435,2,0.1148,0.0756,1,1,1,0,NA,10,10/21/14,AK,47.1,extra incubation times (see notebook),NA,NA,NA,NA,NA,NA,NA
+4,3,RPV,P,5,0,1,shoot,0.1781,0.0108,860.056,754.475,2,0.1066,0.0715,1,1,1,1,NA,4,10/15/14,AK,48.5,2.0 ml tubes for final set,NA,4/22/16,4/30/16,4/30/16,NA,0,1
+4,4,coinfection,low,5,0,0,shoot,0.2351,0.0119,1381.174,911.564,2,0.1414,0.0937,3,3,3,3,NP leaf broken when trans IAP stopped,11,10/22/14,"AK, EB",47,NA,NA,NA,NA,NA,NA,NA,NA
+4,4,coinfection,N,5,1,0,shoot,0.2694,0.012,1388.24,989.325,3,0.1616,0.1078,1,1,1,1,L leaf broken when trans IAP stopped,12,10/23/14,"TP, AK",48.7,extra incubation before heating,NA,NA,NA,NA,NA,NA,NA
+4,4,coinfection,N+P,5,1,1,shoot,0.4513,0.0197,1792.659,1237.941,3,0.2708,0.1805,1,1,1,1,NA,10,10/21/14,AK,47.2,extra incubation times (see notebook),NA,NA,NA,NA,NA,NA,NA
+4,4,coinfection,P,5,0,1,shoot,0.2166,0.0104,1132.831,1031.107,2,0.1297,0.0869,1,1,1,1,NA,2,9/25/14,"AK, EB, TP",50.7,15 min isopropanol incubation,NA,NA,NA,NA,NA,NA,NA
+4,4,healthy,low,5,0,0,shoot,0.4696,0.0146,2072.19,1332.051,3,0.4696,0,NA,NA,NA,NA,NA,12,10/23/14,"TP, AK",51.9,extra incubation before heating,NA,3/3/15,3/5/15,3/10/15,NA,0.5,0.5
+4,4,healthy,N,5,1,0,shoot,0.3063,0.0151,1084.438,900.251,2,0.3063,0,NA,NA,NA,NA,leaf broken when IAP stopped,20,11/10/14,"AK, EB, TP",48.2,"frozen after chloroform transfer, frozen after ethanol addition",NA,2/24/15,3/4/15,3/4/15,NA,0.5,0.5
+4,4,healthy,N+P,5,1,1,shoot,0.5201,0.0181,2188.083,1250.808,3,0.5201,0,NA,NA,NA,NA,NA,5,10/16/14,"AK, TP, KR",48.7,2.0 ml tubes for final set,NA,3/24/15,4/21/15,4/21/15,NA,0,0
+4,4,healthy,P,5,0,1,shoot,0.2375,0.0139,1177.05,1022.055,2,0.2375,0,NA,NA,NA,NA,NA,12,10/23/14,"TP, AK",50.5,extra incubation before heating,NA,3/3/15,3/5/15,3/10/15,NA,0,0
+4,4,PAV,low,5,0,0,shoot,0.1971,0.0126,976.667,770.388,2,0.1178,0.0793,0,0,0,0,"will have two sets of RPV ctrl trans plants, one set is actually from PAV ctrl",3,10/1/14,"AK,EB,TP",48,Frozen after chloroform transfer,NA,NA,NA,NA,NA,NA,NA
+4,4,PAV,N,5,1,0,shoot,0.3347,0.0121,1637.13,1108.753,2,0.2007,0.134,1,1,1,1,"N leaf broken when trans IAP stopped, P leaf broken when trans IAP stopped",3,10/1/14,"AK,EB,TP",48,Frozen after chloroform transfer,NA,NA,NA,NA,NA,NA,NA
+4,4,PAV,N+P,5,1,1,shoot,0.2908,0.0119,1522.903,1045.71,3,0.1747,0.1161,1,1,1,1,P leaf broken when trans IAP stopped,6,10/17/14,AK,50.9,NA,NA,8/19/15,8/21/15,8/21/15,Tested in July with RT-PCR and came up negative for both PAV and RPV so it was re-tested in August,0.5,0
+4,4,PAV,P,5,0,1,shoot,0.3841,0.0171,1741.51,1275.749,3,0.2306,0.1535,1,1,1,1,NA,8,10/19/14,AK,53.3,NA,NA,6/25/15,6/26/15,7/2/15,NA,1,0
+4,4,RPV,low,5,0,0,shoot,0.383,0.0158,1735.794,1112.074,3,0.2294,0.1536,0,0,0,0,"will have two sets of RPV ctrl trans plants, one set is actually from PAV ctrl",1,9/22/14-9/24/14,"AK, EB, TP",48.6,"Air dry 7 min, sit 5 min, frozen after chloroform transfer",didn't see pellet,2/10/16,2/10/16,2/10/16,NA,0,1
+4,4,RPV,N,5,1,0,shoot,0.3178,0.0106,1611.092,1148.051,3,0.1908,0.127,1,1,1,1,NA,13,10/24/14,AK,50.9,frozen after chloroform transfer,NA,NA,NA,NA,NA,NA,NA
+4,4,RPV,N+P,5,1,1,shoot,0.3607,0.014,1806.741,1045.356,2,0.2167,0.144,1,1,1,1,NA,11,10/22/14,"AK, EB",47.8,NA,NA,4/22/16,4/30/16,4/30/16,NA,0,1
+4,4,RPV,P,5,0,1,shoot,0.1924,0.0103,1245.718,954.136,2,0.115,0.0774,1,1,1,1,"3 aphids for transmission to L, N leaf broken when trans IAP stopped",16,10/30/14,"AK,TP",51,"frozen after chlorophyll transfer, no 5 min air dry before adding water",lost in bead beater,NA,NA,NA,lost in extraction and extraction bag with samples was lost,NA,NA
+4,5,coinfection,low,5,0,0,shoot,0.2412,0.0783,1369.179,1040.55,2,0.1445,0.0967,1,1,1,1,NA,22,1/11/15,AK,51.3,samples went in fridge after grinding for ~15 min,"Ext 21, UAT",NA,NA,NA,NA,NA,NA
+4,5,coinfection,N,5,1,0,shoot,0.3889,0.1214,1713.11,1180.71,2,0.2333,0.1556,1,1,1,0,NA,14,10/28/14,"AK, EB",52.4,frozen after chlororophyll transfer,NA,NA,NA,NA,NA,NA,NA
+4,5,coinfection,N+P,5,1,1,shoot,0.19,0.0348,1048.17,901.393,3,0.1144,0.0756,1,1,1,2,NA,20,11/10/14,"AK, EB, TP",52.7,"frozen after chloroform transfer, frozen after ethanol addition",NA,NA,NA,NA,NA,NA,NA
+4,5,coinfection,P,5,0,1,shoot,0.2218,0.1037,1285.263,998.191,2,0.1332,0.0886,1,1,1,1,NA,12,10/23/14,"TP, AK",50.9,extra incubation before heating,NA,NA,NA,NA,NA,NA,NA
+4,5,healthy,low,5,0,0,shoot,0.3242,0.0537,1690.915,1228.451,3,0.3242,0,NA,NA,NA,NA,NA,3,10/1/14,"AK,EB,TP",50.7,Frozen after chloroform transfer,NA,3/4/16,3/5/16,3/5/16,NA,0,0
+4,5,healthy,N,5,1,0,shoot,0.4746,0.0181,2378.675,1616.973,3,0.4746,0,NA,NA,NA,NA,roots may be switched with Healthy P T5,13,10/24/14,AK,47.4,frozen after chloroform transfer,NA,6/3/15,6/12/15,6/12/15,NA,0,0
+4,5,healthy,N+P,5,1,1,shoot,0.492,0.1029,2418.129,1637.973,3,0.492,0,NA,NA,NA,NA,NA,10,10/21/14,AK,46.1,extra incubation times (see notebook),NA,3/24/15,4/21/15,4/21/15,NA,0,0
+4,5,healthy,P,5,0,1,shoot,0.2872,0.0486,1623.145,1283.977,4,0.2872,0,NA,NA,NA,NA,roots may be switched with Healthy N T5,5,10/16/14,"AK, TP, KR",53.5,2.0 ml tubes for final set,NA,3/24/15,4/21/15,4/21/15,NA,0.5,0
+4,5,PAV,low,5,0,0,shoot,0.2334,0.0741,1138.415,945.582,3,0.1401,0.0933,1,1,1,1,NA,12,10/23/14,"TP, AK",52,extra incubation before heating,NA,7/8/15,7/9/15,7/13/15,NA,1,0
+4,5,PAV,N,5,1,0,shoot,0.1955,0.0198,969.946,854.738,2,0.1177,0.0778,1,0,1,1,"leaf broken when IAP stopped, 1 aphid for transmission to L",2,9/25/14,"AK, EB, TP",50.1,15 min isopropanol incubation,NA,8/19/15,8/21/15,8/21/15,NA,1,0
+4,5,PAV,N+P,5,1,1,shoot,0.4681,0.1215,2486.032,1474.816,3,0.2808,0.1873,1,1,1,1,NA,14,10/28/14,"AK, EB",51.5,frozen after chlororophyll transfer,NA,6/25/15,6/26/15,7/2/15,NA,1,0
+4,5,PAV,P,5,0,1,shoot,0.1358,0.0348,851.965,837.802,2,0.0812,0.0546,1,1,1,1,NA,17,11/4/14,"AK, TP",47.8,NA,NA,7/8/15,7/9/15,7/13/15,NA,1,0
+4,5,RPV,low,5,0,0,shoot,0.1126,0.0247,671.096,807.465,2,0.067,0.0456,1,1,0,1,Couldn't find sample for extraction,NA,NA,NA,NA,NA,Couldn't find sample for extraction,NA,NA,NA,NA,NA,NA
+4,5,RPV,N,5,1,0,shoot,0.2858,0.0659,1569.553,1535.435,3,0.1721,0.1137,1,1,1,1,1 aphid for transmission to P,9,10/20/14,AK,52,NA,NA,NA,NA,NA,NA,NA,NA
+4,5,RPV,N+P,5,1,1,shoot,0.3108,0.0624,1677.806,1322.442,3,0.1864,0.1244,1,1,1,1,NP leaf broken when trans IAP stopped,14,10/28/14,"AK, EB",51.7,frozen after chlororophyll transfer,NA,NA,NA,NA,NA,NA,NA
+4,5,RPV,P,5,0,1,shoot,0.2665,0.0919,1277.082,1054.415,3,0.1591,0.1074,1,1,1,1,"2 aphids for transmission to L, NP leaf broken when trans IAP stopped",7,10/18/14,AK,48.9,NA,NA,4/22/16,4/30/16,4/30/16,NA,0,1
+4,6,coinfection,low,5,0,0,shoot,0.3623,0.0155,1681.904,1291.688,3,0.2171,0.1452,1,1,1,1,NA,14,10/28/14,"AK, EB",48.3,frozen after chlororophyll transfer,NA,NA,NA,NA,NA,NA,NA
+4,6,coinfection,N,5,1,0,shoot,0.341,0.0169,1509.077,979.537,2,0.2047,0.1363,1,1,1,1,NA,20,11/10/14,"AK, EB, TP",51.5,"frozen after chloroform transfer, frozen after ethanol addition",NA,NA,NA,NA,NA,NA,NA
+4,6,coinfection,N+P,5,1,1,shoot,0.2254,0.0093,1201.202,1025.063,2,0.1349,0.0905,1,1,1,1,NA,1,9/22/14-9/24/14,"AK, EB, TP",52.7,"Air dry 7 min, sit 5 min, frozen after chloroform transfer",NA,NA,NA,NA,NA,NA,NA
+4,6,coinfection,P,5,0,1,shoot,0.2497,0.0132,1247.245,962.529,2,0.1503,0.0994,1,1,1,1,NA,10,10/21/14,AK,46.6,extra incubation times (see notebook),NA,NA,NA,NA,NA,NA,NA
+4,6,healthy,low,5,0,0,shoot,0.3266,0.026,1618.027,1344.99,3,0.3266,0,NA,NA,NA,NA,NA,8,10/19/14,AK,48.4,NA,NA,3/24/15,4/21/15,4/21/15,NA,0,0
+4,6,healthy,N,5,1,0,shoot,0.3313,0.0085,1834.426,1507.011,3,0.3313,0,NA,NA,NA,NA,NA,22,1/11/15,AK,46.7,samples went in fridge after grinding for ~15 min,Ext 21,2/19/15,3/9/15,3/10/15,NA,1,0
+4,6,healthy,N+P,5,1,1,shoot,0.4707,0.0129,2130.564,1348.765,3,0.4707,0,NA,NA,NA,NA,NA,2,9/25/14,"AK, EB, TP",50.8,15 min isopropanol incubation,<1ml of Trizol- estimated to bring up to 1ml,4/22/16,4/30/16,4/30/16,NA,0,0
+4,6,healthy,P,5,0,1,shoot,0.4158,0.0239,1631.737,1022.942,4,0.4158,0,NA,NA,NA,NA,NA,16,10/30/14,"AK,TP",49.3,"frozen after chlorophyll transfer, no 5 min air dry before adding water",NA,3/3/15,3/5/15,3/10/15,NA,0,0
+4,6,PAV,low,5,0,0,shoot,0.3856,0.0211,2028.925,1229.719,3,0.2313,0.1543,1,1,1,1,NA,12,10/23/14,"TP, AK",51.2,extra incubation before heating,NA,6/25/15,6/26/15,7/2/15,NA,1,0
+4,6,PAV,N,5,1,0,shoot,0.2224,0.0112,1292.808,1101.339,3,0.1335,0.0889,1,1,1,1,NA,17,11/4/14,"AK, TP",48.9,NA,NA,6/25/15,6/26/15,7/2/15,NA,1,0
+4,6,PAV,N+P,5,1,1,shoot,0.5062,0.0129,2546.929,1391.54,3,0.304,0.2022,1,1,1,1,NA,6,10/17/14,AK,51.4,NA,NA,7/23/15,7/24/15,7/30/15,NA,1,0
+4,6,PAV,P,5,0,1,shoot,0.3115,0.0194,1407.628,1172.709,3,0.187,0.1245,1,1,1,1,"NP leaf broken when trans IAP stopped, P leaf broken when trans IAP stopped",9,10/20/14,AK,47.4,NA,NA,7/8/15,7/9/15,7/13/15,NA,1,0
+4,6,RPV,low,5,0,0,shoot,0.3437,0.0214,1510.407,1009.801,2,0.206,0.1377,1,1,1,1,NA,8,10/19/14,AK,48.5,NA,NA,NA,NA,NA,NA,NA,NA
+4,6,RPV,N,5,1,0,shoot,0.3721,0.0112,1767.412,1216.271,3,0.2238,0.1483,1,1,1,1,NA,7,10/18/14,AK,51.7,NA,NA,NA,NA,NA,NA,NA,NA
+4,6,RPV,N+P,5,1,1,shoot,0.1448,0.009,884.823,934.199,3,0.0865,0.0583,1,1,1,1,4 aphids for transmission to N,22,1/11/15,AK,9.2,samples went in fridge after grinding for ~15 min,"Ext 21, UAT",7/23/15,7/24/15,7/30/15,NA,0,1
+4,6,RPV,P,5,0,1,shoot,0.3922,0.018,1822.481,1478.543,3,0.2352,0.157,1,1,1,1,NA,11,10/22/14,"AK, EB",48.9,NA,NA,NA,NA,NA,NA,NA,NA
+4,7,coinfection,low,5,0,0,shoot,0.2894,0.0301,1720.706,1351.245,3,0.1737,0.1157,1,1,1,1,NA,13,10/24/14,AK,50,frozen after chloroform transfer,NA,NA,NA,NA,NA,NA,NA
+4,7,coinfection,N,5,1,0,shoot,0.2289,0.0156,1447.793,1381.241,3,0.1369,0.092,1,1,1,1,"4 aphids for transmission to NP, 1 aphid for transmission to P",11,10/22/14,"AK, EB",47.1,NA,NA,NA,NA,NA,NA,NA,NA
+4,7,coinfection,N+P,5,1,1,shoot,0.1223,0.0071,827.591,764.486,2,0.0733,0.049,1,1,1,1,1 aphid for transmission to N,20,11/10/14,"AK, EB, TP",48.8,"frozen after chloroform transfer, frozen after ethanol addition",NA,NA,NA,NA,NA,NA,NA
+4,7,coinfection,P,5,0,1,shoot,0.3826,0.0209,1850.317,1491.437,3,0.2295,0.1531,1,1,1,1,NA,4,10/15/14,AK,52.7,2.0 ml tubes for final set,NA,NA,NA,NA,NA,NA,NA
+4,7,healthy,low,5,0,0,shoot,0.1499,0.0146,896.176,850.47,3,0.1499,0,NA,NA,NA,NA,NA,14,10/28/14,"AK, EB",49.4,frozen after chlororophyll transfer,NA,3/3/15,3/5/15,3/10/15,NA,0.5,0.5
+4,7,healthy,N,5,1,0,shoot,0.7883,0.0335,3587.654,2157.303,4,0.7883,0,NA,NA,NA,NA,NA,2,9/25/14,"AK, EB, TP",49.6,15 min isopropanol incubation,NA,4/22/16,4/30/16,4/30/16,NA,0,0
+4,7,healthy,N+P,5,1,1,shoot,0.7862,0.0449,3727.383,1897.025,4,0.7862,0,NA,NA,NA,NA,NA,8,10/19/14,AK,48.8,NA,NA,3/24/15,4/21/15,4/21/15,NA,0.5,0
+4,7,healthy,P,5,0,1,shoot,0.5745,0.0549,2598.625,1632.357,4,0.5745,0,NA,NA,NA,NA,NA,9,10/20/14,AK,48.8,NA,NA,3/24/15,4/21/15,4/21/15,NA,0.5,0
+4,7,PAV,low,5,0,0,shoot,0.4137,0.0349,2122.991,1288.64,3,0.2479,0.1658,1,1,1,1,4 aphids for transmission to NP,7,10/18/14,AK,52.4,NA,NA,7/8/15,7/9/15,7/13/15,mis-labelled extraction vial as 47RC,0,0
+4,7,PAV,N,5,1,0,shoot,0.232,0.0165,1610.031,1056.14,3,0.1394,0.0926,1,1,1,1,NA,20,11/10/14,"AK, EB, TP",48.7,"frozen after chloroform transfer, frozen after ethanol addition",NA,6/25/15,6/26/15,7/2/15,NA,1,1
+4,7,PAV,N+P,5,1,1,shoot,0.2359,0.0076,1380.65,1299.209,3,0.1413,0.0946,1,1,1,1,NA,5,10/16/14,"AK, TP, KR",52.2,2.0 ml tubes for final set,NA,6/25/15,6/26/15,7/2/15,NA,1,0.5
+4,7,PAV,P,5,0,1,shoot,0.2523,0.0146,1404.465,888.803,3,0.1517,0.1006,1,1,1,1,NA,10,10/21/14,AK,49.3,extra incubation times (see notebook),NA,7/23/15,7/24/15,7/30/15,NA,1,0.5
+4,7,RPV,low,5,0,0,shoot,0.2815,0.0317,1557.682,1172.13,4,0.1686,0.1129,1,1,1,1,NA,18,11/5/14,"AK, EB",47.6,NA,NA,2/1/16,2/1/16,2/1/16,NA,0,1
+4,7,RPV,N,5,1,0,shoot,0.185,0.0308,1230.125,988.582,3,0.1102,0.0748,1,1,1,1,4 aphids for transmission to N,4,10/15/14,AK,49.9,2.0 ml tubes for final set,NA,NA,NA,NA,NA,NA,NA
+4,7,RPV,N+P,5,1,1,shoot,0.2587,0.0164,1694.027,1364.395,3,0.1548,0.1039,1,1,1,1,4 aphids for transmission to N,13,10/24/14,AK,47.3,frozen after chloroform transfer,NA,NA,NA,NA,NA,NA,NA
+4,7,RPV,P,5,0,1,shoot,0.0826,0.0233,577.714,674.367,2,0.0497,0.0329,1,1,1,1,NA,10,10/21/14,AK,44.5,extra incubation times (see notebook),used all tissue,4/8/16,4/9/16,4/9/16,NA,0,1
+4,8,coinfection,low,5,0,0,shoot,0.5683,0.0454,2631.081,1055.955,3,0.341,0.2273,1,1,1,1,NA,9,10/20/14,AK,51.8,NA,NA,NA,NA,NA,NA,NA,NA
+4,8,coinfection,N,5,1,0,shoot,0.4686,0.022,2142.78,1492.864,3,0.2816,0.187,1,1,1,1,NA,14,10/28/14,"AK, EB",46.2,frozen after chlororophyll transfer,NA,NA,NA,NA,NA,NA,NA
+4,8,coinfection,N+P,5,1,1,shoot,0.4124,0.0241,2200.192,1443.346,3,0.2479,0.1645,1,1,1,1,NA,17,11/4/14,"AK, TP",47.6,NA,NA,NA,NA,NA,NA,NA,NA
+4,8,coinfection,P,5,0,1,shoot,0.1918,0.0285,1087.051,1091.163,3,0.1155,0.0763,1,1,1,1,NA,10,10/21/14,AK,47.7,extra incubation times (see notebook),NA,NA,NA,NA,NA,NA,NA
+4,8,healthy,low,5,0,0,shoot,0.3235,0.0339,1760.88,1391.113,3,0.3235,0,NA,NA,NA,NA,NA,20,11/10/14,"AK, EB, TP",47.2,"frozen after chloroform transfer, frozen after ethanol addition",NA,2/24/15,3/4/15,3/4/15,NA,1,1
+4,8,healthy,N,5,1,0,shoot,0.727,0.0334,3307.835,1889.411,4,0.727,0,NA,NA,NA,NA,NA,1,9/22/14-9/24/14,"AK, EB, TP",50.4,"Air dry 7 min, sit 5 min, frozen after chloroform transfer",NA,3/4/16,3/5/16,3/5/16,NA,0,0.5
+4,8,healthy,N+P,5,1,1,shoot,0.8288,0.0263,3530.475,2053.284,4,0.8288,0,NA,NA,NA,NA,NA,3,10/1/14,"AK,EB,TP",49.2,Frozen after chloroform transfer,NA,3/4/16,3/5/16,3/5/16,NA,0,0
+4,8,healthy,P,5,0,1,shoot,0.4856,0.0302,2243.358,1561.322,4,0.4856,0,NA,NA,NA,NA,NA,15,10/29/14,"AK,TP",48,4 min incubation after Trizol transfer,NA,3/3/15,3/5/15,3/10/15,NA,0.5,0
+4,8,PAV,low,5,0,0,shoot,0.5235,0.0419,2582.195,1863.655,4,0.3142,0.2093,1,1,1,1,NA,8,10/19/14,AK,50.1,NA,NA,7/8/15,7/13/15,7/13/15,NA,0.5,0
+4,8,PAV,N,5,1,0,shoot,0.6444,0.0347,3991.724,2066.709,4,0.3863,0.2581,1,1,1,1,NA,19,11/6/14,"AK, TP",49.4,"tubes flipped after isoproponal addition, frozen after ethanol addition",NA,7/8/15,7/13/15,7/13/15,NA,1,0
+4,8,PAV,N+P,5,1,1,shoot,0.7397,0.0274,3890.676,2242.259,4,0.4439,0.2958,1,1,1,1,NA,19,11/6/14,"AK, TP",48.9,"tubes flipped after isoproponal addition, frozen after ethanol addition",NA,7/8/15,7/13/15,7/13/15,NA,1,0
+4,8,PAV,P,5,0,1,shoot,0.5321,0.0309,2485.427,1742.65,4,0.3196,0.2125,1,1,1,1,NA,4,10/15/14,AK,49.4,2.0 ml tubes for final set,estimated amount of Trizol (~1ml),6/25/15,6/26/15,7/2/15,NA,1,0.5
+4,8,RPV,low,5,0,0,shoot,0.2414,0.0264,1576.456,1214.51,3,0.1445,0.0969,1,1,1,1,NA,13,10/24/14,AK,48,frozen after chloroform transfer,NA,NA,NA,NA,NA,NA,NA
+4,8,RPV,N,5,1,0,shoot,0.3278,0.0165,1840.94,1354.547,4,0.1966,0.1312,1,1,1,1,NA,17,11/4/14,"AK, TP",50,NA,NA,2/1/16,2/1/16,2/1/16,NA,0,1
+4,8,RPV,N+P,5,1,1,shoot,0.5065,0.0236,2775.965,1765.273,4,0.3043,0.2022,0,1,1,1,1 aphid for transmission to P,20,11/10/14,"AK, EB, TP",49,"frozen after chloroform transfer, frozen after ethanol addition",NA,7/23/15,7/24/15,7/30/15,NA,0.5,1
+4,8,RPV,P,5,0,1,shoot,0.2991,0.0246,1659.823,1418.234,3,0.1792,0.1199,1,1,1,1,NA,3,10/1/14,"AK,EB,TP",48.8,Frozen after chloroform transfer,NA,2/1/16,2/1/16,2/1/16,NA,0,0
+5,1,coinfection,low,6,0,0,shoot,0.1503,0.0167,NA,NA,NA,0.1503,NA,NA,NA,NA,NA,Roots dried two days,NA,NA,NA,NA,NA,Looked for samples for extraction and couldn't find them,NA,NA,NA,NA,NA,NA
+5,1,coinfection,N,6,1,0,shoot,0.2572,0.0196,NA,NA,NA,0.2572,NA,NA,NA,NA,NA,Roots dried two days,NA,NA,NA,NA,NA,Looked for samples for extraction and couldn't find them,NA,NA,NA,NA,NA,NA
+5,1,coinfection,N+P,6,1,1,shoot,0.2664,0.0186,NA,NA,NA,0.2664,NA,NA,NA,NA,NA,Roots dried two days,NA,NA,NA,NA,NA,Looked for samples for extraction and couldn't find them,NA,NA,NA,NA,NA,NA
+5,1,coinfection,P,6,0,1,shoot,0.2198,0.0205,NA,NA,NA,0.2198,NA,NA,NA,NA,NA,Roots dried two days,NA,NA,NA,NA,NA,Looked for samples for extraction and couldn't find them,NA,NA,NA,NA,NA,NA
+5,1,PAV,low,6,0,0,shoot,0.1963,0.0164,NA,NA,NA,0.1963,NA,NA,NA,NA,NA,Roots dried two days,NA,10/6/15,NA,48.9,NA,NA,10/10/15,10/11/15,10/11/15,NA,1,0.5
+5,1,PAV,N,6,1,0,shoot,0.2599,0.0215,NA,NA,NA,0.2599,NA,NA,NA,NA,NA,Roots dried two days,NA,10/6/15,NA,49.1,NA,NA,10/10/15,10/11/15,10/11/15,NA,1,0
+5,1,PAV,N+P,6,1,1,shoot,0.1823,0.0163,NA,NA,NA,0.1823,NA,NA,NA,NA,NA,Roots dried two days,NA,10/6/15,NA,52.5,NA,NA,10/10/15,10/11/15,10/11/15,NA,1,0
+5,1,PAV,P,6,0,1,shoot,0.2017,0.0209,NA,NA,NA,0.2017,NA,NA,NA,NA,NA,Roots dried two days,NA,10/6/15,NA,45.5,NA,NA,10/10/15,10/11/15,10/11/15,NA,1,0
+5,1,RPV,low,6,0,0,shoot,0.1408,0.0119,NA,NA,NA,0.1408,NA,NA,NA,NA,NA,Roots dried two days,NA,10/6/15,NA,48.5,NA,NA,10/10/15,10/11/15,10/11/15,NA,0,1
+5,1,RPV,N,6,1,0,shoot,0.2703,0.0165,NA,NA,NA,0.2703,NA,NA,NA,NA,NA,Roots dried two days,NA,10/6/15,NA,52.1,NA,NA,10/10/15,10/11/15,10/11/15,NA,0,1
+5,1,RPV,N+P,6,1,1,shoot,0.2767,0.0198,NA,NA,NA,0.2767,NA,NA,NA,NA,NA,"some healthy aphids came from aphid colony, roots dried two days",NA,10/6/15,NA,48.3,NA,NA,10/10/15,10/11/15,10/11/15,NA,0,1
+5,1,RPV,P,6,0,1,shoot,0.2354,0.0167,NA,NA,NA,0.2354,NA,NA,NA,NA,NA,Roots dried two days,NA,10/6/15,NA,51.3,NA,NA,10/10/15,10/11/15,10/11/15,NA,0,0
+5,2,coinfection,low,6,0,0,shoot,0.1961,0.0126,NA,NA,NA,0.1961,NA,NA,NA,NA,NA,Roots dried two days,NA,11/10/15,NA,50.8,NA,NA,NA,NA,NA,NA,NA,NA
+5,2,coinfection,N,6,1,0,shoot,0.2522,0.0188,NA,NA,NA,0.2522,NA,NA,NA,NA,NA,Roots dried two days,NA,11/10/15,NA,48.5,NA,NA,NA,NA,NA,NA,NA,NA
+5,2,coinfection,N+P,6,1,1,shoot,0.3703,0.0183,NA,NA,NA,0.3703,NA,NA,NA,NA,NA,Roots dried two days,NA,11/10/15,NA,47.6,NA,NA,NA,NA,NA,NA,NA,NA
+5,2,coinfection,P,6,0,1,shoot,0.1925,0.014,NA,NA,NA,0.1925,NA,NA,NA,NA,NA,Roots dried two days,NA,11/10/15,NA,48.5,NA,NA,NA,NA,NA,NA,NA,NA
+5,2,PAV,low,6,0,0,shoot,0.2274,0.0212,NA,NA,NA,0.2274,NA,NA,NA,NA,NA,Roots dried two days,NA,10/6/15,NA,52.1,NA,NA,10/10/15,10/11/15,10/11/15,NA,1,0
+5,2,PAV,N,6,1,0,shoot,0.2533,0.0167,NA,NA,NA,0.2533,NA,NA,NA,NA,NA,Roots dried two days,NA,10/6/15,NA,49.6,NA,NA,10/10/15,10/11/15,10/11/15,NA,1,0
+5,2,PAV,N+P,6,1,1,shoot,0.2487,0.0201,NA,NA,NA,0.2487,NA,NA,NA,NA,NA,Roots dried two days,NA,10/6/15,NA,50.4,NA,NA,10/10/15,10/11/15,10/11/15,NA,1,0
+5,2,PAV,P,6,0,1,shoot,0.1621,0.0148,NA,NA,NA,0.1621,NA,NA,NA,NA,NA,Roots dried two days,NA,10/6/15,NA,47.3,NA,NA,10/10/15,10/11/15,10/11/15,NA,1,0
+5,2,RPV,low,6,0,0,shoot,0.2228,0.0161,NA,NA,NA,0.2228,NA,NA,NA,NA,NA,"some healthy aphids came from aphid colony, Roots dried two days",NA,10/6/15,NA,50,NA,NA,10/10/15,10/11/15,10/11/15,NA,0,1
+5,2,RPV,N,6,1,0,shoot,0.1966,0.0144,NA,NA,NA,0.1966,NA,NA,NA,NA,NA,Roots dried two days,NA,10/6/15,NA,53.8,NA,NA,10/10/15,10/11/15,10/11/15,NA,0,1
+5,2,RPV,N+P,6,1,1,shoot,0.324,0.0174,NA,NA,NA,0.324,NA,NA,NA,NA,NA,Roots dried two days,NA,10/6/15,NA,40.5,NA,NA,10/10/15,10/11/15,10/11/15,NA,0,1
+5,2,RPV,P,6,0,1,shoot,0.231,0.0204,NA,NA,NA,0.231,NA,NA,NA,NA,NA,Roots dried two days,NA,10/6/15,NA,48.9,NA,NA,10/10/15,10/11/15,10/11/15,NA,0,1
+5,3,coinfection,low,6,0,0,shoot,0.2196,0.0148,NA,NA,NA,0.2196,NA,NA,NA,NA,NA,NA,NA,11/10/15,NA,49.9,NA,NA,NA,NA,NA,NA,NA,NA
+5,3,coinfection,P,6,0,1,shoot,0.2994,0.0155,NA,NA,NA,0.2994,NA,NA,NA,NA,NA,NA,NA,11/10/15,NA,50.8,NA,NA,NA,NA,NA,NA,NA,NA
+5,3,PAV,low,6,0,0,shoot,0.2978,0.0218,NA,NA,NA,0.2978,NA,NA,NA,NA,NA,NA,NA,10/6/15,NA,54.3,NA,NA,10/10/15,10/11/15,10/11/15,NA,1,0
+5,3,PAV,low,7,0,0,shoot,0.2302,0.0167,NA,NA,NA,0.2302,NA,NA,NA,NA,NA,NA,NA,10/6/15,NA,49.3,NA,NA,10/10/15,10/11/15,10/11/15,NA,1,0
+5,3,PAV,N,6,1,0,shoot,0.2813,0.017,NA,NA,NA,0.2813,NA,NA,NA,NA,NA,NA,NA,10/6/15,NA,47.1,NA,NA,10/10/15,10/11/15,10/11/15,NA,1,0
+5,3,PAV,N,7,1,0,shoot,0.3425,0.0175,NA,NA,NA,0.3425,NA,NA,NA,NA,NA,some aphids may have been lost during inoculation,NA,10/6/15,NA,47,NA,NA,10/10/15,10/11/15,10/11/15,NA,1,0
+5,3,PAV,P,6,0,1,shoot,0.2704,0.0177,NA,NA,NA,0.2704,NA,NA,NA,NA,NA,NA,NA,10/6/15,NA,52.1,NA,NA,10/10/15,10/11/15,10/11/15,NA,1,0
+5,3,PAV,P,7,0,1,shoot,0.2404,0.0157,NA,NA,NA,0.2404,NA,NA,NA,NA,NA,NA,NA,10/6/15,NA,49.5,NA,NA,10/10/15,10/11/15,10/11/15,NA,1,0
+5,3,RPV,low,6,0,0,shoot,0.2875,0.0215,NA,NA,NA,0.2875,NA,NA,NA,NA,NA,NA,NA,10/7/15,NA,54,NA,NA,10/10/15,10/11/15,10/11/15,NA,0,1
+5,3,RPV,N,6,1,0,shoot,0.3257,0.0182,NA,NA,NA,0.3257,NA,NA,NA,NA,NA,NA,NA,10/7/15,NA,47,NA,NA,10/10/15,10/11/15,10/11/15,NA,0,1
+5,3,RPV,N+P,6,1,1,shoot,0.4055,0.0166,NA,NA,NA,0.4055,NA,NA,NA,NA,NA,some healthy aphids came from aphid colony,NA,11/24/15,NA,53.2,sample lost in extraction 10/7/15 - re-do,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,0,0.5
+5,3,RPV,P,6,0,1,shoot,0.2896,0.0191,NA,NA,NA,0.2896,NA,NA,NA,NA,NA,NA,NA,12/1/16,NA,48.3,sample lost in extraction 10/7/15 - re-do,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,0,1
+5,3,RPV,P,7,0,1,shoot,0.2051,0.0114,NA,NA,NA,0.2051,NA,NA,NA,NA,NA,NA,NA,12/1/16,NA,46,sample lost in extraction 10/7/15 - re-do,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,0,1
+5,4,coinfection,low,6,0,0,shoot,0.2779,0.0145,NA,NA,NA,0.2779,NA,NA,NA,NA,NA,NA,NA,11/10/15,NA,48.9,NA,NA,NA,NA,NA,NA,NA,NA
+5,4,coinfection,N,6,1,0,shoot,0.4048,0.0235,NA,NA,NA,0.4048,NA,NA,NA,NA,NA,NA,NA,11/10/15,NA,51.8,NA,NA,NA,NA,NA,NA,NA,NA
+5,4,coinfection,N+P,6,1,1,shoot,0.4169,0.0174,NA,NA,NA,0.4169,NA,NA,NA,NA,NA,roots may be N RPV 6 (mixed up during weighing),NA,11/10/15,NA,49.9,NA,NA,NA,NA,NA,NA,NA,NA
+5,4,coinfection,N+P,7,1,1,shoot,0.3523,0.0245,NA,NA,NA,0.3523,NA,NA,NA,NA,NA,NA,NA,11/10/15,NA,47.4,NA,NA,NA,NA,NA,NA,NA,NA
+5,4,coinfection,P,6,0,1,shoot,0.2406,0.0169,NA,NA,NA,0.2406,NA,NA,NA,NA,NA,NA,NA,11/10/15,NA,53.2,NA,NA,NA,NA,NA,NA,NA,NA
+5,4,PAV,low,6,0,0,shoot,0.3116,0.0222,NA,NA,NA,0.3116,NA,NA,NA,NA,NA,NA,NA,12/1/16,NA,51.1,sample lost in extraction 10/7/15 - re-do,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,1,0
+5,4,PAV,N,6,1,0,shoot,0.2622,0.0181,NA,NA,NA,0.2622,NA,NA,NA,NA,NA,pulled off one of the leaves when moving plants,NA,10/7/15,NA,51.4,NA,NA,10/10/15,10/11/15,10/11/15,NA,1,0
+5,4,PAV,N+P,6,1,1,shoot,0.3586,0.0188,NA,NA,NA,0.3586,NA,NA,NA,NA,NA,NA,NA,10/7/15,NA,49.8,NA,NA,10/10/15,10/11/15,10/11/15,NA,1,0
+5,4,PAV,P,6,0,1,shoot,0.2093,0.0174,NA,NA,NA,0.2093,NA,NA,NA,NA,NA,NA,NA,10/7/15,NA,54.1,NA,NA,10/10/15,10/11/15,10/11/15,NA,1,0
+5,4,PAV,P,7,0,1,shoot,0.2393,0.0191,NA,NA,NA,0.2393,NA,NA,NA,NA,NA,NA,NA,12/1/16,NA,46,sample lost in extraction 10/7/15 - re-do,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,1,0
+5,4,RPV,low,6,0,0,shoot,0.3041,0.0183,NA,NA,NA,0.3041,NA,NA,NA,NA,NA,NA,NA,10/7/15,NA,50.3,NA,NA,10/10/15,10/11/15,10/11/15,NA,0,1
+5,4,RPV,N,6,1,0,shoot,0.3322,0.018,NA,NA,NA,0.3322,NA,NA,NA,NA,NA,roots may be NP Co 6 (mixed up during weighing),NA,12/1/16,NA,47.5,sample lost in extraction 10/7/15 - re-do,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,0,1
+5,4,RPV,N,7,1,0,shoot,0.4344,0.0183,NA,NA,NA,0.4344,NA,NA,NA,NA,NA,NA,NA,10/7/15,NA,48.6,NA,NA,10/10/15,10/11/15,10/11/15,NA,0,1
+5,4,RPV,N+P,6,1,1,shoot,0.2779,0.0119,NA,NA,NA,0.2779,NA,NA,NA,NA,NA,NA,NA,10/7/15,NA,48.6,NA,NA,10/10/15,10/11/15,10/11/15,NA,0,1
+5,4,RPV,P,6,0,1,shoot,0.2713,0.0203,NA,NA,NA,0.2713,NA,NA,NA,NA,NA,NA,NA,10/7/15,NA,50.3,NA,NA,10/10/15,10/11/15,10/11/15,NA,0,1
+5,4,RPV,P,7,0,1,shoot,0.2373,0.0166,NA,NA,NA,0.2373,NA,NA,NA,NA,NA,NA,NA,10/7/15,NA,51,NA,NA,10/10/15,10/11/15,10/11/15,NA,0,1
+5,5,coinfection,low,6,0,0,shoot,0.2915,0.0222,NA,NA,NA,0.2915,NA,NA,NA,NA,NA,NA,NA,11/10/15,NA,50.5,NA,NA,NA,NA,NA,NA,NA,NA
+5,5,coinfection,N,6,1,0,shoot,0.3861,0.0163,NA,NA,NA,0.3861,NA,NA,NA,NA,NA,NA,NA,11/10/15,NA,48.8,NA,NA,NA,NA,NA,NA,NA,NA
+5,5,coinfection,P,6,0,1,shoot,0.2819,0.018,NA,NA,NA,0.2819,NA,NA,NA,NA,NA,NA,NA,11/10/15,NA,48.6,NA,NA,NA,NA,NA,NA,NA,NA
+5,5,PAV,low,6,0,0,shoot,0.2986,0.0227,NA,NA,NA,0.2986,NA,NA,NA,NA,NA,NA,NA,10/7/15,NA,46.7,NA,NA,10/10/15,10/11/15,10/11/15,NA,1,0
+5,5,PAV,low,7,0,0,shoot,0.3644,0.0182,NA,NA,NA,0.3644,NA,NA,NA,NA,NA,NA,NA,10/7/15,NA,49.8,NA,NA,10/10/15,10/11/15,10/11/15,NA,1,0
+5,5,PAV,N,6,1,0,shoot,0.4344,0.0173,NA,NA,NA,0.4344,NA,NA,NA,NA,NA,NA,NA,10/7/15,NA,47.5,NA,NA,10/10/15,10/11/15,10/11/15,NA,1,0
+5,5,PAV,N+P,6,1,1,shoot,0.2933,0.0137,NA,NA,NA,0.2933,NA,NA,NA,NA,NA,NA,NA,10/7/15,NA,51,NA,NA,10/10/15,10/11/15,10/11/15,NA,1,0
+5,5,PAV,N+P,7,1,1,shoot,0.4516,0.0195,NA,NA,NA,0.4516,NA,NA,NA,NA,NA,NA,NA,10/7/15,NA,47.8,NA,NA,10/10/15,10/11/15,10/11/15,NA,1,0
+5,5,PAV,P,6,0,1,shoot,0.3267,0.0213,NA,NA,NA,0.3267,NA,NA,NA,NA,NA,NA,NA,10/7/15,NA,47.6,"tissue sampled twice for extraction, both positive for PAV, used first for qPCR",NA,10/10/15,10/11/15,10/11/15,NA,1,0
+5,5,RPV,low,6,0,0,shoot,0.2779,0.0177,NA,NA,NA,0.2779,NA,NA,NA,NA,NA,NA,NA,10/7/15,NA,48.9,NA,NA,10/10/15,10/11/15,10/11/15,NA,0,1
+5,5,RPV,N,6,1,0,shoot,0.371,0.0153,NA,NA,NA,0.371,NA,NA,NA,NA,NA,NA,NA,10/7/15,NA,50.3,NA,NA,10/10/15,10/11/15,10/11/15,NA,0,1
+5,5,RPV,N+P,6,1,1,shoot,0.3037,0.0149,NA,NA,NA,0.3037,NA,NA,NA,NA,NA,NA,NA,10/7/15,NA,48,NA,NA,10/10/15,10/11/15,10/11/15,NA,0,1
+5,5,RPV,P,6,0,1,shoot,0.2447,0.0198,NA,NA,NA,0.2447,NA,NA,NA,NA,NA,NA,NA,10/7/15,NA,47,NA,NA,10/10/15,10/11/15,10/11/15,NA,0,1
+5,5,RPV,P,7,0,1,shoot,0.3441,0.0171,NA,NA,NA,0.3441,NA,NA,NA,NA,NA,NA,NA,10/7/15,NA,48.2,NA,NA,10/10/15,10/11/15,10/11/15,NA,0,1
+5,6,PAV,N+P,6,1,1,shoot,0.352,0.0195,NA,NA,NA,0.352,NA,NA,NA,NA,NA,NA,NA,10/7/15,NA,51.9,NA,NA,10/10/15,10/11/15,10/11/15,NA,1,0
+5,6,RPV,low,6,0,0,shoot,0.2606,0.014,NA,NA,NA,0.2606,NA,NA,NA,NA,NA,NA,NA,10/7/15,NA,51.3,NA,NA,10/10/15,10/11/15,10/11/15,NA,0,1
+5,6,RPV,N,6,1,0,shoot,0.4673,0.0183,NA,NA,NA,0.4673,NA,NA,NA,NA,NA,NA,NA,11/24/15,NA,46.5,NA,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,0,1
+5,6,RPV,N+P,6,1,1,shoot,0.4675,0.0181,NA,NA,NA,0.4675,NA,NA,NA,NA,NA,NA,NA,11/24/15,NA,51.4,NA,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,0,1
+5,6,RPV,N+P,7,1,1,shoot,0.5506,0.201,NA,NA,NA,0.5506,NA,NA,NA,NA,NA,NA,NA,11/24/15,NA,51.5,NA,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,0,1
+5,6,RPV,P,6,0,1,shoot,0.3394,0.0194,NA,NA,NA,0.3394,NA,NA,NA,NA,NA,NA,NA,11/24/15,NA,48.1,NA,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,0,1
+5,7,coinfection,N+P,6,1,1,shoot,0.4783,0.0155,NA,NA,NA,0.4783,NA,NA,NA,NA,NA,NA,NA,11/10/15,NA,47.8,NA,NA,NA,NA,NA,NA,NA,NA
+5,7,PAV,low,6,0,0,shoot,0.2925,0.0191,NA,NA,NA,0.2925,NA,NA,NA,NA,NA,NA,NA,11/24/15,NA,49.6,NA,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,1,0.5
+5,7,PAV,N,6,1,0,shoot,0.4169,0.0152,NA,NA,NA,0.4169,NA,NA,NA,NA,NA,NA,NA,11/24/15,NA,50.9,NA,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,1,0
+5,7,PAV,N,7,1,0,shoot,0.4599,0.0265,NA,NA,NA,0.4599,NA,NA,NA,NA,NA,NA,NA,11/24/15,NA,47.1,NA,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,1,0
+5,7,PAV,N+P,6,1,1,shoot,0.5746,0.0195,NA,NA,NA,0.5746,NA,NA,NA,NA,NA,NA,NA,11/24/15,NA,50.3,NA,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,1,0
+5,7,PAV,N+P,7,1,1,shoot,0.5388,0.0204,NA,NA,NA,0.5388,NA,NA,NA,NA,NA,NA,NA,11/24/15,NA,49.6,NA,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,1,0
+5,7,PAV,P,6,0,1,shoot,0.3274,0.0203,NA,NA,NA,0.3274,NA,NA,NA,NA,NA,NA,NA,11/24/15,NA,46.4,NA,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,1,0
+5,7,RPV,low,6,0,0,shoot,0.2972,0.0186,NA,NA,NA,0.2972,NA,NA,NA,NA,NA,NA,NA,11/24/15,NA,51.7,NA,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,0.5,1
+5,7,RPV,low,7,0,0,shoot,0.3267,0.0195,NA,NA,NA,0.3267,NA,NA,NA,NA,NA,NA,NA,11/24/15,NA,47.3,NA,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,0.5,1
+5,7,RPV,N,6,1,0,shoot,0.5685,0.0222,NA,NA,NA,0.5685,NA,NA,NA,NA,NA,NA,NA,11/24/15,NA,48.2,NA,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,0,1
+5,7,RPV,N+P,6,1,1,shoot,0.5164,0.0141,NA,NA,NA,0.5164,NA,NA,NA,NA,NA,NA,NA,11/24/15,NA,46.4,NA,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,0,1
+5,7,RPV,P,6,0,1,shoot,0.2923,0.0183,NA,NA,NA,0.2923,NA,NA,NA,NA,NA,NA,NA,11/24/15,NA,47.5,NA,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,0,1
+5,8,coinfection,N,6,1,0,shoot,0.5319,0.0206,NA,NA,NA,0.5319,NA,NA,NA,NA,NA,NA,NA,11/10/15,NA,49.4,NA,NA,NA,NA,NA,NA,NA,NA
+5,8,PAV,low,6,0,0,shoot,0.3547,0.0213,NA,NA,NA,0.3547,NA,NA,NA,NA,NA,NA,NA,11/24/15,NA,50.5,NA,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,1,0.5
+5,8,PAV,low,7,0,0,shoot,0.3434,0.0254,NA,NA,NA,0.3434,NA,NA,NA,NA,NA,NA,NA,11/24/15,NA,49,NA,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,1,0
+5,8,PAV,N,6,1,0,shoot,0.5483,0.019,NA,NA,NA,0.5483,NA,NA,NA,NA,NA,NA,NA,11/24/15,NA,46.8,NA,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,1,0
+5,8,PAV,N,7,1,0,shoot,0.6076,0.0207,NA,NA,NA,0.6076,NA,NA,NA,NA,NA,NA,NA,11/24/15,NA,53.4,NA,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,1,0
+5,8,PAV,N+P,6,1,1,shoot,0.3931,0.0098,NA,NA,NA,0.3931,NA,NA,NA,NA,NA,NA,NA,11/24/15,NA,48,NA,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,1,0
+5,8,PAV,N+P,7,1,1,shoot,0.5662,0.02,NA,NA,NA,0.5662,NA,NA,NA,NA,NA,NA,NA,11/24/15,NA,49.3,NA,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,1,0
+5,8,PAV,P,6,0,1,shoot,0.244,0.0152,NA,NA,NA,0.244,NA,NA,NA,NA,NA,NA,NA,11/24/15,NA,48.5,NA,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,1,0
+5,8,PAV,P,7,0,1,shoot,0.3692,0.0207,NA,NA,NA,0.3692,NA,NA,NA,NA,NA,NA,NA,11/24/15,NA,51.4,NA,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,1,0
+5,8,RPV,low,6,0,0,shoot,0.3496,0.0202,NA,NA,NA,0.3496,NA,NA,NA,NA,NA,NA,NA,11/24/15,NA,53.2,NA,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,0.5,1
+5,8,RPV,low,7,0,0,shoot,0.4343,0.0255,NA,NA,NA,0.4343,NA,NA,NA,NA,NA,NA,NA,11/24/15,NA,53.3,NA,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,0,1
+5,8,RPV,N,6,1,0,shoot,0.5625,0.0174,NA,NA,NA,0.5625,NA,NA,NA,NA,NA,NA,NA,11/24/15,NA,51.9,NA,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,0,1
+5,8,RPV,N,7,1,0,shoot,0.2994,0.0064,NA,NA,NA,0.2994,NA,NA,NA,NA,NA,NA,NA,11/24/15,NA,52.9,NA,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,0,1
+5,8,RPV,N+P,6,1,1,shoot,0.5097,0.0179,NA,NA,NA,0.5097,NA,NA,NA,NA,NA,NA,NA,11/24/15,NA,50.5,NA,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,0,1
+5,8,RPV,N+P,7,1,1,shoot,0.5655,0.0197,NA,NA,NA,0.5655,NA,NA,NA,NA,NA,NA,NA,11/24/15,NA,47.6,NA,NA,1/6/16,1/7/16,1/7/16,PAV ctrl blank on gel,0,1

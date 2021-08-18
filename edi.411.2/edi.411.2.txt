@@ -1,0 +1,2452 @@
+
+  
+    
+      uid=EDI,o=EDI,dc=edirepository,dc=org
+      all
+    
+    
+      uid=aekendig,o=EDI,dc=edirepository,dc=org
+      all
+    
+    
+      public
+      read
+    
+  
+  
+    doi:10.6073/pasta/00a35cbd4a9b2a007433c3d2be0d1742
+    Soil nitrogen and phosphorus effects on plant virus density, transmission, and species interactions
+    
+      Amy Kendig
+      University of Minnesota
+      aekendig@gmail.com
+      https://orcid.org/0000-0002-2774-1795
+    
+    
+      Elizabeth Borer
+      University of Minnesota
+      borer@umn.edu
+      https://orcid.org/0000-0003-2259-5853
+    
+    
+      Emily Boak
+      Texas A&M University
+      boakn009@tamu.edu
+    
+    
+      Tashina Picard
+      University of Minnesota
+      picar022@umn.edu
+    
+    
+      Eric Seabloom
+      University of Minnesota
+      seabloom@umn.edu
+      https://orcid.org/0000-0001-6780-9259
+    
+    2020-04-20
+    
+      
+  This data package includes data and code from an experiment testing
+  the effects of nitrogen and phosphorus addition on interactions
+  between two grass viruses (BYDV-PAV and CYDV-RPV). Data include virus
+  density within oats (Avena sativa) and transmission of viruses to a
+  second set of oats. Data were collected by Amy E. Kendig and
+  collaborators between February 2014 and August 2014 at the University
+  of Minnesota in St. Paul Minnesota, USA. Experiments were performed in
+  growth chambers, virus density data were obtained using one-step
+  reverse transcription-quantitative polymerase chain reaction
+  (RT-qPCR), and transmission data were obtained using RT-PCR. The code
+  includes statistical analyses and figures. Model objects created
+  through statistical analyses are also included. The code was run using
+  R (version 3.5.2).
+
+    
+    
+      viruses
+      grasses
+      nitrogen
+      phosphorus
+      disease
+      species interactions
+      LTER
+    
+    
+      
+  This dataset is associated with the manuscript Host nutrition mediates
+  interactions between plant viruses, altering transmission and
+  predicted disease spread by Kendig et al., submitted to Ecology.
+
+      
+  R script outputs can be found here:
+  https://github.com/aekendig/nutrients-plant-viruses
+
+    
+    
+      
+  This information is released under the Creative Commons license -
+  Attribution - CC BY (https://creativecommons.org/licenses/by/4.0/).
+  The consumer of these data ("Data User" herein) is required
+  to cite it appropriately in any publication that results from its use.
+  The Data User should realize that these data may be actively used by
+  others for ongoing research and that coordination may be necessary to
+  prevent duplicate publication. The Data User is urged to contact the
+  authors of these data if any questions about methodology or results
+  occur. Where appropriate, the Data User is encouraged to consider
+  collaboration or co-authorship with the authors. The Data User should
+  realize that misinterpretation of data may occur if used out of
+  context of the original study. While substantial efforts are made to
+  ensure the accuracy of data and associated documentation, complete
+  accuracy of data sets cannot be guaranteed. All data are made
+  available "as is." The Data User should be aware, however,
+  that data are updated periodically and it is the responsibility of the
+  Data User to check for new versions of the data. The data authors and
+  the repository where these data were obtained shall not be liable for
+  damages resulting from any use or misinterpretation of the data. Thank
+  you.
+
+    
+    
+      
+        St. Paul, MN, USA
+        
+          -93.18
+          -93.18
+          44.98
+          44.98
+        
+      
+      
+        
+          
+            2014-02-10
+          
+          
+            2014-08-01
+          
+        
+      
+    
+    
+      completed
+    
+    
+      Amy Kendig
+      University of Minnesota
+      aekendig@gmail.com
+      https://orcid.org/0000-0002-2774-1795
+    
+    
+      
+        
+          
+  Motivation: Ecological theory that predicts the effects of resource
+  availability on species interactions has been explored across a range
+  of systems. Yet, application of this theory to communities of
+  host-associated pathogens has been limited. Host resources and diet
+  can impact disease severity and prevalence, and these resource effects
+  on disease may be mediated by pathogen-pathogen interactions within
+  hosts infected with multiple pathogens. As with free-living organisms,
+  pathogen species can alter each other’s population growth rates,
+  population densities, and transmission to new hosts through
+  facilitative or antagonistic processes. We used a model grass-virus
+  system (Barley and Cereal Yellow Dwarf Viruses in Avena sativa) to
+  test the hypothesis that host nutrition can constrain virus-virus
+  interactions by simultaneously determining both within-host density
+  and transmission to new hosts.
+
+          
+  Design: The experiment consisted of twelve treatments: four host
+  nutrient treatments crossed with three inoculation treatments. Host
+  nutrients were manipulated by watering Avena sativa with one of four
+  modified Hoagland solutions (7.5 μM N and 1 μM P (Low), 7.5 μM N and
+  50 μM P (P), 375 μM N and 1 μM P (N), or 375 μM N and 50 μM P (N+P)).
+  Watering began two days after planting A. sativa seeds in 164 mL
+  conical pots with 70% Sunshine medium vermiculite (vermiculite and
+  less than 1% crystalline silica; Sun Gro Horticulture) and 30% Turface
+  MVP (calcined clay containing up to 30% crystalline silica; Turface
+  Athletics, Buffalo Grove, IL, USA). A. sativa were watered with 30 mL
+  of nutrient solution twice per week prior to inoculation and weekly
+  following inoculation. Inoculation treatments consisted of BYDV-PAV
+  (PAV, hereafter), CYDV-RPV (RPV, hereafter), or both. Plants were
+  inoculated ten to eleven days post planting using ten aphids
+  (Rhopalosiphum padi) per plant (PAV: five aphids carrying PAV, five
+  mock-inoculated; RPV: five carrying RPV, five mock-inoculated; both:
+  five carrying PAV, five carrying RPV). We conducted transmission
+  trials by placing 25 aphids on this first set of plants (i.e., the
+  source plants), allowing them to feed, and transferring five of the
+  aphids to each of four uninfected plants grown in the four nutrient
+  treatments (i.e., the receiving plants). Transmission trials took
+  place when source plants were harvested. Plants were maintained in a
+  growth chamber at 20 degrees C with a 16:8 h light:dark cycle under
+  28W bulbs. We destructively harvested the source plants at eight
+  different days post inoculation (DPI): 5, 8, 12, 16, 19, 22, 26, or 29
+  days. We stored approximately 60% of the source plant tissue at -80
+  degrees C and used the rest for the transmission trials. The receiving
+  plants were harvested 14-15 DPI and all of the stem and leaf tissue
+  was stored at -80 degrees C. The experiment was performed over five
+  temporal blocks with one to two treatment-by-harvesting day replicates
+  (n = 96) per block.
+
+          
+  Plant Measurements: At each harvesting day, we measured chlorophyll
+  three times along the largest leaf on each plant using a SPAD-502
+  (Konica Minolta, Tokyo, Japan). Then, we split the plants into shoots
+  (stem and leaves) and roots by dividing them at the highest roots. We
+  weighed the aboveground tissue immediately, and the belowground tissue
+  after rinsing with tap water and drying on paper towels. Stems and
+  leaves were scanned (Seiko Epson Crop, Suwa, Japan) and analyzed for
+  area and perimeter with ImageJ software (Rasband 2014).
+
+          
+  Virus Density: To quantify virus density (number of viruses per mg
+  plant) in source plants, we first thawed approximately 50 mg of
+  haphazardly chosen cut plant tissue from the portion stored at -80
+  degrees C. We extracted total RNA from the plant tissue following the
+  manufacturer’s instructions for TRIzol Reagent (Invitrogen, Thermo
+  Fisher Scientific, Waltham, MA, USA). We divided the RNA extract into
+  three technical replicates and used one-step reverse
+  transcription-quantitative polymerase chain reaction to obtain
+  estimates of the number of copies of PAV and RPV RNA within each
+  sample. We used the RNA-to-CT 1-Step Kit (Applied Biosystems, Thermo
+  Fisher Scientific), primers, probes, and standards designed for PAV
+  and RPV, and the Applied Biosystems StepOnePlus Real-time PCR System.
+  To estimate the density of PAV or RPV in a plant, we took the mean of
+  the concentration (copies/ul) in the technical replicates (wells),
+  calculated the copies in the 50 ul of total RNA extract, and then
+  divided it by the mass of plant tissue used for the RNA extraction.
+  Some of the samples were also analyzed with reverse transcription,
+  polymerase chain reaction, and gel electrophoresis following the
+  methods presented by Lacroix et al. (2014) in order to screen for
+  accidental infections.
+
+          
+  Virus Transmission: To test the transmission success of receiving
+  plants, we first extracted the total RNA following the methods
+  described in Virus Density. We then followed the methods presented by
+  Lacroix et al. (2014) for reverse transcription, polymerase chain
+  reaction, and gel electrophoresis.
+
+          
+  Analysis Decisions: We excluded standards from analysis if they had a
+  lower density than any detected negative controls (i.e., water;
+  indicating a potential false positive). Samples in runs with standard
+  curves outside the target efficiency range (85% - 115%) were
+  re-analyzed when possible but excluded in analyses otherwise. We
+  removed technical replicates that were detected, but outside of the
+  standard curve. Non-detected technical replicates were included in the
+  mean as zero density and non-detected samples (i.e. all replicates
+  were not detected) were included in the analysis of infection rate,
+  but not virus density. Only source plants with quantified virus
+  densities corresponding to their inoculation treatment were used in
+  the analysis of transmission. Plants with accidental infections
+  (i.e. PAV detected in RPV-inoculated plants and RPV detected in
+  PAV-inoculated plants) were included in analyses as singly infected
+  plants because the timing of the accidental infection was unknown.
+  Such infections may have been caused by small aphids that escaped
+  inoculation cages (no other insects were observed on the experimental
+  plants).
+
+          
+  Analysis: We performed all statistical analyses in R version 3.5.2. To
+  analyze the effects of nutrient addition and coinfection on virus
+  density in source plants, the infection rate of source plants, and
+  transmission to receiving plants, we fit Bayesian generalized linear
+  models to data for each virus species using the brms package (Bürkner
+  2017). Virus density was modeled with a Gaussian distribution and
+  formatted as ln(density) ~ coinoculation * N addition * P addition,
+  where coinoculation, N addition, and P addition were binary variables.
+  Harvesting day was included as a first-order autocorrelation structure
+  (cor_ar function). Source plant infection was modeled with a Bernoulli
+  distribution (logit-link) and formatted as infection ~ coinoculation *
+  N addition * P addition. Harvesting day was included as a random
+  effect because autocorrelation structures were not compatible with
+  this family of models. Transmission was also modeled with a Bernoulli
+  distribution (logit-link) and formatted as transmission ~ density *
+  (Nsource * Psource + Nreceiving * Preceiving) + coinfection * (Nsource
+  * Psource + Nreceiving * Preceiving), where the subscripts indicate
+  which plant the nutrient treatment was applied to, and density was
+  centered and scaled. Harvesting day and experimental block were
+  included as crossed random effects. We used data from a previous
+  experiment that measured PAV and RPV densities and transmission under
+  almost identical laboratory conditions to inform the priors for the
+  density and transmission models (Lacroix et al. 2017). All models were
+  run with three Markov chains, 6000 iterations each with a 1000
+  iteration warm-up. We used r-hat values, visualizations of chain
+  convergence, and visual comparisons of the observed data and simulated
+  data from the posterior predictive distributions to evaluate model
+  fit. All packages and versions are reported in the code.
+
+          
+  References: - Bürkner, P.-C. 2017. brms: An R package for Bayesian
+  multilevel models using Stan. Journal of Statistical Software 80:1–28.
+  - Lacroix, C., E. W. Seabloom, and E. T. Borer. 2014. Environmental
+  nutrient supply alters prevalence and weakens competitive interactions
+  among coinfecting viruses. The New Phytologist 204:424–433. - Lacroix,
+  C., E. W. Seabloom, and E. T. Borer. 2017. Environmental nutrient
+  supply directly alters plant traits but indirectly determines virus
+  growth rate. Frontiers in Microbiology 8:2116. - Rasband, W. S. 2014.
+  ImageJ. National Institutes of Health, Bethesda, Maryland, USA.
+
+        
+      
+    
+    
+      No project title to report
+      
+        Elizabeth Borer
+        University of Minnesota
+        borer@umn.edu
+        https://orcid.org/0000-0003-2259-5853
+        Principal Investigator
+      
+      NSF DEB-1015805
+      
+        No project title to report
+        
+          Eric Seabloom
+          University of Minnesota
+          seabloom@umn.edu
+          https://orcid.org/0000-0001-6780-9259
+          Principal Investigator
+        
+        NSF DEB-1015805
+      
+    
+    
+      Comments for qPCR
+      comments about controls and standards for each qPCR group
+      
+        qPCR_group_comments.csv
+        3057
+        7fc8d2cf921467cf0b370af4ff4e4f36
+        
+          
+            1
+            \r\n
+            column
+            
+              ,
+              "
+            
+          
+        
+        
+          
+            https://pasta.lternet.edu/package/data/eml/edi/411/2/cbd86bf22f49f86f9254680b82c12473
+          
+        
+      
+      
+        
+          group
+          qPCR group number
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1
+                  45
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          negative_controls
+          notes regarding detection of negative controls
+          string
+          
+            
+              
+                
+                  notes regarding detection of negative controls
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          PAV_standards
+          notes regarding PAV standards
+          string
+          
+            
+              
+                
+                  notes regarding PAV standards
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          RPV_standards
+          notes regarding RPV standards
+          string
+          
+            
+              
+                
+                  notes regarding RPV standards
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+      
+      44
+    
+    
+      Source plant experimental and molecular data
+      includes experimental treatments, measurements taken during harvesting, and molecular analysis information for source plants
+      
+        sample_exp_molc_data.csv
+        140716
+        162d9d3c4cd9d01712f5c91357710d16
+        
+          
+            1
+            \r\n
+            column
+            
+              ,
+              "
+            
+          
+        
+        
+          
+            https://pasta.lternet.edu/package/data/eml/edi/411/2/edd564ae1f77764129ed94f24f6459ed
+          
+        
+      
+      
+        
+          round
+          Experimental block (5, separated by time)
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1
+                  5
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          time
+          Time that plants were harvested (sequence 1 - 8)
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1
+                  8
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          inoc
+          Inoculation treatment
+          string
+          
+            
+              
+                
+                  
+                    coinfection
+                    inoculated with both viruses
+                  
+                  
+                    healthy
+                    mock-inoculated
+                  
+                  
+                    PAV
+                    inoculated with PAV
+                  
+                  
+                    RPV
+                    inoculated with RPV
+                  
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          nutrient
+          Nutrient treatment
+          string
+          
+            
+              
+                
+                  
+                    low
+                    grown with low treatment
+                  
+                  
+                    N
+                    grown with elevated N treatment
+                  
+                  
+                    N+P
+                    grown with elevated N and P treatment
+                  
+                  
+                    P
+                    grown with elevated P treatment
+                  
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          replicate
+          Treatment by time replicate
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1
+                  7
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          high_N
+          Whether or not nutrient treamtent had elevated N (1 or 0, respectively)
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                whole
+                
+                  0
+                  1
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          high_P
+          Whether or not nutrient treamtent had elevated P (1 or 0, respectively)
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                whole
+                
+                  0
+                  1
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          material
+          Plant material used for molecular analysis
+          string
+          
+            
+              
+                
+                  
+                    shoot
+                    stems and leaves
+                  
+                  
+                    root
+                    roots
+                  
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          shoot_mass_g
+          Mass of leaves and stem
+          float
+          
+            
+              
+                gram
+              
+              
+                real
+                
+                  0.0235
+                  0.968
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          root_mass_g
+          Mass of roots
+          float
+          
+            
+              
+                gram
+              
+              
+                real
+                
+                  0
+                  0.208
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          leaf_area_mm2
+          Area of leaves and stem
+          float
+          
+            
+              
+                squareMillimeters
+              
+              
+                real
+                
+                  100.158
+                  4439.516
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          leaf_perim_mm
+          Perimeter of leaves and stem
+          float
+          
+            
+              
+                millimeter
+              
+              
+                real
+                
+                  56
+                  2761.417
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          leaves
+          Number of leaves
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                whole
+                
+                  0
+                  5
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          mass_saved_g
+          Mass of shoot saved in freezer at -80 degrees C
+          float
+          
+            
+              
+                gram
+              
+              
+                real
+                
+                  0.0235
+                  0.968
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          aphid_mass_g
+          Mass of shoot fed to aphids for transmission trial
+          float
+          
+            
+              
+                gram
+              
+              
+                real
+                
+                  0
+                  0.2958
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          trans_N
+          Whether or not transmission trial included a plant grown in the elevated N treatment  (1 or 0, respectively)
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                whole
+                
+                  0
+                  3
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          trans_P
+          Whether or not transmission trial included a plant grown in the elevated P treatment  (1 or 0, respectively)
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                whole
+                
+                  0
+                  3
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          trans_NP
+          Whether or not transmission trial included a plant grown in the elevated N and P treatment  (1 or 0, respectively)
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                whole
+                
+                  0
+                  3
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          trans_L
+          Whether or not transmission trial included a plant grown in the low nutrient treatment  (1 or 0, respectively)
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                whole
+                
+                  0
+                  3
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          exp_notes
+          Notes from experimental set-up and harvesting
+          string
+          
+            
+              
+                
+                  Notes from experimental set-up and harvesting
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          ext_group
+          Group the sample was in for total RNA extraction
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1
+                  22
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          ext_date
+          Date the sample was extracted
+          date
+          
+            
+              MM/DD/YY
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          extractors
+          Initials of individuals that extracted the samples
+          string
+          
+            
+              
+                
+                  Initials of individuals that extracted the samples
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          mass_ext_mg
+          Mass of shoot used in extraction
+          float
+          
+            
+              
+                milligram
+              
+              
+                real
+                
+                  7.2
+                  54.8
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          ext_group_notes
+          Notes about the extraction (as a group)
+          string
+          
+            
+              
+                
+                  Notes about the extraction (as a group)
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          ext_sample_notes
+          Notes about the extraction (specific to a sample)
+          string
+          
+            
+              
+                
+                  Notes about the extraction (specific to a sample)
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          RT_date
+          Date reverse transcription was performed on the sample
+          date
+          
+            
+              MM/DD/YY
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          PCR_date
+          Date PCR was performed on the sample
+          date
+          
+            
+              MM/DD/YY
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          gel_date
+          Date gel electrophoresis was performed on the sample
+          date
+          
+            
+              MM/DD/YY
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          molc_notes
+          Notes about RT/PCR/gel electrophoresis
+          string
+          
+            
+              
+                
+                  Notes about RT/PCR/gel electrophoresis
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          RTPCR_PAV
+          Visibility of gel electrophoresis band for PAV for the sample (0 = not visible; 0.5 = visible, but very weak compared to the control; 1 = clearly visible)
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  1
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          RTPCR_RPV
+          Visibility of gel electrophoresis band for RPV for the sample (0 = not visible; 0.5 = visible, but very weak compared to the control; 1 = clearly visible)
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  1
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+      
+      720
+    
+    
+      Source plant chlorophyll data
+      chlorophyll measurements for source plants
+      
+        source_plant_chlorophyll_data.csv
+        47441
+        7f4d0086189810a7f9746f5ed6b00486
+        
+          
+            1
+            \n
+            column
+            
+              ,
+              "
+            
+          
+        
+        
+          
+            https://pasta.lternet.edu/package/data/eml/edi/411/2/91e12896a8347ddc211803294af5d9e9
+          
+        
+      
+      
+        
+          round
+          Experimental block (5, separated by time)
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1
+                  4
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          time
+          Time that plants were harvested (sequence 1 - 8)
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1
+                  8
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          inoc
+          Inoculation treatment
+          string
+          
+            
+              
+                
+                  
+                    PAV
+                    inoculated with PAV
+                  
+                  
+                    RPV
+                    inoculated with RPV
+                  
+                  
+                    healthy
+                    mock-inoculated
+                  
+                  
+                    coinfection
+                    inoculated with both viruses
+                  
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          nutrient
+          Nutrient treatment
+          string
+          
+            
+              
+                
+                  
+                    N
+                    grown with elevated N treatment
+                  
+                  
+                    P
+                    grown with elevated P treatment
+                  
+                  
+                    N+P
+                    grown with elevated N and P treatment
+                  
+                  
+                    low
+                    grown with low treatment
+                  
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          replicate
+          Treatment by time replicate
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1
+                  5
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          chlorophyll
+          Chlorophyll measurement on leaf
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  46.6
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+      
+      1920
+    
+    
+      Source plant qPCR data
+      qPCR data for source plants
+      
+        source_plant_qPCR_data.csv
+        681368
+        727dbf6ac6d2f6bc38351cd5181beea2
+        
+          
+            1
+            \n
+            column
+            
+              ,
+              "
+            
+          
+        
+        
+          
+            https://pasta.lternet.edu/package/data/eml/edi/411/2/94510d72cf3d2e6e00264917d0f47c21
+          
+        
+      
+      
+        
+          well
+          position of sample in 96-well plate
+          string
+          
+            
+              
+                
+                  position of sample in 96-well plate
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          sample
+          ID assigned to sample
+          string
+          
+            
+              
+                
+                  
+                    NTC
+                    no template control (water instead of sample)
+                  
+                  
+                    NAC
+                    no amplification control (water instead of enzyme)
+                  
+                  
+                    XXYYYX
+                    samples coded by treatment information in the following order: round, time, inoculation, nutrient, replicate (for more information on meaning, see qPCR_raw_data_processing.R)
+                  
+                  
+                    PAV1EX
+                    PAV standard diluted to a concentration of 1exp(X)
+                  
+                  
+                    RPV1EX
+                    RPV standard diluted to a concentration of 1exp(X)
+                  
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          target
+          virus species being targeted for qPCR
+          string
+          
+            
+              
+                
+                  
+                    PAV
+                    well is set up to detect and quantify PAV (primers and probes)
+                  
+                  
+                    RPV
+                    well is set up to detect and quantify RPV (primers and probes)
+                  
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          task
+          purpose of the sample
+          string
+          
+            
+              
+                
+                  
+                    NTC
+                    no template control
+                  
+                  
+                    UNKNOWN
+                    no amplification control or sample
+                  
+                  
+                    STANDARD
+                    standard
+                  
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          reporter
+          fluorescent dye probe used to detect amplification
+          string
+          
+            
+              
+                
+                  
+                    FAM
+                    probe reporter for PAV
+                  
+                  
+                    VIC
+                    probe reporter for RPV
+                  
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          quencher
+          molecule attached to the 3' end of the probes to prevent the reporter from emitting signal while the probe is still intact
+          string
+          
+            
+              
+                
+                  
+                    NFQ-MGB
+                    used for all probes
+                  
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          cycle
+          PCR cycle at which the fluorescence meets the threshold in the amplification plot (lower concentration samples take longer and have higher cycle numbers)
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  17.10435295
+                  53.59302902
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          cycle_mean
+          the mean of the cycles associated with a single sample-target combination
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  17.10435295
+                  52.64407349
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          cycle_sd
+          the standard deviation of the cycles associated with a single sample-target combination
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0.005068395
+                  9.741675377
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          quantity
+          the automatically estimated amount of target in the well, based on cycle and standard curve
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0.041080073
+                  21620545536
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          quantity_mean
+          the mean of the quantities associated with a single sample-target combination
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0.041080073
+                  21620545536
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          quantity_sd
+          the standard deviation of the quantities associated with a single sample-target combination
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0.839604855
+                  598042752
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          auto_threshold
+          indicator variable for whether or not the threshold was set automatically
+          string
+          
+            
+              
+                
+                  
+                    TRUE
+                    automatic threhold used
+                  
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          threshold
+          the level of fluorescence above the baseline and within the exponential amplification region
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0.012234218
+                  0.094069857
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          auto_baseline
+          indicator variable for whether or not the baseline was set automatically
+          string
+          
+            
+              
+                
+                  
+                    TRUE
+                    automatic baseline used
+                  
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          baseline_start
+          the lower end of the cycle range that defines background fluorescence
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1
+                  3
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          baseline_end
+          the upper end of the cycle range that defines background fluorescence
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  3
+                  54
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          comments
+          comments entered during qPCR analysis
+          string
+          
+            
+              
+                
+                  comments entered during qPCR analysis
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          high_sd
+          indicator that the cycle_sd value is high relative to a predetermined threshold
+          string
+          
+            
+              
+                
+                  
+                    N
+                    no
+                  
+                  
+                    Y
+                    yes
+                  
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          no_amp
+          indicator that the sample did not amplify (no fluorescence detected at or above the threshold)
+          string
+          
+            
+              
+                
+                  
+                    N
+                    no
+                  
+                  
+                    Y
+                    yes
+                  
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          outlier_rg
+          indicator that the well cycle has a large deviation from other replicate wells in the same sample-target combination (outlier in replicate group)
+          string
+          
+            
+              
+                
+                  
+                    N
+                    no
+                  
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          exp_fail
+          indicator that the automatic algorithm failed for the well (exponential algorithm failed)
+          string
+          
+            
+              
+                
+                  
+                    N
+                    no
+                  
+                  
+                    Y
+                    yes
+                  
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          qPCR_notes
+          notes regarding sample preparation or analysis
+          string
+          
+            
+              
+                
+                  notes regarding sample preparation or analysis
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          q_group
+          qPCR group in which the sample was analyzed (numbered in order of analysis)
+          string
+          
+            
+              
+                
+                  qPCR group in which the sample was analyzed (numbered in order of analysis)
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+      
+      5218
+    
+    
+      Receiving plant experimental and molecular data
+      experimental treatments and molecular analysis information for receiving plants in transmission trials
+      
+        transmission_data.csv
+        79953
+        af57e5005e9b57f0bce7aaa7d1cd850a
+        
+          
+            1
+            \r\n
+            column
+            
+              ,
+              "
+            
+          
+        
+        
+          
+            https://pasta.lternet.edu/package/data/eml/edi/411/2/3c4606b1d044c5732b0f5114de2a34ab
+          
+        
+      
+      
+        
+          round
+          Experimental block (5, separated by time)
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1
+                  4
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          time
+          Time that plants were harvested (sequence 1 - 8)
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1
+                  8
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          inoc
+          Inoculation treatment
+          string
+          
+            
+              
+                
+                  
+                    RPV
+                    inoculated with RPV
+                  
+                  
+                    coinfection
+                    inoculated with both viruses
+                  
+                  
+                    PAV
+                    inoculated with PAV
+                  
+                  
+                    P/R
+                    unsure whether it was inoculated with PAV or RPV (labelling error), removed from the dataset in the code through an NA in material
+                  
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          nutrient
+          Nutrient treatment of source plant
+          string
+          
+            
+              
+                
+                  
+                    low
+                    source plant grown with low treatment
+                  
+                  
+                    N
+                    source plant grown with elevated N treatment
+                  
+                  
+                    N+P
+                    source plant grown with elevated N and P treatment
+                  
+                  
+                    P
+                    source plant grown with elevated P treatment
+                  
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          replicate
+          Treatment by time replicate
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                natural
+                
+                  1
+                  5
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          nutrient_t
+          Nutrient treatment or receiving plant
+          string
+          
+            
+              
+                
+                  
+                    N+P
+                    receiving plant grown with elevated N and P treatment
+                  
+                  
+                    P
+                    receiving plant grown with elevated P treatment
+                  
+                  
+                    low
+                    receiving plant grown with low treatment
+                  
+                  
+                    N
+                    receiving plant grown with elevated N treatment
+                  
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          ext_date_t
+          Date the receiving plan tsample was extracted (extraction group number used when date was unknown)
+          date
+          
+            
+              MM/DD/YY
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          RT_date_t
+          Date reverse transcription was performed on the receiving plant sample
+          date
+          
+            
+              MM/DD/YY
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          PCR_date_t
+          Date PCR was performed on the receiving plant sample
+          date
+          
+            
+              MM/DD/YY
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          gel_date_t
+          Date gel electrophoresis was performed on the receiving plant sample
+          date
+          
+            
+              MM/DD/YY
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          PAV_t
+          Visibility of gel electrophoresis band for PAV for the sample (0 = not visible; 0.5 = visible, but very weak compared to the control; 1 = clearly visible)
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  1
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          RPV_t
+          Visibility of gel electrophoresis band for RPV for the sample (0 = not visible; 0.5 = visible, but very weak compared to the control; 1 = clearly visible)
+          float
+          
+            
+              
+                dimensionless
+              
+              
+                real
+                
+                  0
+                  1
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          notes_t
+          Notes from experimental set-up and harvesting
+          string
+          
+            
+              
+                
+                  Notes from experimental set-up and harvesting
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          ext_notes_t
+          Notes about the extraction
+          string
+          
+            
+              
+                
+                  Notes about the extraction
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          gel_notes_t
+          Notes about the gel electrophoresis
+          string
+          
+            
+              
+                
+                  Notes about the gel electrophoresis
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+        
+          material
+          Plant material used for molecular analysis
+          string
+          
+            
+              
+                
+                  Plant material used for molecular analysis
+                
+              
+            
+          
+          
+            NA
+            not applicable
+          
+        
+      
+      1102
+    
+    
+      Virus density analysis
+      code to analyze density of viruses within source plants
+      
+        concentration_analysis.R
+        19418
+        fe0a214339ea227cf7b7936f6a2e8beb
+        
+          
+            unknown
+          
+        
+        
+          
+            https://pasta.lternet.edu/package/data/eml/edi/411/2/faff81816873ab522615ac119d0f2d7c
+          
+        
+      
+      unknown
+    
+    
+      Virus establishment analysis
+      code to analyze establishment of viruses within source plants
+      
+        infection_analysis.R
+        5629
+        33d929a869de5e7f16a52fca392f1425
+        
+          
+            unknown
+          
+        
+        
+          
+            https://pasta.lternet.edu/package/data/eml/edi/411/2/ddc440c99a8b547c017a93889ec30af8
+          
+        
+      
+      unknown
+    
+    
+      Figures for virus density and establishment
+      code to create figure of treatment effects on virus establishment and density
+      
+        infection_concentration_figure_results.R
+        10220
+        67f05c7ef4afc173326066bd90044bda
+        
+          
+            unknown
+          
+        
+        
+          
+            https://pasta.lternet.edu/package/data/eml/edi/411/2/48398cf33280698f4bb16d56c60c3063
+          
+        
+      
+      unknown
+    
+    
+      Mathematical model of disease spread
+      code for mathematical model and figures
+      
+        prevalence_ode_model.R
+        9265
+        2e3366736aa7b5cb29879c82dd83d71a
+        
+          
+            unknown
+          
+        
+        
+          
+            https://pasta.lternet.edu/package/data/eml/edi/411/2/feed867ed7840f52eaec934088f8e28e
+          
+        
+      
+      unknown
+    
+    
+      Processing of raw qPCR data
+      code to process raw qPCR data files
+      
+        qPCR_raw_data_processing.R
+        13658
+        448fbc89f9a7dfcb2d1bfbf46b2eb7d6
+        
+          
+            unknown
+          
+        
+        
+          
+            https://pasta.lternet.edu/package/data/eml/edi/411/2/0d68925ce90d24c316ed97416217bd2a
+          
+        
+      
+      unknown
+    
+    
+      Supplementary figure comparing models
+      code to create supplementary figure of comparison between models with and without priors
+      
+        supplementary_prior_comparison_figure.R
+        32532
+        bc8d5605787fd51ca77a256c8d71f02d
+        
+          
+            unknown
+          
+        
+        
+          
+            https://pasta.lternet.edu/package/data/eml/edi/411/2/86972b1c4e986ba045c2740fde74f1f1
+          
+        
+      
+      unknown
+    
+    
+      Transmission analysis
+      code to analyze transmission
+      
+        transmission_analysis.R
+        24977
+        f452223682095145a16f22d8182bd4ac
+        
+          
+            unknown
+          
+        
+        
+          
+            https://pasta.lternet.edu/package/data/eml/edi/411/2/257719610f603f9869ff5e3f04b75495
+          
+        
+      
+      unknown
+    
+    
+      Figures for transmission
+      code to create figure of treatment effects on transmission
+      
+        transmission_figure_results.R
+        17469
+        1bcdbdfa1db34b8b8c5d106b3f998384
+        
+          
+            unknown
+          
+        
+        
+          
+            https://pasta.lternet.edu/package/data/eml/edi/411/2/7708a1af2d28d7434d27c117b645ae59
+          
+        
+      
+      unknown
+    
+  

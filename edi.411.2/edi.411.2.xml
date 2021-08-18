@@ -1,0 +1,2490 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eml:eml packageId="edi.411.2" system="https://pasta.edirepository.org"
+  xmlns:eml="https://eml.ecoinformatics.org/eml-2.2.0"
+  xmlns:stmml="http://www.xml-cml.org/schema/stmml-1.2"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="eml://ecoinformatics.org/eml-2.2.0  https://nis.lternet.edu/schemas/EML/eml-2.2.0/xsd/eml.xsd">
+  <access authSystem="https://pasta.edirepository.org/authentication"
+    order="allowFirst" scope="document" system="https://pasta.edirepository.org">
+    <allow>
+      <principal>uid=EDI,o=EDI,dc=edirepository,dc=org</principal>
+      <permission>all</permission>
+    </allow>
+    <allow>
+      <principal>uid=aekendig,o=EDI,dc=edirepository,dc=org</principal>
+      <permission>all</permission>
+    </allow>
+    <allow>
+      <principal>public</principal>
+      <permission>read</permission>
+    </allow>
+  </access>
+  <dataset>
+    <alternateIdentifier system="https://doi.org">doi:10.6073/pasta/00a35cbd4a9b2a007433c3d2be0d1742</alternateIdentifier>
+    <title>Soil nitrogen and phosphorus effects on plant virus density, transmission, and species interactions</title>
+    <creator>
+      <individualName>
+        <givenName>Amy</givenName>
+        <givenName>E</givenName>
+        <surName>Kendig</surName>
+      </individualName>
+      <organizationName>University of Minnesota</organizationName>
+      <electronicMailAddress>aekendig@gmail.com</electronicMailAddress>
+      <userId directory="https://orcid.org">https://orcid.org/0000-0002-2774-1795</userId>
+    </creator>
+    <creator>
+      <individualName>
+        <givenName>Elizabeth</givenName>
+        <givenName>T</givenName>
+        <surName>Borer</surName>
+      </individualName>
+      <organizationName>University of Minnesota</organizationName>
+      <electronicMailAddress>borer@umn.edu</electronicMailAddress>
+      <userId directory="https://orcid.org">https://orcid.org/0000-0003-2259-5853</userId>
+    </creator>
+    <creator>
+      <individualName>
+        <givenName>Emily</givenName>
+        <givenName>N</givenName>
+        <surName>Boak</surName>
+      </individualName>
+      <organizationName>Texas A&amp;M University</organizationName>
+      <electronicMailAddress>boakn009@tamu.edu</electronicMailAddress>
+    </creator>
+    <creator>
+      <individualName>
+        <givenName>Tashina</givenName>
+        <givenName>C</givenName>
+        <surName>Picard</surName>
+      </individualName>
+      <organizationName>University of Minnesota</organizationName>
+      <electronicMailAddress>picar022@umn.edu</electronicMailAddress>
+    </creator>
+    <creator>
+      <individualName>
+        <givenName>Eric</givenName>
+        <givenName>W</givenName>
+        <surName>Seabloom</surName>
+      </individualName>
+      <organizationName>University of Minnesota</organizationName>
+      <electronicMailAddress>seabloom@umn.edu</electronicMailAddress>
+      <userId directory="https://orcid.org">https://orcid.org/0000-0001-6780-9259</userId>
+    </creator>
+    <pubDate>2020-04-20</pubDate>
+    <abstract>
+      <para>
+  This data package includes data and code from an experiment testing
+  the effects of nitrogen and phosphorus addition on interactions
+  between two grass viruses (BYDV-PAV and CYDV-RPV). Data include virus
+  density within oats (Avena sativa) and transmission of viruses to a
+  second set of oats. Data were collected by Amy E. Kendig and
+  collaborators between February 2014 and August 2014 at the University
+  of Minnesota in St. Paul Minnesota, USA. Experiments were performed in
+  growth chambers, virus density data were obtained using one-step
+  reverse transcription-quantitative polymerase chain reaction
+  (RT-qPCR), and transmission data were obtained using RT-PCR. The code
+  includes statistical analyses and figures. Model objects created
+  through statistical analyses are also included. The code was run using
+  R (version 3.5.2).
+</para>
+    </abstract>
+    <keywordSet>
+      <keyword>viruses</keyword>
+      <keyword>grasses</keyword>
+      <keyword>nitrogen</keyword>
+      <keyword>phosphorus</keyword>
+      <keyword>disease</keyword>
+      <keyword>species interactions</keyword>
+      <keywordThesaurus>LTER</keywordThesaurus>
+    </keywordSet>
+    <additionalInfo>
+      <para>
+  This dataset is associated with the manuscript Host nutrition mediates
+  interactions between plant viruses, altering transmission and
+  predicted disease spread by Kendig et al., submitted to Ecology.
+</para>
+      <para>
+  R script outputs can be found here:
+  https://github.com/aekendig/nutrients-plant-viruses
+</para>
+    </additionalInfo>
+    <intellectualRights>
+      <para>
+  This information is released under the Creative Commons license -
+  Attribution - CC BY (https://creativecommons.org/licenses/by/4.0/).
+  The consumer of these data ("Data User" herein) is required
+  to cite it appropriately in any publication that results from its use.
+  The Data User should realize that these data may be actively used by
+  others for ongoing research and that coordination may be necessary to
+  prevent duplicate publication. The Data User is urged to contact the
+  authors of these data if any questions about methodology or results
+  occur. Where appropriate, the Data User is encouraged to consider
+  collaboration or co-authorship with the authors. The Data User should
+  realize that misinterpretation of data may occur if used out of
+  context of the original study. While substantial efforts are made to
+  ensure the accuracy of data and associated documentation, complete
+  accuracy of data sets cannot be guaranteed. All data are made
+  available "as is." The Data User should be aware, however,
+  that data are updated periodically and it is the responsibility of the
+  Data User to check for new versions of the data. The data authors and
+  the repository where these data were obtained shall not be liable for
+  damages resulting from any use or misinterpretation of the data. Thank
+  you.
+</para>
+    </intellectualRights>
+    <coverage>
+      <geographicCoverage>
+        <geographicDescription>St. Paul, MN, USA</geographicDescription>
+        <boundingCoordinates>
+          <westBoundingCoordinate>-93.18</westBoundingCoordinate>
+          <eastBoundingCoordinate>-93.18</eastBoundingCoordinate>
+          <northBoundingCoordinate>44.98</northBoundingCoordinate>
+          <southBoundingCoordinate>44.98</southBoundingCoordinate>
+        </boundingCoordinates>
+      </geographicCoverage>
+      <temporalCoverage>
+        <rangeOfDates>
+          <beginDate>
+            <calendarDate>2014-02-10</calendarDate>
+          </beginDate>
+          <endDate>
+            <calendarDate>2014-08-01</calendarDate>
+          </endDate>
+        </rangeOfDates>
+      </temporalCoverage>
+    </coverage>
+    <maintenance>
+      <description>completed</description>
+    </maintenance>
+    <contact>
+      <individualName>
+        <givenName>Amy</givenName>
+        <givenName>E</givenName>
+        <surName>Kendig</surName>
+      </individualName>
+      <organizationName>University of Minnesota</organizationName>
+      <electronicMailAddress>aekendig@gmail.com</electronicMailAddress>
+      <userId directory="https://orcid.org">https://orcid.org/0000-0002-2774-1795</userId>
+    </contact>
+    <methods>
+      <methodStep>
+        <description>
+          <para>
+  Motivation: Ecological theory that predicts the effects of resource
+  availability on species interactions has been explored across a range
+  of systems. Yet, application of this theory to communities of
+  host-associated pathogens has been limited. Host resources and diet
+  can impact disease severity and prevalence, and these resource effects
+  on disease may be mediated by pathogen-pathogen interactions within
+  hosts infected with multiple pathogens. As with free-living organisms,
+  pathogen species can alter each other’s population growth rates,
+  population densities, and transmission to new hosts through
+  facilitative or antagonistic processes. We used a model grass-virus
+  system (Barley and Cereal Yellow Dwarf Viruses in Avena sativa) to
+  test the hypothesis that host nutrition can constrain virus-virus
+  interactions by simultaneously determining both within-host density
+  and transmission to new hosts.
+</para>
+          <para>
+  Design: The experiment consisted of twelve treatments: four host
+  nutrient treatments crossed with three inoculation treatments. Host
+  nutrients were manipulated by watering Avena sativa with one of four
+  modified Hoagland solutions (7.5 μM N and 1 μM P (Low), 7.5 μM N and
+  50 μM P (P), 375 μM N and 1 μM P (N), or 375 μM N and 50 μM P (N+P)).
+  Watering began two days after planting A. sativa seeds in 164 mL
+  conical pots with 70% Sunshine medium vermiculite (vermiculite and
+  less than 1% crystalline silica; Sun Gro Horticulture) and 30% Turface
+  MVP (calcined clay containing up to 30% crystalline silica; Turface
+  Athletics, Buffalo Grove, IL, USA). A. sativa were watered with 30 mL
+  of nutrient solution twice per week prior to inoculation and weekly
+  following inoculation. Inoculation treatments consisted of BYDV-PAV
+  (PAV, hereafter), CYDV-RPV (RPV, hereafter), or both. Plants were
+  inoculated ten to eleven days post planting using ten aphids
+  (Rhopalosiphum padi) per plant (PAV: five aphids carrying PAV, five
+  mock-inoculated; RPV: five carrying RPV, five mock-inoculated; both:
+  five carrying PAV, five carrying RPV). We conducted transmission
+  trials by placing 25 aphids on this first set of plants (i.e., the
+  source plants), allowing them to feed, and transferring five of the
+  aphids to each of four uninfected plants grown in the four nutrient
+  treatments (i.e., the receiving plants). Transmission trials took
+  place when source plants were harvested. Plants were maintained in a
+  growth chamber at 20 degrees C with a 16:8 h light:dark cycle under
+  28W bulbs. We destructively harvested the source plants at eight
+  different days post inoculation (DPI): 5, 8, 12, 16, 19, 22, 26, or 29
+  days. We stored approximately 60% of the source plant tissue at -80
+  degrees C and used the rest for the transmission trials. The receiving
+  plants were harvested 14-15 DPI and all of the stem and leaf tissue
+  was stored at -80 degrees C. The experiment was performed over five
+  temporal blocks with one to two treatment-by-harvesting day replicates
+  (n = 96) per block.
+</para>
+          <para>
+  Plant Measurements: At each harvesting day, we measured chlorophyll
+  three times along the largest leaf on each plant using a SPAD-502
+  (Konica Minolta, Tokyo, Japan). Then, we split the plants into shoots
+  (stem and leaves) and roots by dividing them at the highest roots. We
+  weighed the aboveground tissue immediately, and the belowground tissue
+  after rinsing with tap water and drying on paper towels. Stems and
+  leaves were scanned (Seiko Epson Crop, Suwa, Japan) and analyzed for
+  area and perimeter with ImageJ software (Rasband 2014).
+</para>
+          <para>
+  Virus Density: To quantify virus density (number of viruses per mg
+  plant) in source plants, we first thawed approximately 50 mg of
+  haphazardly chosen cut plant tissue from the portion stored at -80
+  degrees C. We extracted total RNA from the plant tissue following the
+  manufacturer’s instructions for TRIzol Reagent (Invitrogen, Thermo
+  Fisher Scientific, Waltham, MA, USA). We divided the RNA extract into
+  three technical replicates and used one-step reverse
+  transcription-quantitative polymerase chain reaction to obtain
+  estimates of the number of copies of PAV and RPV RNA within each
+  sample. We used the RNA-to-CT 1-Step Kit (Applied Biosystems, Thermo
+  Fisher Scientific), primers, probes, and standards designed for PAV
+  and RPV, and the Applied Biosystems StepOnePlus Real-time PCR System.
+  To estimate the density of PAV or RPV in a plant, we took the mean of
+  the concentration (copies/ul) in the technical replicates (wells),
+  calculated the copies in the 50 ul of total RNA extract, and then
+  divided it by the mass of plant tissue used for the RNA extraction.
+  Some of the samples were also analyzed with reverse transcription,
+  polymerase chain reaction, and gel electrophoresis following the
+  methods presented by Lacroix et al. (2014) in order to screen for
+  accidental infections.
+</para>
+          <para>
+  Virus Transmission: To test the transmission success of receiving
+  plants, we first extracted the total RNA following the methods
+  described in Virus Density. We then followed the methods presented by
+  Lacroix et al. (2014) for reverse transcription, polymerase chain
+  reaction, and gel electrophoresis.
+</para>
+          <para>
+  Analysis Decisions: We excluded standards from analysis if they had a
+  lower density than any detected negative controls (i.e., water;
+  indicating a potential false positive). Samples in runs with standard
+  curves outside the target efficiency range (85% - 115%) were
+  re-analyzed when possible but excluded in analyses otherwise. We
+  removed technical replicates that were detected, but outside of the
+  standard curve. Non-detected technical replicates were included in the
+  mean as zero density and non-detected samples (i.e. all replicates
+  were not detected) were included in the analysis of infection rate,
+  but not virus density. Only source plants with quantified virus
+  densities corresponding to their inoculation treatment were used in
+  the analysis of transmission. Plants with accidental infections
+  (i.e. PAV detected in RPV-inoculated plants and RPV detected in
+  PAV-inoculated plants) were included in analyses as singly infected
+  plants because the timing of the accidental infection was unknown.
+  Such infections may have been caused by small aphids that escaped
+  inoculation cages (no other insects were observed on the experimental
+  plants).
+</para>
+          <para>
+  Analysis: We performed all statistical analyses in R version 3.5.2. To
+  analyze the effects of nutrient addition and coinfection on virus
+  density in source plants, the infection rate of source plants, and
+  transmission to receiving plants, we fit Bayesian generalized linear
+  models to data for each virus species using the brms package (Bürkner
+  2017). Virus density was modeled with a Gaussian distribution and
+  formatted as ln(density) ~ coinoculation * N addition * P addition,
+  where coinoculation, N addition, and P addition were binary variables.
+  Harvesting day was included as a first-order autocorrelation structure
+  (cor_ar function). Source plant infection was modeled with a Bernoulli
+  distribution (logit-link) and formatted as infection ~ coinoculation *
+  N addition * P addition. Harvesting day was included as a random
+  effect because autocorrelation structures were not compatible with
+  this family of models. Transmission was also modeled with a Bernoulli
+  distribution (logit-link) and formatted as transmission ~ density *
+  (Nsource * Psource + Nreceiving * Preceiving) + coinfection * (Nsource
+  * Psource + Nreceiving * Preceiving), where the subscripts indicate
+  which plant the nutrient treatment was applied to, and density was
+  centered and scaled. Harvesting day and experimental block were
+  included as crossed random effects. We used data from a previous
+  experiment that measured PAV and RPV densities and transmission under
+  almost identical laboratory conditions to inform the priors for the
+  density and transmission models (Lacroix et al. 2017). All models were
+  run with three Markov chains, 6000 iterations each with a 1000
+  iteration warm-up. We used r-hat values, visualizations of chain
+  convergence, and visual comparisons of the observed data and simulated
+  data from the posterior predictive distributions to evaluate model
+  fit. All packages and versions are reported in the code.
+</para>
+          <para>
+  References: - Bürkner, P.-C. 2017. brms: An R package for Bayesian
+  multilevel models using Stan. Journal of Statistical Software 80:1–28.
+  - Lacroix, C., E. W. Seabloom, and E. T. Borer. 2014. Environmental
+  nutrient supply alters prevalence and weakens competitive interactions
+  among coinfecting viruses. The New Phytologist 204:424–433. - Lacroix,
+  C., E. W. Seabloom, and E. T. Borer. 2017. Environmental nutrient
+  supply directly alters plant traits but indirectly determines virus
+  growth rate. Frontiers in Microbiology 8:2116. - Rasband, W. S. 2014.
+  ImageJ. National Institutes of Health, Bethesda, Maryland, USA.
+</para>
+        </description>
+      </methodStep>
+    </methods>
+    <project>
+      <title>No project title to report</title>
+      <personnel>
+        <individualName>
+          <givenName>Elizabeth</givenName>
+          <givenName>T</givenName>
+          <surName>Borer</surName>
+        </individualName>
+        <organizationName>University of Minnesota</organizationName>
+        <electronicMailAddress>borer@umn.edu</electronicMailAddress>
+        <userId directory="https://orcid.org">https://orcid.org/0000-0003-2259-5853</userId>
+        <role>Principal Investigator</role>
+      </personnel>
+      <funding>NSF DEB-1015805</funding>
+      <relatedProject>
+        <title>No project title to report</title>
+        <personnel>
+          <individualName>
+            <givenName>Eric</givenName>
+            <givenName>W</givenName>
+            <surName>Seabloom</surName>
+          </individualName>
+          <organizationName>University of Minnesota</organizationName>
+          <electronicMailAddress>seabloom@umn.edu</electronicMailAddress>
+          <userId directory="https://orcid.org">https://orcid.org/0000-0001-6780-9259</userId>
+          <role>Principal Investigator</role>
+        </personnel>
+        <funding>NSF DEB-1015805</funding>
+      </relatedProject>
+    </project>
+    <dataTable>
+      <entityName>Comments for qPCR</entityName>
+      <entityDescription>comments about controls and standards for each qPCR group</entityDescription>
+      <physical>
+        <objectName>qPCR_group_comments.csv</objectName>
+        <size unit="bytes">3057</size>
+        <authentication method="MD5">7fc8d2cf921467cf0b370af4ff4e4f36</authentication>
+        <dataFormat>
+          <textFormat>
+            <numHeaderLines>1</numHeaderLines>
+            <recordDelimiter>\r\n</recordDelimiter>
+            <attributeOrientation>column</attributeOrientation>
+            <simpleDelimited>
+              <fieldDelimiter>,</fieldDelimiter>
+              <quoteCharacter>"</quoteCharacter>
+            </simpleDelimited>
+          </textFormat>
+        </dataFormat>
+        <distribution>
+          <online>
+            <url>https://pasta.lternet.edu/package/data/eml/edi/411/2/cbd86bf22f49f86f9254680b82c12473</url>
+          </online>
+        </distribution>
+      </physical>
+      <attributeList>
+        <attribute>
+          <attributeName>group</attributeName>
+          <attributeDefinition>qPCR group number</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>natural</numberType>
+                <bounds>
+                  <minimum exclusive="false">1</minimum>
+                  <maximum exclusive="false">45</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>negative_controls</attributeName>
+          <attributeDefinition>notes regarding detection of negative controls</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>notes regarding detection of negative controls</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>PAV_standards</attributeName>
+          <attributeDefinition>notes regarding PAV standards</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>notes regarding PAV standards</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>RPV_standards</attributeName>
+          <attributeDefinition>notes regarding RPV standards</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>notes regarding RPV standards</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+      </attributeList>
+      <numberOfRecords>44</numberOfRecords>
+    </dataTable>
+    <dataTable>
+      <entityName>Source plant experimental and molecular data</entityName>
+      <entityDescription>includes experimental treatments, measurements taken during harvesting, and molecular analysis information for source plants</entityDescription>
+      <physical>
+        <objectName>sample_exp_molc_data.csv</objectName>
+        <size unit="bytes">140716</size>
+        <authentication method="MD5">162d9d3c4cd9d01712f5c91357710d16</authentication>
+        <dataFormat>
+          <textFormat>
+            <numHeaderLines>1</numHeaderLines>
+            <recordDelimiter>\r\n</recordDelimiter>
+            <attributeOrientation>column</attributeOrientation>
+            <simpleDelimited>
+              <fieldDelimiter>,</fieldDelimiter>
+              <quoteCharacter>"</quoteCharacter>
+            </simpleDelimited>
+          </textFormat>
+        </dataFormat>
+        <distribution>
+          <online>
+            <url>https://pasta.lternet.edu/package/data/eml/edi/411/2/edd564ae1f77764129ed94f24f6459ed</url>
+          </online>
+        </distribution>
+      </physical>
+      <attributeList>
+        <attribute>
+          <attributeName>round</attributeName>
+          <attributeDefinition>Experimental block (5, separated by time)</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>natural</numberType>
+                <bounds>
+                  <minimum exclusive="false">1</minimum>
+                  <maximum exclusive="false">5</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>time</attributeName>
+          <attributeDefinition>Time that plants were harvested (sequence 1 - 8)</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>natural</numberType>
+                <bounds>
+                  <minimum exclusive="false">1</minimum>
+                  <maximum exclusive="false">8</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>inoc</attributeName>
+          <attributeDefinition>Inoculation treatment</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>coinfection</code>
+                    <definition>inoculated with both viruses</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>healthy</code>
+                    <definition>mock-inoculated</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>PAV</code>
+                    <definition>inoculated with PAV</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>RPV</code>
+                    <definition>inoculated with RPV</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>nutrient</attributeName>
+          <attributeDefinition>Nutrient treatment</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>low</code>
+                    <definition>grown with low treatment</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>N</code>
+                    <definition>grown with elevated N treatment</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>N+P</code>
+                    <definition>grown with elevated N and P treatment</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>P</code>
+                    <definition>grown with elevated P treatment</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>replicate</attributeName>
+          <attributeDefinition>Treatment by time replicate</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>natural</numberType>
+                <bounds>
+                  <minimum exclusive="false">1</minimum>
+                  <maximum exclusive="false">7</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>high_N</attributeName>
+          <attributeDefinition>Whether or not nutrient treamtent had elevated N (1 or 0, respectively)</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">1</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>high_P</attributeName>
+          <attributeDefinition>Whether or not nutrient treamtent had elevated P (1 or 0, respectively)</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">1</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>material</attributeName>
+          <attributeDefinition>Plant material used for molecular analysis</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>shoot</code>
+                    <definition>stems and leaves</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>root</code>
+                    <definition>roots</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>shoot_mass_g</attributeName>
+          <attributeDefinition>Mass of leaves and stem</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>gram</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0.0235</minimum>
+                  <maximum exclusive="false">0.968</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>root_mass_g</attributeName>
+          <attributeDefinition>Mass of roots</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>gram</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">0.208</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>leaf_area_mm2</attributeName>
+          <attributeDefinition>Area of leaves and stem</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>squareMillimeters</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">100.158</minimum>
+                  <maximum exclusive="false">4439.516</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>leaf_perim_mm</attributeName>
+          <attributeDefinition>Perimeter of leaves and stem</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>millimeter</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">56</minimum>
+                  <maximum exclusive="false">2761.417</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>leaves</attributeName>
+          <attributeDefinition>Number of leaves</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">5</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>mass_saved_g</attributeName>
+          <attributeDefinition>Mass of shoot saved in freezer at -80 degrees C</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>gram</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0.0235</minimum>
+                  <maximum exclusive="false">0.968</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>aphid_mass_g</attributeName>
+          <attributeDefinition>Mass of shoot fed to aphids for transmission trial</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>gram</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">0.2958</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>trans_N</attributeName>
+          <attributeDefinition>Whether or not transmission trial included a plant grown in the elevated N treatment  (1 or 0, respectively)</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">3</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>trans_P</attributeName>
+          <attributeDefinition>Whether or not transmission trial included a plant grown in the elevated P treatment  (1 or 0, respectively)</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">3</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>trans_NP</attributeName>
+          <attributeDefinition>Whether or not transmission trial included a plant grown in the elevated N and P treatment  (1 or 0, respectively)</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">3</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>trans_L</attributeName>
+          <attributeDefinition>Whether or not transmission trial included a plant grown in the low nutrient treatment  (1 or 0, respectively)</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">3</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>exp_notes</attributeName>
+          <attributeDefinition>Notes from experimental set-up and harvesting</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Notes from experimental set-up and harvesting</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>ext_group</attributeName>
+          <attributeDefinition>Group the sample was in for total RNA extraction</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>natural</numberType>
+                <bounds>
+                  <minimum exclusive="false">1</minimum>
+                  <maximum exclusive="false">22</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>ext_date</attributeName>
+          <attributeDefinition>Date the sample was extracted</attributeDefinition>
+          <storageType>date</storageType>
+          <measurementScale>
+            <dateTime>
+              <formatString>MM/DD/YY</formatString>
+              <dateTimeDomain/>
+            </dateTime>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>extractors</attributeName>
+          <attributeDefinition>Initials of individuals that extracted the samples</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Initials of individuals that extracted the samples</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>mass_ext_mg</attributeName>
+          <attributeDefinition>Mass of shoot used in extraction</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>milligram</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">7.2</minimum>
+                  <maximum exclusive="false">54.8</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>ext_group_notes</attributeName>
+          <attributeDefinition>Notes about the extraction (as a group)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Notes about the extraction (as a group)</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>ext_sample_notes</attributeName>
+          <attributeDefinition>Notes about the extraction (specific to a sample)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Notes about the extraction (specific to a sample)</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>RT_date</attributeName>
+          <attributeDefinition>Date reverse transcription was performed on the sample</attributeDefinition>
+          <storageType>date</storageType>
+          <measurementScale>
+            <dateTime>
+              <formatString>MM/DD/YY</formatString>
+              <dateTimeDomain/>
+            </dateTime>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>PCR_date</attributeName>
+          <attributeDefinition>Date PCR was performed on the sample</attributeDefinition>
+          <storageType>date</storageType>
+          <measurementScale>
+            <dateTime>
+              <formatString>MM/DD/YY</formatString>
+              <dateTimeDomain/>
+            </dateTime>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>gel_date</attributeName>
+          <attributeDefinition>Date gel electrophoresis was performed on the sample</attributeDefinition>
+          <storageType>date</storageType>
+          <measurementScale>
+            <dateTime>
+              <formatString>MM/DD/YY</formatString>
+              <dateTimeDomain/>
+            </dateTime>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>molc_notes</attributeName>
+          <attributeDefinition>Notes about RT/PCR/gel electrophoresis</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Notes about RT/PCR/gel electrophoresis</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>RTPCR_PAV</attributeName>
+          <attributeDefinition>Visibility of gel electrophoresis band for PAV for the sample (0 = not visible; 0.5 = visible, but very weak compared to the control; 1 = clearly visible)</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">1</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>RTPCR_RPV</attributeName>
+          <attributeDefinition>Visibility of gel electrophoresis band for RPV for the sample (0 = not visible; 0.5 = visible, but very weak compared to the control; 1 = clearly visible)</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">1</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+      </attributeList>
+      <numberOfRecords>720</numberOfRecords>
+    </dataTable>
+    <dataTable>
+      <entityName>Source plant chlorophyll data</entityName>
+      <entityDescription>chlorophyll measurements for source plants</entityDescription>
+      <physical>
+        <objectName>source_plant_chlorophyll_data.csv</objectName>
+        <size unit="bytes">47441</size>
+        <authentication method="MD5">7f4d0086189810a7f9746f5ed6b00486</authentication>
+        <dataFormat>
+          <textFormat>
+            <numHeaderLines>1</numHeaderLines>
+            <recordDelimiter>\n</recordDelimiter>
+            <attributeOrientation>column</attributeOrientation>
+            <simpleDelimited>
+              <fieldDelimiter>,</fieldDelimiter>
+              <quoteCharacter>"</quoteCharacter>
+            </simpleDelimited>
+          </textFormat>
+        </dataFormat>
+        <distribution>
+          <online>
+            <url>https://pasta.lternet.edu/package/data/eml/edi/411/2/91e12896a8347ddc211803294af5d9e9</url>
+          </online>
+        </distribution>
+      </physical>
+      <attributeList>
+        <attribute>
+          <attributeName>round</attributeName>
+          <attributeDefinition>Experimental block (5, separated by time)</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>natural</numberType>
+                <bounds>
+                  <minimum exclusive="false">1</minimum>
+                  <maximum exclusive="false">4</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>time</attributeName>
+          <attributeDefinition>Time that plants were harvested (sequence 1 - 8)</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>natural</numberType>
+                <bounds>
+                  <minimum exclusive="false">1</minimum>
+                  <maximum exclusive="false">8</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>inoc</attributeName>
+          <attributeDefinition>Inoculation treatment</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>PAV</code>
+                    <definition>inoculated with PAV</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>RPV</code>
+                    <definition>inoculated with RPV</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>healthy</code>
+                    <definition>mock-inoculated</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>coinfection</code>
+                    <definition>inoculated with both viruses</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>nutrient</attributeName>
+          <attributeDefinition>Nutrient treatment</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>N</code>
+                    <definition>grown with elevated N treatment</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>P</code>
+                    <definition>grown with elevated P treatment</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>N+P</code>
+                    <definition>grown with elevated N and P treatment</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>low</code>
+                    <definition>grown with low treatment</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>replicate</attributeName>
+          <attributeDefinition>Treatment by time replicate</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>natural</numberType>
+                <bounds>
+                  <minimum exclusive="false">1</minimum>
+                  <maximum exclusive="false">5</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>chlorophyll</attributeName>
+          <attributeDefinition>Chlorophyll measurement on leaf</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">46.6</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+      </attributeList>
+      <numberOfRecords>1920</numberOfRecords>
+    </dataTable>
+    <dataTable>
+      <entityName>Source plant qPCR data</entityName>
+      <entityDescription>qPCR data for source plants</entityDescription>
+      <physical>
+        <objectName>source_plant_qPCR_data.csv</objectName>
+        <size unit="bytes">681368</size>
+        <authentication method="MD5">727dbf6ac6d2f6bc38351cd5181beea2</authentication>
+        <dataFormat>
+          <textFormat>
+            <numHeaderLines>1</numHeaderLines>
+            <recordDelimiter>\n</recordDelimiter>
+            <attributeOrientation>column</attributeOrientation>
+            <simpleDelimited>
+              <fieldDelimiter>,</fieldDelimiter>
+              <quoteCharacter>"</quoteCharacter>
+            </simpleDelimited>
+          </textFormat>
+        </dataFormat>
+        <distribution>
+          <online>
+            <url>https://pasta.lternet.edu/package/data/eml/edi/411/2/94510d72cf3d2e6e00264917d0f47c21</url>
+          </online>
+        </distribution>
+      </physical>
+      <attributeList>
+        <attribute>
+          <attributeName>well</attributeName>
+          <attributeDefinition>position of sample in 96-well plate</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>position of sample in 96-well plate</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>sample</attributeName>
+          <attributeDefinition>ID assigned to sample</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>NTC</code>
+                    <definition>no template control (water instead of sample)</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>NAC</code>
+                    <definition>no amplification control (water instead of enzyme)</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>XXYYYX</code>
+                    <definition>samples coded by treatment information in the following order: round, time, inoculation, nutrient, replicate (for more information on meaning, see qPCR_raw_data_processing.R)</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>PAV1EX</code>
+                    <definition>PAV standard diluted to a concentration of 1exp(X)</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>RPV1EX</code>
+                    <definition>RPV standard diluted to a concentration of 1exp(X)</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>target</attributeName>
+          <attributeDefinition>virus species being targeted for qPCR</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>PAV</code>
+                    <definition>well is set up to detect and quantify PAV (primers and probes)</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>RPV</code>
+                    <definition>well is set up to detect and quantify RPV (primers and probes)</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>task</attributeName>
+          <attributeDefinition>purpose of the sample</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>NTC</code>
+                    <definition>no template control</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>UNKNOWN</code>
+                    <definition>no amplification control or sample</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>STANDARD</code>
+                    <definition>standard</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>reporter</attributeName>
+          <attributeDefinition>fluorescent dye probe used to detect amplification</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>FAM</code>
+                    <definition>probe reporter for PAV</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>VIC</code>
+                    <definition>probe reporter for RPV</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>quencher</attributeName>
+          <attributeDefinition>molecule attached to the 3' end of the probes to prevent the reporter from emitting signal while the probe is still intact</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>NFQ-MGB</code>
+                    <definition>used for all probes</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>cycle</attributeName>
+          <attributeDefinition>PCR cycle at which the fluorescence meets the threshold in the amplification plot (lower concentration samples take longer and have higher cycle numbers)</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">17.10435295</minimum>
+                  <maximum exclusive="false">53.59302902</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>cycle_mean</attributeName>
+          <attributeDefinition>the mean of the cycles associated with a single sample-target combination</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">17.10435295</minimum>
+                  <maximum exclusive="false">52.64407349</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>cycle_sd</attributeName>
+          <attributeDefinition>the standard deviation of the cycles associated with a single sample-target combination</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0.005068395</minimum>
+                  <maximum exclusive="false">9.741675377</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>quantity</attributeName>
+          <attributeDefinition>the automatically estimated amount of target in the well, based on cycle and standard curve</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0.041080073</minimum>
+                  <maximum exclusive="false">21620545536</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>quantity_mean</attributeName>
+          <attributeDefinition>the mean of the quantities associated with a single sample-target combination</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0.041080073</minimum>
+                  <maximum exclusive="false">21620545536</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>quantity_sd</attributeName>
+          <attributeDefinition>the standard deviation of the quantities associated with a single sample-target combination</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0.839604855</minimum>
+                  <maximum exclusive="false">598042752</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>auto_threshold</attributeName>
+          <attributeDefinition>indicator variable for whether or not the threshold was set automatically</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>TRUE</code>
+                    <definition>automatic threhold used</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>threshold</attributeName>
+          <attributeDefinition>the level of fluorescence above the baseline and within the exponential amplification region</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0.012234218</minimum>
+                  <maximum exclusive="false">0.094069857</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>auto_baseline</attributeName>
+          <attributeDefinition>indicator variable for whether or not the baseline was set automatically</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>TRUE</code>
+                    <definition>automatic baseline used</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>baseline_start</attributeName>
+          <attributeDefinition>the lower end of the cycle range that defines background fluorescence</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>natural</numberType>
+                <bounds>
+                  <minimum exclusive="false">1</minimum>
+                  <maximum exclusive="false">3</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>baseline_end</attributeName>
+          <attributeDefinition>the upper end of the cycle range that defines background fluorescence</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>natural</numberType>
+                <bounds>
+                  <minimum exclusive="false">3</minimum>
+                  <maximum exclusive="false">54</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>comments</attributeName>
+          <attributeDefinition>comments entered during qPCR analysis</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>comments entered during qPCR analysis</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>high_sd</attributeName>
+          <attributeDefinition>indicator that the cycle_sd value is high relative to a predetermined threshold</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>N</code>
+                    <definition>no</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Y</code>
+                    <definition>yes</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>no_amp</attributeName>
+          <attributeDefinition>indicator that the sample did not amplify (no fluorescence detected at or above the threshold)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>N</code>
+                    <definition>no</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Y</code>
+                    <definition>yes</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>outlier_rg</attributeName>
+          <attributeDefinition>indicator that the well cycle has a large deviation from other replicate wells in the same sample-target combination (outlier in replicate group)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>N</code>
+                    <definition>no</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>exp_fail</attributeName>
+          <attributeDefinition>indicator that the automatic algorithm failed for the well (exponential algorithm failed)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>N</code>
+                    <definition>no</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>Y</code>
+                    <definition>yes</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>qPCR_notes</attributeName>
+          <attributeDefinition>notes regarding sample preparation or analysis</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>notes regarding sample preparation or analysis</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>q_group</attributeName>
+          <attributeDefinition>qPCR group in which the sample was analyzed (numbered in order of analysis)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>qPCR group in which the sample was analyzed (numbered in order of analysis)</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+      </attributeList>
+      <numberOfRecords>5218</numberOfRecords>
+    </dataTable>
+    <dataTable>
+      <entityName>Receiving plant experimental and molecular data</entityName>
+      <entityDescription>experimental treatments and molecular analysis information for receiving plants in transmission trials</entityDescription>
+      <physical>
+        <objectName>transmission_data.csv</objectName>
+        <size unit="bytes">79953</size>
+        <authentication method="MD5">af57e5005e9b57f0bce7aaa7d1cd850a</authentication>
+        <dataFormat>
+          <textFormat>
+            <numHeaderLines>1</numHeaderLines>
+            <recordDelimiter>\r\n</recordDelimiter>
+            <attributeOrientation>column</attributeOrientation>
+            <simpleDelimited>
+              <fieldDelimiter>,</fieldDelimiter>
+              <quoteCharacter>"</quoteCharacter>
+            </simpleDelimited>
+          </textFormat>
+        </dataFormat>
+        <distribution>
+          <online>
+            <url>https://pasta.lternet.edu/package/data/eml/edi/411/2/3c4606b1d044c5732b0f5114de2a34ab</url>
+          </online>
+        </distribution>
+      </physical>
+      <attributeList>
+        <attribute>
+          <attributeName>round</attributeName>
+          <attributeDefinition>Experimental block (5, separated by time)</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>natural</numberType>
+                <bounds>
+                  <minimum exclusive="false">1</minimum>
+                  <maximum exclusive="false">4</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>time</attributeName>
+          <attributeDefinition>Time that plants were harvested (sequence 1 - 8)</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>natural</numberType>
+                <bounds>
+                  <minimum exclusive="false">1</minimum>
+                  <maximum exclusive="false">8</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>inoc</attributeName>
+          <attributeDefinition>Inoculation treatment</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>RPV</code>
+                    <definition>inoculated with RPV</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>coinfection</code>
+                    <definition>inoculated with both viruses</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>PAV</code>
+                    <definition>inoculated with PAV</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>P/R</code>
+                    <definition>unsure whether it was inoculated with PAV or RPV (labelling error), removed from the dataset in the code through an NA in material</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>nutrient</attributeName>
+          <attributeDefinition>Nutrient treatment of source plant</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>low</code>
+                    <definition>source plant grown with low treatment</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>N</code>
+                    <definition>source plant grown with elevated N treatment</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>N+P</code>
+                    <definition>source plant grown with elevated N and P treatment</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>P</code>
+                    <definition>source plant grown with elevated P treatment</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>replicate</attributeName>
+          <attributeDefinition>Treatment by time replicate</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>natural</numberType>
+                <bounds>
+                  <minimum exclusive="false">1</minimum>
+                  <maximum exclusive="false">5</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>nutrient_t</attributeName>
+          <attributeDefinition>Nutrient treatment or receiving plant</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>N+P</code>
+                    <definition>receiving plant grown with elevated N and P treatment</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>P</code>
+                    <definition>receiving plant grown with elevated P treatment</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>low</code>
+                    <definition>receiving plant grown with low treatment</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>N</code>
+                    <definition>receiving plant grown with elevated N treatment</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>ext_date_t</attributeName>
+          <attributeDefinition>Date the receiving plan tsample was extracted (extraction group number used when date was unknown)</attributeDefinition>
+          <storageType>date</storageType>
+          <measurementScale>
+            <dateTime>
+              <formatString>MM/DD/YY</formatString>
+              <dateTimeDomain/>
+            </dateTime>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>RT_date_t</attributeName>
+          <attributeDefinition>Date reverse transcription was performed on the receiving plant sample</attributeDefinition>
+          <storageType>date</storageType>
+          <measurementScale>
+            <dateTime>
+              <formatString>MM/DD/YY</formatString>
+              <dateTimeDomain/>
+            </dateTime>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>PCR_date_t</attributeName>
+          <attributeDefinition>Date PCR was performed on the receiving plant sample</attributeDefinition>
+          <storageType>date</storageType>
+          <measurementScale>
+            <dateTime>
+              <formatString>MM/DD/YY</formatString>
+              <dateTimeDomain/>
+            </dateTime>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>gel_date_t</attributeName>
+          <attributeDefinition>Date gel electrophoresis was performed on the receiving plant sample</attributeDefinition>
+          <storageType>date</storageType>
+          <measurementScale>
+            <dateTime>
+              <formatString>MM/DD/YY</formatString>
+              <dateTimeDomain/>
+            </dateTime>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>PAV_t</attributeName>
+          <attributeDefinition>Visibility of gel electrophoresis band for PAV for the sample (0 = not visible; 0.5 = visible, but very weak compared to the control; 1 = clearly visible)</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">1</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>RPV_t</attributeName>
+          <attributeDefinition>Visibility of gel electrophoresis band for RPV for the sample (0 = not visible; 0.5 = visible, but very weak compared to the control; 1 = clearly visible)</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">1</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>notes_t</attributeName>
+          <attributeDefinition>Notes from experimental set-up and harvesting</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Notes from experimental set-up and harvesting</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>ext_notes_t</attributeName>
+          <attributeDefinition>Notes about the extraction</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Notes about the extraction</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>gel_notes_t</attributeName>
+          <attributeDefinition>Notes about the gel electrophoresis</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Notes about the gel electrophoresis</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>material</attributeName>
+          <attributeDefinition>Plant material used for molecular analysis</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Plant material used for molecular analysis</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>not applicable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+      </attributeList>
+      <numberOfRecords>1102</numberOfRecords>
+    </dataTable>
+    <otherEntity>
+      <entityName>Virus density analysis</entityName>
+      <entityDescription>code to analyze density of viruses within source plants</entityDescription>
+      <physical>
+        <objectName>concentration_analysis.R</objectName>
+        <size unit="bytes">19418</size>
+        <authentication method="MD5">fe0a214339ea227cf7b7936f6a2e8beb</authentication>
+        <dataFormat>
+          <externallyDefinedFormat>
+            <formatName>unknown</formatName>
+          </externallyDefinedFormat>
+        </dataFormat>
+        <distribution>
+          <online>
+            <url>https://pasta.lternet.edu/package/data/eml/edi/411/2/faff81816873ab522615ac119d0f2d7c</url>
+          </online>
+        </distribution>
+      </physical>
+      <entityType>unknown</entityType>
+    </otherEntity>
+    <otherEntity>
+      <entityName>Virus establishment analysis</entityName>
+      <entityDescription>code to analyze establishment of viruses within source plants</entityDescription>
+      <physical>
+        <objectName>infection_analysis.R</objectName>
+        <size unit="bytes">5629</size>
+        <authentication method="MD5">33d929a869de5e7f16a52fca392f1425</authentication>
+        <dataFormat>
+          <externallyDefinedFormat>
+            <formatName>unknown</formatName>
+          </externallyDefinedFormat>
+        </dataFormat>
+        <distribution>
+          <online>
+            <url>https://pasta.lternet.edu/package/data/eml/edi/411/2/ddc440c99a8b547c017a93889ec30af8</url>
+          </online>
+        </distribution>
+      </physical>
+      <entityType>unknown</entityType>
+    </otherEntity>
+    <otherEntity>
+      <entityName>Figures for virus density and establishment</entityName>
+      <entityDescription>code to create figure of treatment effects on virus establishment and density</entityDescription>
+      <physical>
+        <objectName>infection_concentration_figure_results.R</objectName>
+        <size unit="bytes">10220</size>
+        <authentication method="MD5">67f05c7ef4afc173326066bd90044bda</authentication>
+        <dataFormat>
+          <externallyDefinedFormat>
+            <formatName>unknown</formatName>
+          </externallyDefinedFormat>
+        </dataFormat>
+        <distribution>
+          <online>
+            <url>https://pasta.lternet.edu/package/data/eml/edi/411/2/48398cf33280698f4bb16d56c60c3063</url>
+          </online>
+        </distribution>
+      </physical>
+      <entityType>unknown</entityType>
+    </otherEntity>
+    <otherEntity>
+      <entityName>Mathematical model of disease spread</entityName>
+      <entityDescription>code for mathematical model and figures</entityDescription>
+      <physical>
+        <objectName>prevalence_ode_model.R</objectName>
+        <size unit="bytes">9265</size>
+        <authentication method="MD5">2e3366736aa7b5cb29879c82dd83d71a</authentication>
+        <dataFormat>
+          <externallyDefinedFormat>
+            <formatName>unknown</formatName>
+          </externallyDefinedFormat>
+        </dataFormat>
+        <distribution>
+          <online>
+            <url>https://pasta.lternet.edu/package/data/eml/edi/411/2/feed867ed7840f52eaec934088f8e28e</url>
+          </online>
+        </distribution>
+      </physical>
+      <entityType>unknown</entityType>
+    </otherEntity>
+    <otherEntity>
+      <entityName>Processing of raw qPCR data</entityName>
+      <entityDescription>code to process raw qPCR data files</entityDescription>
+      <physical>
+        <objectName>qPCR_raw_data_processing.R</objectName>
+        <size unit="bytes">13658</size>
+        <authentication method="MD5">448fbc89f9a7dfcb2d1bfbf46b2eb7d6</authentication>
+        <dataFormat>
+          <externallyDefinedFormat>
+            <formatName>unknown</formatName>
+          </externallyDefinedFormat>
+        </dataFormat>
+        <distribution>
+          <online>
+            <url>https://pasta.lternet.edu/package/data/eml/edi/411/2/0d68925ce90d24c316ed97416217bd2a</url>
+          </online>
+        </distribution>
+      </physical>
+      <entityType>unknown</entityType>
+    </otherEntity>
+    <otherEntity>
+      <entityName>Supplementary figure comparing models</entityName>
+      <entityDescription>code to create supplementary figure of comparison between models with and without priors</entityDescription>
+      <physical>
+        <objectName>supplementary_prior_comparison_figure.R</objectName>
+        <size unit="bytes">32532</size>
+        <authentication method="MD5">bc8d5605787fd51ca77a256c8d71f02d</authentication>
+        <dataFormat>
+          <externallyDefinedFormat>
+            <formatName>unknown</formatName>
+          </externallyDefinedFormat>
+        </dataFormat>
+        <distribution>
+          <online>
+            <url>https://pasta.lternet.edu/package/data/eml/edi/411/2/86972b1c4e986ba045c2740fde74f1f1</url>
+          </online>
+        </distribution>
+      </physical>
+      <entityType>unknown</entityType>
+    </otherEntity>
+    <otherEntity>
+      <entityName>Transmission analysis</entityName>
+      <entityDescription>code to analyze transmission</entityDescription>
+      <physical>
+        <objectName>transmission_analysis.R</objectName>
+        <size unit="bytes">24977</size>
+        <authentication method="MD5">f452223682095145a16f22d8182bd4ac</authentication>
+        <dataFormat>
+          <externallyDefinedFormat>
+            <formatName>unknown</formatName>
+          </externallyDefinedFormat>
+        </dataFormat>
+        <distribution>
+          <online>
+            <url>https://pasta.lternet.edu/package/data/eml/edi/411/2/257719610f603f9869ff5e3f04b75495</url>
+          </online>
+        </distribution>
+      </physical>
+      <entityType>unknown</entityType>
+    </otherEntity>
+    <otherEntity>
+      <entityName>Figures for transmission</entityName>
+      <entityDescription>code to create figure of treatment effects on transmission</entityDescription>
+      <physical>
+        <objectName>transmission_figure_results.R</objectName>
+        <size unit="bytes">17469</size>
+        <authentication method="MD5">1bcdbdfa1db34b8b8c5d106b3f998384</authentication>
+        <dataFormat>
+          <externallyDefinedFormat>
+            <formatName>unknown</formatName>
+          </externallyDefinedFormat>
+        </dataFormat>
+        <distribution>
+          <online>
+            <url>https://pasta.lternet.edu/package/data/eml/edi/411/2/7708a1af2d28d7434d27c117b645ae59</url>
+          </online>
+        </distribution>
+      </physical>
+      <entityType>unknown</entityType>
+    </otherEntity>
+  </dataset>
+</eml:eml>

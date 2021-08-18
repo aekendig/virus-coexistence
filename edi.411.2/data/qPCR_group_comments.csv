@@ -1,0 +1,45 @@
+﻿group,negative_controls,PAV_standards,RPV_standards
+1,no controls detected,only one 1E3,NA
+2,no controls detected,only 1 1E3 detected,"included multiple 1E3 and 1E4 standards, high efficiency (121)"
+3,no controls detected,none of the 1E3's detected,NA
+4,no controls detected,only 1 1E3 detected,"only 1 1E3 detected, the 1E5's look like they were prepared incorrectly"
+5,no controls detected,only 1 1E3 detected,"only 1 1E3 detected, none of the 1E5's detected (preparation mistake?)"
+6,no controls detected,none of the 1E3's detected,only 1 1E3 detected
+7,no controls detected,only 1 1E3 detected,"only 1 1E3 detected, none of the 1E5's detected (preparation mistake?)"
+8,"three detected with RPV, lowest one is 39.2",none of the 1E3's or 1E4's detected,"remove standards lower than contamination, one rep of 1e3 and one rep of 1e4, only slightly changes standard curve"
+9,no controls detected,one 1E3 detected,"1 1E3 missing, 2 1E5's missing (preparation mistake?)"
+10,no controls detected,1 1E3 detected,none of the 1E3's detected
+11,NTC detected for PAV at 43.2 and three for RPV with the lowest at 35.5,"all above contamination, no 1E3's","all detected above negative control, high efficiency"
+12, one PAV NTC at 44.9,all above negative control,NA
+13,PAV NTC's detected at 39.1,all above contamination,no RPV tested
+14,no controls detected,NA,no RPV Tested
+15,no controls detected,NA,no RPV Tested
+16,PAV control detected at 44.6,all standards above control,no RPV Tested
+17,no controls detected,NA,no RPV Tested
+18,no controls detected,NA,1 1E3 rep detected
+19,one PAV at 45.1 and one RPV at 40.7,all above control,"1 1E3 rep detected, all above control"
+20,no controls detected,95%; standard deviation among 1E3's is high,no 1E3 reps detected
+21,one PAV at 40.0 and one RPV at 39.3,one 1E3 rep is lower in concentration than control,all above control
+22,"3 PAV's detected, lowest CT is 38.4",some standards removed due to contamination,NA
+23,no controls detected,NA,NA
+24,no controls detected,NA,NA
+25,no controls detected,NA,NA
+26,one PAV NTC detected at 40.8 cycles,all higher,1E3 seems off
+27,no controls detected,NA,NA
+28,no controls detected,NA,NA
+29,no controls detected,NA,NA
+30,three RPV NTC's detected. Lowest = 39.2,NA,some standards removed due to contamination
+31,no controls detected,NA,NA
+32,RPV detected at 39.1 CT,no PAV,some standards removed due to contamination
+33,no controls detected,no PAV,NA
+34,no controls detected,no PAV,NA
+35,RPV detected at 28.5 and 28.8,no PAV,some standards removed due to contamination
+36,no controls detected,NA,no RPV
+38,one RPV control detected at 42.9,NA,all above contamination
+39,one PAV control detected at 42.7,some standards removed due to contamination,NA
+40,NTC RPV: 40.1,no PAV,all above contamination
+41,no controls detected,the one 1E3 is really high,NA
+42,no controls detected,NA,no RPV
+43,PAV at 48.3 and RPV at 41.9,all above contamination,all above contamination
+44,PAV at 41.3,all above contamination,NA
+45,no controls detected,no PAV,NA
