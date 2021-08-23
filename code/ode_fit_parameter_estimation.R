@@ -121,6 +121,10 @@ dat5 <- dat4 %>%
 dat5[duplicated(dat5$sample) == T, ]
 # all were removed
 
+# subset for mock-inoculated plants
+mock <- dat5 %>%
+  filter(inoc == "healthy")
+
 
 #### plant parameters ####
 
@@ -137,11 +141,11 @@ k_n <- 4.9e-5
 k_p <- 3.0e-5
 Qmin_n <- 1.1e-3
 Qmin_p <- 7.4e-5
-m <- 1e-3
+m <- 0.01
 
 # initial values
-R0_n <- 0
-R0_p <- 0
+R0_n <- a_n_lo * 7
+R0_p <- a_p_lo * 7
 Q0_n <- Qmin_n
 Q0_p <- Qmin_p
 B0 <- 1e-3
@@ -176,32 +180,41 @@ plant.model = function (t, yy, parms) {
   return(list(c(dR_n, dR_p, dQ_n, dQ_p, dB)))
 }
 
+
+#### estimate plant growth rate ####
+
+# time 
+times <- seq(0, max(dat5$dpi))
+
 #### start here ####
+# modify function below to include data from the four treatments
+# four simulations
 
-###################################################
-### Simulation with wrapper
-###################################################
-
-# Look at days for each
-unique(rdath$dpi)
-
-times=seq(0,max(rdath$dpi),length=1000)
-
-wrapper <- function(q){
-  parms=c(q=q)
-  out=ode(y0h, times, ERHP.model, parms)
-  par(mfrow=c(2,1))
-  plot(times,out[,4],ylim=c(0,0.5),type="l",col="red",xlab="Time",ylab="Host mass")
-  points(rdath$dpi,rdath$meanMass,col="red")
-  arrows(rdath$dpi,(rdath$meanMass-rdath$seMass),rdath$dpi,(rdath$meanMass+rdath$seMass),length=0.05,angle=90,code=3,col="red")
-  plot(times,out[,5],ylim=c(0,4000),type="l",col="red",xlab="Time",ylab="Pathogen concentration")
-  points(rdath$dpi,rdath$meanPath,col="red")
-  arrows(rdath$dpi,(rdath$meanPath-rdath$sePath),rdath$dpi,(rdath$meanPath+rdath$sePath),length=0.05,angle=90,code=3,col="red")
+# wrapper function
+plant_wrapper <- function(g){
+  
+  parms <- c(a_n = a_n_lo, a_p = a_p_lo, g = g)
+  
+  out <- ode(y0_plant, times, plant.model, parms)
+  
+  out2 <- out %>%
+    as_tibble()  %>%
+    mutate(across(everything(), as.double)) %>%
+    pivot_longer(cols = c(R_n, R_p, Q_n, Q_p, B),
+                 names_to = "variable",
+                 values_to = "value") %>%
+    mutate(var_type = case_when(variable %in% c("Q_n", "Q_p") ~ "nutrient content",
+                                variable %in% c("R_n", "R_p") ~ "resource",
+                                variable == "B" ~ "biomass"))
+  
+  ggplot(out2, aes(x = time, y = value, color = variable)) +
+    geom_line() +
+    facet_wrap(~ var_type, scales = "free")
 }
 
-manipulate(wrapper(q),q=slider(0,0.01))
+manipulate(plant_wrapper(g), g = slider(0.01, 3))
 
-#4e-5
+
 
 
 ###################################################
