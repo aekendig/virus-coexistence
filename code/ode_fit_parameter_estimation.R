@@ -121,10 +121,6 @@ dat5 <- dat4 %>%
 dat5[duplicated(dat5$sample) == T, ]
 # all were removed
 
-# subset for mock-inoculated plants
-mock <- dat5 %>%
-  filter(inoc == "healthy")
-
 
 #### plant parameters ####
 
@@ -141,7 +137,6 @@ k_n <- 4.9e-5
 k_p <- 3.0e-5
 Qmin_n <- 1.1e-3
 Qmin_p <- 7.4e-5
-m <- 0.01
 
 # initial values
 R0_n <- a_n_lo * 7
@@ -162,6 +157,7 @@ plant.model = function (t, yy, parms) {
   a_n = parms[1];
   a_p = parms[2];
   g = parms[3]
+  m = parms[4]
 
   # set initial values
   R_n = yy[1];
@@ -181,39 +177,69 @@ plant.model = function (t, yy, parms) {
 }
 
 
-#### estimate plant growth rate ####
+#### visualize plant parameters ####
+
+# data
+mock <- dat5 %>%
+  filter(inoc == "healthy") %>%
+  mutate(variable = "B",
+         value = full_mass_g,
+         time = dpi)
+
+# initiate slider for ggplot
+manipulate(plot(1:5, cex=size), size = slider(0.5,10,step=0.5))
 
 # time 
-times <- seq(0, max(dat5$dpi))
-
-#### start here ####
-# modify function below to include data from the four treatments
-# four simulations
+# times <- seq(0, max(dat5$dpi), length.out = 100)
+times <- seq(0, 100)
 
 # wrapper function
-plant_wrapper <- function(g){
+plant_wrapper <- function(g, m){
   
-  parms <- c(a_n = a_n_lo, a_p = a_p_lo, g = g)
+  out_low <- ode(y0_plant, times, plant.model, c(a_n = a_n_lo, a_p = a_p_lo, g = g, m = m)) %>%
+    as_tibble() %>%
+    mutate(nutrient = "low",
+           across(!nutrient, as.double),
+           nutrient = as.character(nutrient))
   
-  out <- ode(y0_plant, times, plant.model, parms)
+  out_N <- ode(y0_plant, times, plant.model, c(a_n = a_n_hi, a_p = a_p_lo, g = g, m = m)) %>%
+    as_tibble() %>%
+    mutate(nutrient = "N",
+           across(!nutrient, as.double),
+           nutrient = as.character(nutrient))
   
-  out2 <- out %>%
-    as_tibble()  %>%
-    mutate(across(everything(), as.double)) %>%
+  out_P <- ode(y0_plant, times, plant.model, c(a_n = a_n_lo, a_p = a_p_hi, g = g, m = m)) %>%
+    as_tibble() %>%
+    mutate(nutrient = "P",
+           across(!nutrient, as.double),
+           nutrient = as.character(nutrient))
+  
+  out_NP <- ode(y0_plant, times, plant.model, c(a_n = a_n_hi, a_p = a_p_hi, g = g, m = m)) %>%
+    as_tibble() %>%
+    mutate(nutrient = "N+P",
+           across(!nutrient, as.double),
+           nutrient = as.character(nutrient))
+  
+  out <- out_low %>%
+    full_join(out_N) %>%
+    full_join(out_P) %>%
+    full_join(out_NP) %>%
     pivot_longer(cols = c(R_n, R_p, Q_n, Q_p, B),
                  names_to = "variable",
-                 values_to = "value") %>%
-    mutate(var_type = case_when(variable %in% c("Q_n", "Q_p") ~ "nutrient content",
-                                variable %in% c("R_n", "R_p") ~ "resource",
-                                variable == "B" ~ "biomass"))
+                 values_to = "value")
   
-  ggplot(out2, aes(x = time, y = value, color = variable)) +
+  ggplot(out, aes(x = time, y = value, color = nutrient)) +
     geom_line() +
-    facet_wrap(~ var_type, scales = "free")
+    stat_summary(data = mock, geom = "errorbar", width = 0, fun.data = "mean_se") +
+    stat_summary(data = mock, geom = "point", size = 2, fun = "mean") +
+    facet_wrap(~ variable, scales = "free")
 }
 
-manipulate(plant_wrapper(g), g = slider(0.01, 3))
-
+manipulate(plant_wrapper(g, m), g = slider(0.001, 1), m = slider(0.001, 1))
+# only fits the high N+P data
+# m ~ 0.03
+# g ~ 0.7
+# predicted biomass of other treatments way lower and don't increase with parameter adjustments
 
 
 
