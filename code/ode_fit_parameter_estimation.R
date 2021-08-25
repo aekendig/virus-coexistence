@@ -122,7 +122,7 @@ dat5[duplicated(dat5$sample) == T, ]
 # all were removed
 
 
-#### plant parameters ####
+#### parameters ####
 
 # supply rates
 a_n_lo <- 1.1e-6
@@ -137,7 +137,13 @@ k_n <- 4.9e-5
 k_p <- 3.0e-5
 Qmin_n <- 1.1e-3
 Qmin_p <- 7.4e-5
-
+q_n <- 1.1e-3 # same for both viruses
+q_p <- 7.4e-5 # same for both viruses
+z_nb <- 1.6e-18
+z_pb <- 2.6e-19
+z_nc <- 1.7e-18
+z_pc <- 2.6e-19
+ 
 # initial values
 R0_n <- a_n_lo * 7
 R0_p <- a_p_lo * 7
@@ -151,13 +157,13 @@ y0_plant <- c(R_n = R0_n, R_p = R0_p, Q_n = Q0_n, Q_p = Q0_p, B = B0)
 
 #### plant model ####
 
-plant.model = function (t, yy, parms) { 
+plant_model = function (t, yy, parms) { 
   
   # supply rates
-  a_n = parms[1];
-  a_p = parms[2];
-  g = parms[3]
-  m = parms[4]
+  g = parms[1];
+  a_n = ifelse(length(parms) > 1, parms[2], a_n);
+  a_p = ifelse(length(parms) > 2, parms[3], a_p);
+  m = ifelse(length(parms) == 4, parms[4], m);
 
   # set initial values
   R_n = yy[1];
@@ -184,7 +190,168 @@ mock <- dat5 %>%
   filter(inoc == "healthy") %>%
   mutate(variable = "B",
          value = full_mass_g,
+         time = dpp)
+
+# initiate slider for ggplot
+manipulate(plot(1:5, cex=size), size = slider(0.5,10,step=0.5))
+
+# time 
+times <- seq(0, max(dat5$dpp), length.out = 100)
+# times <- seq(0, 100)
+
+# wrapper function
+plant_wrapper <- function(g, m){
+  
+  out_low <- ode(y0_plant, times, plant_model, c(g = g, a_n = a_n_lo, a_p = a_p_lo, m = m)) %>%
+    as_tibble() %>%
+    mutate(nutrient = "low",
+           across(!nutrient, as.double),
+           nutrient = as.character(nutrient))
+  
+  out_N <- ode(y0_plant, times, plant_model, c(g = g, a_n = a_n_hi, a_p = a_p_lo, m = m)) %>%
+    as_tibble() %>%
+    mutate(nutrient = "N",
+           across(!nutrient, as.double),
+           nutrient = as.character(nutrient))
+  
+  out_P <- ode(y0_plant, times, plant_model, c(g = g, a_n = a_n_lo, a_p = a_p_hi, m = m)) %>%
+    as_tibble() %>%
+    mutate(nutrient = "P",
+           across(!nutrient, as.double),
+           nutrient = as.character(nutrient))
+  
+  out_NP <- ode(y0_plant, times, plant_model, c(g = g, a_n = a_n_hi, a_p = a_p_hi, m = m)) %>%
+    as_tibble() %>%
+    mutate(nutrient = "N+P",
+           across(!nutrient, as.double),
+           nutrient = as.character(nutrient))
+  
+  out <- out_low %>%
+    full_join(out_N) %>%
+    full_join(out_P) %>%
+    full_join(out_NP) %>%
+    pivot_longer(cols = c(R_n, R_p, Q_n, Q_p, B),
+                 names_to = "variable",
+                 values_to = "value")
+  
+  ggplot(out, aes(x = time, y = value, color = nutrient)) +
+    geom_line() +
+    stat_summary(data = mock, geom = "errorbar", width = 0, fun.data = "mean_se") +
+    stat_summary(data = mock, geom = "point", size = 2, fun = "mean") +
+    facet_wrap(~ variable, scales = "free")
+}
+
+manipulate(plant_wrapper(g, m), g = slider(0.001, 1), m = slider(0.001, 1))
+# only fits the high N+P data
+# m ~ 0.03
+# g ~ 0.3
+# predicted biomass of other treatments way lower and don't increase with parameter adjustments
+
+# set m so that we only estimate one parameter
+m <- 0.03
+
+
+#### compare plant model to observations ####
+
+# data
+mock_NP <- mock %>%
+  filter(nutrient == "N+P") %>%
+  rename("name" = "variable") %>%
+  select(name, time, value) %>%
+  data.frame()
+
+# nutrient supply rates
+a_n <- a_n_hi
+a_p <- a_p_hi
+
+# # Rename columns 
+# colnames(rdatCH)=c("name","time","val")
+# 
+# # Combine data
+# rdat3=subset(rdatCH,name=="Hh"|name=="Ph")
+
+plant_cost <- function(input_plant){ 
+  g = input_plant[1];
+  out = ode(y = y0_plant, times = seq(0, max(mock_NP$time), length.out = 100), func = plant_model, parms = c(g = g))
+  return(modCost(model = out[ , c("time", "B")], obs = mock_NP, y = "value"))   
+  # return(out[ , c("time", "B")]) #for troubleshooting
+}
+
+
+#### estimate plant parameters ####
+
+#initial guess
+input_plant <- c(0.3) 
+
+# fit model
+fit_plant <- modFit(plant_cost, input_plant, lower = c(0))
+summary(fit_plant)
+deviance(fit_plant)
+fit_plant$ssr # sum of squared residuals
+fit_plant$ms # mean squared residuals
+
+
+#### visualize plant model fit ####
+
+# save value
+g <- fit_plant$par[1]; # 0.27
+
+# fit model
+pred_plant <- ode(y = y0_plant, times = seq(0, max(mock_NP$time), length.out = 100), func = plant_model, parms = c(g)) %>%
+  as_tibble() %>%
+  mutate(across(everything(), as.double))
+
+# visualize
+ggplot(mock_NP, aes(time, value)) +
+  geom_point() +
+  geom_line(data = pred_plant, aes(y = B))
+
+
+#### virus model ####
+
+virus_model = function (t, yy, parms) { 
+  
+  # supply rates
+  r = parms[1];
+  a_n = ifelse(length(parms) > 1, parms[2], a_n);
+  a_p = ifelse(length(parms) > 2, parms[3], a_p);
+  c = ifelse(length(parms) == 4, parms[4], c);
+  
+  # set initial values
+  R_n = yy[1];
+  R_p = yy[2];
+  Q_n = yy[3];
+  Q_p = yy[4];
+  B = yy[5];
+  V = yy[6];
+  
+  # model
+  dR_n = a_n - (u_n * R_n * B) / (R_n + k_n);
+  dR_p = a_p - (u_p * R_p * B) / (R_p + k_p);
+  dQ_n = (u_n * R_n) / (R_n + k_n) - min((1 - Qmin_n / Q_n), (1 - Qmin_p / Q_p)) * g * Q_n - min((1 - q_n / Q_n), (1 - q_p / Q_p)) * z_n * r * V
+  dQ_p = (u_p * R_p) / (R_p + k_p) - min((1 - Qmin_n / Q_n), (1 - Qmin_p / Q_p)) * g * Q_p - min((1 - q_n / Q_n), (1 - q_p / Q_p)) * z_p * r * V
+  dB = min((1 - Qmin_n / Q_n), (1 - Qmin_p / Q_p)) * g * B - m * B
+  dV = min((1 - q_n / Q_n), (1 - q_p / Q_p)) * r * V - c * V
+  
+  return(list(c(dR_n, dR_p, dQ_n, dQ_p, dB, dV)))
+}
+
+
+#### visualize virus parameters ####
+
+# data
+pav <- dat5 %>%
+  filter(inoc == "PAV") %>%
+  mutate(variable = "V",
+         value = conc_PAV,
          time = dpi)
+
+#### start here: predict plant size at 0 dpi and change starting condition vector ####
+# all code below this is for plant fitting, not virus
+
+B0 <-
+V0 <- 1e-3
+y0_virus <- c(R_n = R0_n, R_p = R0_p, Q_n = Q0_n, Q_p = Q0_p, B = B0, V = V0)
 
 # initiate slider for ggplot
 manipulate(plot(1:5, cex=size), size = slider(0.5,10,step=0.5))
@@ -196,25 +363,25 @@ times <- seq(0, 100)
 # wrapper function
 plant_wrapper <- function(g, m){
   
-  out_low <- ode(y0_plant, times, plant.model, c(a_n = a_n_lo, a_p = a_p_lo, g = g, m = m)) %>%
+  out_low <- ode(y0_plant, times, plant_model, c(g = g, a_n = a_n_lo, a_p = a_p_lo, m = m)) %>%
     as_tibble() %>%
     mutate(nutrient = "low",
            across(!nutrient, as.double),
            nutrient = as.character(nutrient))
   
-  out_N <- ode(y0_plant, times, plant.model, c(a_n = a_n_hi, a_p = a_p_lo, g = g, m = m)) %>%
+  out_N <- ode(y0_plant, times, plant_model, c(g = g, a_n = a_n_hi, a_p = a_p_lo, m = m)) %>%
     as_tibble() %>%
     mutate(nutrient = "N",
            across(!nutrient, as.double),
            nutrient = as.character(nutrient))
   
-  out_P <- ode(y0_plant, times, plant.model, c(a_n = a_n_lo, a_p = a_p_hi, g = g, m = m)) %>%
+  out_P <- ode(y0_plant, times, plant_model, c(g = g, a_n = a_n_lo, a_p = a_p_hi, m = m)) %>%
     as_tibble() %>%
     mutate(nutrient = "P",
            across(!nutrient, as.double),
            nutrient = as.character(nutrient))
   
-  out_NP <- ode(y0_plant, times, plant.model, c(a_n = a_n_hi, a_p = a_p_hi, g = g, m = m)) %>%
+  out_NP <- ode(y0_plant, times, plant_model, c(g = g, a_n = a_n_hi, a_p = a_p_hi, m = m)) %>%
     as_tibble() %>%
     mutate(nutrient = "N+P",
            across(!nutrient, as.double),
@@ -241,107 +408,59 @@ manipulate(plant_wrapper(g, m), g = slider(0.001, 1), m = slider(0.001, 1))
 # g ~ 0.7
 # predicted biomass of other treatments way lower and don't increase with parameter adjustments
 
+# set m so that we only estimate one parameter
+m <- 0.03
 
 
-###################################################
-# Objective function 2 (modCost) - try with raw data
-###################################################
+#### compare plant model to observations ####
 
-# Subset for needed columns
-rdatCH=subset(subset(rdatC,highP==0),select=c("highN","dpi","FullMass"))
+# data
+mock_NP <- mock %>%
+  filter(nutrient == "N+P") %>%
+  rename("name" = "variable") %>%
+  select(name, time, value) %>%
+  data.frame()
 
-# Re-value highN
-rdatCH$highN=as.factor(rdatCH$highN)
-rdatCH$highN=revalue(rdatCH$highN,c("0"="Hl","1"="Hh"))
+# nutrient supply rates
+a_n <- a_n_hi
+a_p <- a_p_hi
 
-# Rename columns 
-colnames(rdatCH)=c("name","time","val")
+# # Rename columns 
+# colnames(rdatCH)=c("name","time","val")
+# 
+# # Combine data
+# rdat3=subset(rdatCH,name=="Hh"|name=="Ph")
 
-# Combine data
-rdat3=subset(rdatCH,name=="Hh"|name=="Ph")
-
-sse.model <- function(params0){ 
-  q = params0[1];
-  out = ode(y=y0h,times=seq(0,max(rdat3$time),length=100),func=ERHP.model,parms=c(q=q))
-  return(modCost(model=out,obs=rdat3,y="val"))   
-  #return(out) #for troubleshooting
+plant_cost <- function(input_plant){ 
+  g = input_plant[1];
+  out = ode(y = y0_plant, times = seq(0, max(mock_NP$time), length.out = 100), func = plant_model, parms = c(g = g))
+  return(modCost(model = out[ , c("time", "B")], obs = mock_NP, y = "value"))   
+  # return(out[ , c("time", "B")]) #for troubleshooting
 }
 
 
-###################################################
-### Optimization: Estimate parameters
-###################################################
+#### estimate plant parameters ####
 
-params0=c(0.00004)  #initial guess
+#initial guess
+input_plant <- c(0.7) 
 
-fit = modFit(sse.model,params0,lower=c(0),upper=c(1))
-summary(fit)
-deviance(fit)
-fit$ssr
-fit$ms
-
-#8.70e-6
-
-###################################################
-### Obtain model prediction
-###################################################
-
-q = fit$par[1];
-mod.pred = ode(y0h,times=times,func=ERHP.model,parms=c(q))
+# fit model
+fit_plant <- modFit(plant_cost, input_plant, lower = c(0))
+summary(fit_plant)
+deviance(fit_plant)
+fit_plant$ssr # sum of squared residuals
+fit_plant$ms # mean squared residuals
 
 
-###################################################
-### Plot Model and Data
-###################################################
+#### visualize plant model fit ####
 
-par(mfrow=c(2,1))
-plot(mod.pred[,1],mod.pred[,4],ylim=c(0,0.5),type="l",col="red",xlab="Time (days)",ylab="Host mass (g)")
-points(rdath$dpi,rdath$meanMass,col="red")
-arrows(rdath$dpi,(rdath$meanMass-rdath$seMass),rdath$dpi,(rdath$meanMass+rdath$seMass),length=0.05,angle=90,code=3,col="red")
-plot(mod.pred[,1],mod.pred[,5],ylim=c(0,4000),type="l",col="red",xlab="Time",ylab="Pathogen concentration*10^10")
-points(rdath$dpi,rdath$meanPath,col="red")
-arrows(rdath$dpi,(rdath$meanPath-rdath$sePath),rdath$dpi,(rdath$meanPath+rdath$sePath),length=0.05,angle=90,code=3,col="red")
+# fit model
+g <- fit_plant$par[1];
+pred_plant <- ode(y = y0_plant, times = seq(0, max(mock_NP$time), length.out = 100), func = plant_model, parms = c(g)) %>%
+  as_tibble() %>%
+  mutate(across(everything(), as.double))
 
-
-###################################################
-### Plot Model Predictions
-###################################################
-
-par(mfrow=c(2,1))
-plot(mod.pred[,1],mod.pred[,2],type="l",col="red",xlab="Time (days)",ylab="Environmental nutrients (g)")
-plot(mod.pred[,1],mod.pred[,3],type="l",col="red",xlab="Time (days)",ylab="Tissue nutrient concentration")
-
-
-###################################################
-### Figure for paper - come back to
-###################################################
-
-
-setwd("~/Google Drive/Within Host Coexistence/Figures")
-pdf("virusParameters_ModFits_071917.pdf",width=9,height=12)
-par(mfrow=c(4,2),cex.lab=1.5,cex.axis=1.5,cex.main=1.5,mar=c(5, 6, 2, 2))
-plot(mod.pred[,1],mod.pred[,5],ylim=c(0,2000),type="l",lwd=2,col="red",xlab="",ylab="Pathogen\nconcentration (pg/g)",main="Low N")
-points(rdatl$dpi,rdatl$meanPath,col="red")
-arrows(rdatl$dpi,(rdatl$meanPath-rdatl$sePath),rdatl$dpi,(rdatl$meanPath+rdatl$sePath),length=0.05,angle=90,code=3,col="red")
-mtext("A",side=3,line=1,adj=0,font=2)
-plot(mod.pred[,1],mod.pred[,9],ylim=c(0,2000),type="l",lwd=2,col="blue",xlab="Time",ylab="",main="High N")
-points(rdath$dpi,rdath$meanPath,col="blue")
-arrows(rdath$dpi,(rdath$meanPath-rdath$sePath),rdath$dpi,(rdath$meanPath+rdath$sePath),length=0.05,angle=90,code=3,col="blue")
-mtext("B",side=3,line=1,adj=0,font=2)
-plot(mod.pred[,1],mod.pred[,4],ylim=c(0,0.6),type="l",lwd=2,col="red",xlab="",ylab="Host mass (g)")
-points(rdatl$dpi,rdatl$meanMass,col="red")
-arrows(rdatl$dpi,(rdatl$meanMass-rdatl$seMass),rdatl$dpi,(rdatl$meanMass+rdatl$seMass),length=0.05,angle=90,code=3,col="red")
-mtext("C",side=3,line=1,adj=0,font=2)
-plot(mod.pred[,1],mod.pred[,8],ylim=c(0,0.6),type="l",lwd=2,col="blue",xlab="",ylab="")
-points(rdath$dpi,rdath$meanMass,col="blue")
-arrows(rdath$dpi,(rdath$meanMass-rdath$seMass),rdath$dpi,(rdath$meanMass+rdath$seMass),length=0.05,angle=90,code=3,col="blue")
-mtext("D",side=3,line=1,adj=0,font=2)
-plot(mod.pred[,1],mod.pred[,3],type="l",lwd=2,col="red",xlab="",ylab="Tissue nutrient\nconcentration")
-mtext("E",side=3,line=1,adj=0,font=2)
-plot(mod.pred[,1],mod.pred[,7],type="l",lwd=2,col="blue",xlab="",ylab="")
-mtext("F",side=3,line=1,adj=0,font=2)
-plot(mod.pred[,1],mod.pred[,2],type="l",lwd=2,col="red",xlab="Days post inoculation",ylab="Environmental\nnutrients (g)")
-mtext("G",side=3,line=1,adj=0,font=2)
-plot(mod.pred[,1],mod.pred[,6],type="l",lwd=2,col="blue",xlab="Days post inoculation",ylab="")
-mtext("H",side=3,line=1,adj=0,font=2)
-dev.off()
+# visualize
+ggplot(mock_NP, aes(time, value)) +
+  geom_point() +
+  geom_line(data = pred_plant, aes(y = B))
