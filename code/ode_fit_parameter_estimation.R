@@ -264,12 +264,7 @@ mock_NP <- mock %>%
 a_n <- a_n_hi
 a_p <- a_p_hi
 
-# # Rename columns 
-# colnames(rdatCH)=c("name","time","val")
-# 
-# # Combine data
-# rdat3=subset(rdatCH,name=="Hh"|name=="Ph")
-
+# cost function
 plant_cost <- function(input_plant){ 
   g = input_plant[1];
   out = ode(y = y0_plant, times = seq(0, max(mock_NP$time), length.out = 100), func = plant_model, parms = c(g = g))
@@ -346,42 +341,65 @@ pav <- dat5 %>%
          value = conc_PAV,
          time = dpi)
 
-#### start here: predict plant size at 0 dpi and change starting condition vector ####
-# all code below this is for plant fitting, not virus
+rpv <- dat5 %>%
+  filter(inoc == "RPV") %>%
+  mutate(variable = "V",
+         value = conc_RPV,
+         time = dpi)
 
-B0 <-
-V0 <- 1e-3
-y0_virus <- c(R_n = R0_n, R_p = R0_p, Q_n = Q0_n, Q_p = Q0_p, B = B0, V = V0)
+# min dpp
+min(pav$dpp)
+
+# min virions
+min(c(pav$conc_PAV, rpv$conc_RPV))
+
+plant_init <- ode(y = y0_plant, times = seq(0, 16), func = plant_model, parms = c(g)) %>%
+  as_tibble() %>%
+  mutate(across(everything(), as.double)) %>%
+  filter(time == 16)
+V0 <- 100
+y0_virus <- c(R_n = pull(plant_init, R_n), 
+              R_p = pull(plant_init, R_p), 
+              Q_n = pull(plant_init, Q_n), 
+              Q_p = pull(plant_init, Q_p), 
+              B = pull(plant_init, B), 
+              V = V0)
 
 # initiate slider for ggplot
 manipulate(plot(1:5, cex=size), size = slider(0.5,10,step=0.5))
 
 # time 
-# times <- seq(0, max(dat5$dpi), length.out = 100)
-times <- seq(0, 100)
+times <- seq(0, max(dat5$dpi), length.out = 100)
+# times <- seq(0, 100)
 
 # wrapper function
-plant_wrapper <- function(g, m){
+virus_wrapper <- function(r, c, species){
   
-  out_low <- ode(y0_plant, times, plant_model, c(g = g, a_n = a_n_lo, a_p = a_p_lo, m = m)) %>%
+  if(species == "PAV"){
+    virus <- pav
+  }else{
+    virus <- rpv
+  }
+
+  out_low <- ode(y0_virus, times, virus_model, c(r = r, a_n = a_n_lo, a_p = a_p_lo, c = c)) %>%
     as_tibble() %>%
     mutate(nutrient = "low",
            across(!nutrient, as.double),
            nutrient = as.character(nutrient))
   
-  out_N <- ode(y0_plant, times, plant_model, c(g = g, a_n = a_n_hi, a_p = a_p_lo, m = m)) %>%
+  out_N <- ode(y0_virus, times, virus_model, c(r = r, a_n = a_n_hi, a_p = a_p_lo, c = c)) %>%
     as_tibble() %>%
     mutate(nutrient = "N",
            across(!nutrient, as.double),
            nutrient = as.character(nutrient))
   
-  out_P <- ode(y0_plant, times, plant_model, c(g = g, a_n = a_n_lo, a_p = a_p_hi, m = m)) %>%
+  out_P <- ode(y0_virus, times, virus_model, c(r = r, a_n = a_n_lo, a_p = a_p_hi, c = c)) %>%
     as_tibble() %>%
     mutate(nutrient = "P",
            across(!nutrient, as.double),
            nutrient = as.character(nutrient))
   
-  out_NP <- ode(y0_plant, times, plant_model, c(g = g, a_n = a_n_hi, a_p = a_p_hi, m = m)) %>%
+  out_NP <- ode(y0_virus, times, virus_model, c(r = r, a_n = a_n_hi, a_p = a_p_hi, c = c)) %>%
     as_tibble() %>%
     mutate(nutrient = "N+P",
            across(!nutrient, as.double),
@@ -391,28 +409,42 @@ plant_wrapper <- function(g, m){
     full_join(out_N) %>%
     full_join(out_P) %>%
     full_join(out_NP) %>%
-    pivot_longer(cols = c(R_n, R_p, Q_n, Q_p, B),
+    pivot_longer(cols = c(R_n, R_p, Q_n, Q_p, B, V),
                  names_to = "variable",
                  values_to = "value")
   
   ggplot(out, aes(x = time, y = value, color = nutrient)) +
     geom_line() +
-    stat_summary(data = mock, geom = "errorbar", width = 0, fun.data = "mean_se") +
-    stat_summary(data = mock, geom = "point", size = 2, fun = "mean") +
+    stat_summary(data = virus, geom = "errorbar", width = 0, fun.data = "mean_se") +
+    stat_summary(data = virus, geom = "point", size = 2, fun = "mean") +
     facet_wrap(~ variable, scales = "free")
 }
 
-manipulate(plant_wrapper(g, m), g = slider(0.001, 1), m = slider(0.001, 1))
-# only fits the high N+P data
-# m ~ 0.03
-# g ~ 0.7
-# predicted biomass of other treatments way lower and don't increase with parameter adjustments
+# PAV
+z_n <- z_nb
+z_p <- z_pb
+manipulate(virus_wrapper(r, c, species = "PAV"), r = slider(0.001, 1), c = slider(0.001, 1))
+# fits P data the best
+# predicted peaks of N and N+P are a little late
+# r ~ 0.4
+# c ~ 0.1
 
-# set m so that we only estimate one parameter
-m <- 0.03
+# RPV
+z_n <- z_nc
+z_p <- z_pc
+manipulate(virus_wrapper(r, c, species = "RPV"), r = slider(0.001, 1), c = slider(0.001, 1))
+# fits P data the best because of peak timing (again)
+# over predicts N and N+P
+# r ~ 0.6
+# c ~ 0.1
+
+# set c so that we only estimate one parameter
+c <- 0.1
 
 
-#### compare plant model to observations ####
+#### compare virus model to observations ####
+
+#### start here ####
 
 # data
 mock_NP <- mock %>%
