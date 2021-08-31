@@ -17,9 +17,31 @@ rm(list = setdiff(ls(), c("dat")))
 library(FME)
 library(manipulate)
 library(minpack.lm)
+library(cowplot)
 
 # import data
 sdat <- read_csv("./edi.411.2/data/sample_exp_molc_data.csv")
+
+# figure settings
+fig_theme <- theme_bw() +
+  theme(panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.spacing.x = unit(0,"line"),
+        axis.text.y = element_text(size = 8, color = "black"),
+        axis.text.x = element_text(size = 8, color = "black"),
+        axis.title = element_text(size = 10),
+        axis.line = element_line(color = "black"),
+        legend.text = element_text(size = 8),
+        legend.title = element_blank(),
+        legend.background = element_blank(),
+        legend.position = "none",
+        legend.key.size = unit(5, "mm"),
+        strip.background = element_blank(),
+        strip.text = element_text(size = 10),
+        strip.placement = "outside",
+        plot.title = element_text(size = 12, vjust = 0))
 
 
 #### edit data ####
@@ -106,12 +128,12 @@ dat5 <- dat4 %>%
   select(target:RPVslope, quant_ul) %>%
   pivot_wider(names_from = target,
               values_from = quant_ul,
-              names_glue = "quant_{target}") %>%
+              names_glue = "quant_{target}") %>% # quant_target = quantity / ul
   filter(!(sample %in% accs) & 
            !(inoc %in% c("PAV", "coinfection") & quant_PAV == 0) & 
            !(inoc %in% c("RPV", "coinfection") & quant_RPV == 0)) %>%
-  mutate(conc_PAV = quant_PAV * 50 / mass_ext_mg,
-         conc_RPV = quant_RPV * 50 / mass_ext_mg,
+  mutate(conc_PAV = 1000 * quant_PAV * 50 / mass_ext_mg, # convert to quantity / g
+         conc_RPV = 1000 * quant_RPV * 50 / mass_ext_mg,
          co = ifelse(inoc == "coinfection", 1, 0),
          dpp = case_when(round == 1 ~ dpi + 10,
                          TRUE ~ dpi + 11),
@@ -291,15 +313,21 @@ fit_plant$ms # mean squared residuals
 # save value
 g <- fit_plant$par[1]; # 0.27
 
+# nutrients
+a_n <- a_n_hi
+a_p <- a_p_hi
+
 # fit model
 pred_plant <- ode(y = y0_plant, times = seq(0, max(mock_NP$time), length.out = 100), func = plant_model, parms = c(g)) %>%
   as_tibble() %>%
   mutate(across(everything(), as.double))
 
 # visualize
-ggplot(mock_NP, aes(time, value)) +
+plant_fig <- ggplot(mock_NP, aes(time, value)) +
   geom_point() +
-  geom_line(data = pred_plant, aes(y = B))
+  geom_line(data = pred_plant, aes(y = B)) +
+  labs(x = "Time (days)", y = "Plant biomass (g)", title = "(A) Plant growth rate") +
+  fig_theme
 
 
 #### virus model ####
@@ -351,19 +379,28 @@ rpv <- dat5 %>%
 min(pav$dpp)
 
 # min virions
-min(c(pav$conc_PAV, rpv$conc_RPV))
+min(pav$conc_PAV)
+min(rpv$conc_RPV)
 
 plant_init <- ode(y = y0_plant, times = seq(0, 16), func = plant_model, parms = c(g)) %>%
   as_tibble() %>%
   mutate(across(everything(), as.double)) %>%
   filter(time == 16)
-V0 <- 100
-y0_virus <- c(R_n = pull(plant_init, R_n), 
+V0_pav <- 100000
+V0_rpv <- 100000
+y0_pav <- c(R_n = pull(plant_init, R_n), 
               R_p = pull(plant_init, R_p), 
               Q_n = pull(plant_init, Q_n), 
               Q_p = pull(plant_init, Q_p), 
               B = pull(plant_init, B), 
-              V = V0)
+              V = V0_pav)
+
+y0_rpv <- c(R_n = pull(plant_init, R_n), 
+            R_p = pull(plant_init, R_p), 
+            Q_n = pull(plant_init, Q_n), 
+            Q_p = pull(plant_init, Q_p), 
+            B = pull(plant_init, B), 
+            V = V0_rpv)
 
 # initiate slider for ggplot
 manipulate(plot(1:5, cex=size), size = slider(0.5,10,step=0.5))
@@ -377,8 +414,10 @@ virus_wrapper <- function(r, c, species){
   
   if(species == "PAV"){
     virus <- pav
+    y0_virus <- y0_pav
   }else{
     virus <- rpv
+    y0_virus <- y0_rpv
   }
 
   out_low <- ode(y0_virus, times, virus_model, c(r = r, a_n = a_n_lo, a_p = a_p_lo, c = c)) %>%
@@ -426,8 +465,8 @@ z_p <- z_pb
 manipulate(virus_wrapper(r, c, species = "PAV"), r = slider(0.001, 1), c = slider(0.001, 1))
 # fits P data the best
 # predicted peaks of N and N+P are a little late
-# r ~ 0.4
-# c ~ 0.1
+# r ~ 0.57
+# c ~ 0.2
 
 # RPV
 z_n <- z_nc
@@ -435,64 +474,128 @@ z_p <- z_pc
 manipulate(virus_wrapper(r, c, species = "RPV"), r = slider(0.001, 1), c = slider(0.001, 1))
 # fits P data the best because of peak timing (again)
 # over predicts N and N+P
-# r ~ 0.6
-# c ~ 0.1
+# r ~ 0.96
+# c ~ 0.3
 
 # set c so that we only estimate one parameter
-c <- 0.1
+c_b <- 0.2
+c_c <- 0.3
 
 
 #### compare virus model to observations ####
 
-#### start here ####
-
 # data
-mock_NP <- mock %>%
-  filter(nutrient == "N+P") %>%
+pav_P <- pav %>%
+  filter(nutrient == "P") %>%
+  rename("name" = "variable") %>%
+  select(name, time, value) %>%
+  data.frame()
+
+rpv_P <- rpv %>%
+  filter(nutrient == "P") %>%
   rename("name" = "variable") %>%
   select(name, time, value) %>%
   data.frame()
 
 # nutrient supply rates
-a_n <- a_n_hi
+a_n <- a_n_lo
 a_p <- a_p_hi
 
-# # Rename columns 
-# colnames(rdatCH)=c("name","time","val")
-# 
-# # Combine data
-# rdat3=subset(rdatCH,name=="Hh"|name=="Ph")
+# cost functions
+pav_cost <- function(input_virus){ 
+  r = input_virus[1];
+  out = ode(y = y0_pav, times = seq(0, max(pav_P$time), length.out = 100), func = virus_model, parms = c(r = r))
+  return(modCost(model = out[ , c("time", "V")], obs = pav_P, y = "value"))   
+  # return(out[ , c("time", "B")]) #for troubleshooting
+}
 
-plant_cost <- function(input_plant){ 
-  g = input_plant[1];
-  out = ode(y = y0_plant, times = seq(0, max(mock_NP$time), length.out = 100), func = plant_model, parms = c(g = g))
-  return(modCost(model = out[ , c("time", "B")], obs = mock_NP, y = "value"))   
+rpv_cost <- function(input_virus){ 
+  r = input_virus[1];
+  out = ode(y = y0_rpv, times = seq(0, max(rpv_P$time), length.out = 100), func = virus_model, parms = c(r = r))
+  return(modCost(model = out[ , c("time", "V")], obs = rpv_P, y = "value"))   
   # return(out[ , c("time", "B")]) #for troubleshooting
 }
 
 
-#### estimate plant parameters ####
+#### estimate virus parameters ####
 
 #initial guess
-input_plant <- c(0.7) 
+input_pav <- c(0.57)
+input_rpv <- c(0.96)
 
-# fit model
-fit_plant <- modFit(plant_cost, input_plant, lower = c(0))
-summary(fit_plant)
-deviance(fit_plant)
-fit_plant$ssr # sum of squared residuals
-fit_plant$ms # mean squared residuals
+# fit PAV model
+z_n <- z_nb
+z_p <- z_pb
+c <- c_b
+fit_pav <- modFit(pav_cost, input_pav, lower = c(0))
+summary(fit_pav)
+deviance(fit_pav)
+fit_pav$ssr # sum of squared residuals
+fit_pav$ms # mean squared residuals
+
+# fit RPV model
+z_n <- z_nc
+z_p <- z_pc
+c <- c_c
+fit_rpv <- modFit(rpv_cost, input_rpv, lower = c(0))
+summary(fit_rpv)
+deviance(fit_rpv)
+fit_rpv$ssr # sum of squared residuals
+fit_rpv$ms # mean squared residuals
 
 
-#### visualize plant model fit ####
+#### visualize virus model fit ####
 
-# fit model
-g <- fit_plant$par[1];
-pred_plant <- ode(y = y0_plant, times = seq(0, max(mock_NP$time), length.out = 100), func = plant_model, parms = c(g)) %>%
+# nutrient supply rates
+a_n <- a_n_lo
+a_p <- a_p_hi
+
+# fit PAV model
+r_b <- fit_pav$par[1];
+c <- c_b
+z_n <- z_nb
+z_p <- z_pb
+pred_pav <- ode(y = y0_virus, times = seq(0, max(pav_P$time), length.out = 100), func = virus_model, parms = c(r_b)) %>%
   as_tibble() %>%
   mutate(across(everything(), as.double))
 
 # visualize
-ggplot(mock_NP, aes(time, value)) +
-  geom_point() +
-  geom_line(data = pred_plant, aes(y = B))
+pav_fig <- ggplot(pav_P, aes(time, value)) +
+  stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0) +
+  stat_summary(geom = "point", fun = "mean") +
+  geom_line(data = pred_pav, aes(y = V)) +
+  labs(x = "Time (days)", y = expression(paste("PAV concentration (", g^-1, ")", sep = "")), title = "(B) PAV growth rate") +
+  fig_theme
+
+# fit RPV model
+r_c <- fit_rpv$par[1];
+c <- c_c
+z_n <- z_nc
+z_p <- z_pc
+pred_rpv <- ode(y = y0_virus, times = seq(0, max(rpv_P$time), length.out = 100), func = virus_model, parms = c(r_c)) %>%
+  as_tibble() %>%
+  mutate(across(everything(), as.double))
+
+# visualize
+rpv_fig <- ggplot(rpv_P, aes(time, value)) +
+  stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0) +
+  stat_summary(geom = "point", fun = "mean") +
+  geom_line(data = pred_rpv, aes(y = V)) +
+  labs(x = "Time (days)", y = expression(paste("RPV concentration (", g^-1, ")", sep = "")), title = "(C) RPV growth rate") +
+  fig_theme +
+  theme(plot.title = element_text(size = 12, vjust = 0, hjust = 0.3))
+
+
+#### output ####
+
+# figure
+tiff("output/growth_rate_fit_figure.tiff", width = 6.5, height = 2.5, units = "in", res = 300)
+plot_grid(plant_fig, pav_fig, rpv_fig,
+          nrow = 1)
+dev.off()
+
+# parameters
+write_csv(tibble(parameter = c("g", "m", "r_b", "c_b", "r_c", "c_c"),
+                 value = c(g, m, r_b, c_b, r_c, c_c)),
+          "output/estimated_growth_mortality_rates.csv")
+
