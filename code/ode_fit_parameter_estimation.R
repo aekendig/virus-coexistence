@@ -1,3 +1,6 @@
+## Goal: estimate plant and virus growth rates
+
+
 #### set up ####
 
 # import data
