@@ -170,9 +170,15 @@ z_nc <- 1.7e-18
 z_pc <- 2.6e-19
  
 # initial values
-Q0_n <- Qmin_n
-Q0_p <- Qmin_p
 B0 <- 1e-3
+Q0_const <- 10
+Q0_n <- Qmin_n * Q0_const
+Q0_p <- Qmin_p * Q0_const
+R0_const <- 3
+R0_n_lo <- a_n_hi * R0_const
+R0_n_hi <- a_n_hi * R0_const
+R0_p_lo <- a_p_hi * R0_const
+R0_p_hi <- a_p_hi * R0_const
 
 
 #### plant model ####
@@ -221,28 +227,28 @@ times <- seq(0, max(dat5$dpp), length.out = 100)
 # wrapper function
 plant_wrapper <- function(g, m){
   
-  out_low <- ode(c(R_n = a_n_lo*2, R_p = a_p_lo*2, Q_n = Q0_n, Q_p = Q0_p, B = B0), 
+  out_low <- ode(c(R_n = R0_n_lo, R_p = R0_p_lo, Q_n = Q0_n, Q_p = Q0_p, B = B0), 
                  times, plant_model, c(g = g, a_n = a_n_lo, a_p = a_p_lo, m = m)) %>%
     as_tibble() %>%
     mutate(nutrient = "low",
            across(!nutrient, as.double),
            nutrient = as.character(nutrient))
   
-  out_N <- ode(c(R_n = a_n_hi*2, R_p = a_p_lo*2, Q_n = Q0_n, Q_p = Q0_p, B = B0),
+  out_N <- ode(c(R_n = R0_n_hi, R_p = R0_p_lo, Q_n = Q0_n, Q_p = Q0_p, B = B0),
                times, plant_model, c(g = g, a_n = a_n_hi, a_p = a_p_lo, m = m)) %>%
     as_tibble() %>%
     mutate(nutrient = "N",
            across(!nutrient, as.double),
            nutrient = as.character(nutrient))
   
-  out_P <- ode(c(R_n = a_n_lo*2, R_p = a_p_hi*2, Q_n = Q0_n, Q_p = Q0_p, B = B0),
+  out_P <- ode(c(R_n = R0_n_lo, R_p = R0_p_hi, Q_n = Q0_n, Q_p = Q0_p, B = B0),
                times, plant_model, c(g = g, a_n = a_n_lo, a_p = a_p_hi, m = m)) %>%
     as_tibble() %>%
     mutate(nutrient = "P",
            across(!nutrient, as.double),
            nutrient = as.character(nutrient))
   
-  out_NP <- ode(c(R_n = a_n_hi*2, R_p = a_p_hi*2, Q_n = Q0_n, Q_p = Q0_p, B = B0),
+  out_NP <- ode(c(R_n = R0_n_hi, R_p = R0_p_hi, Q_n = Q0_n, Q_p = Q0_p, B = B0),
                 times, plant_model, c(g = g, a_n = a_n_hi, a_p = a_p_hi, m = m)) %>%
     as_tibble() %>%
     mutate(nutrient = "N+P",
@@ -267,11 +273,17 @@ plant_wrapper <- function(g, m){
 manipulate(plant_wrapper(g, m), g = slider(0.001, 1), m = slider(0.001, 1))
 # only fits the high N+P data
 # m ~ 0.05
-# g ~ 0.32
-# predicted biomass of other treatments way lower and don't increase with parameter adjustments
+# g ~ 0.4
+# predicted biomass of other treatments way lower
 
 # set m so that we only estimate one parameter
-m <- 0.04
+m <- 0.05
+
+#### start here ####
+# re-estimate g
+# re-estimate virus params
+# got low nut treatments to grow by using higher initial R values
+
 
 
 #### compare plant model to observations ####

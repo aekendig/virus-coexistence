@@ -8,6 +8,7 @@ rm(list=ls())
 
 # load packages
 library(tidyverse)
+library(deSolve)
 
 
 #### parameters ####
@@ -100,12 +101,103 @@ sim_fun <- function(N_level, P_level, nut_trt, first_virus){
     a_p <- a_p_hi
   }
   
-  # model
+  # plant model
   plant_mod <- ode(c(R_n = R0_n, R_p = R0_p, Q_n = Q0_n, Q_p = Q0_p, B = B0, V_b = 0, V_c = 0),
-                   plant_times, plant_virus_model, c(a_n = a_n, a_p = a_p)) %>%
+                   seq(0, 11, length.out = 100), plant_virus_model, c(a_n = a_n, a_p = a_p)) %>%
     as_tibble() %>%
+    mutate(across(everything(), as.double))
+    
+  # final time
+  plant_init <- plant_mod %>%
+    filter(time == 11)
+  
+  # virus initial conditions
+  y0_first_virus <- c(R_n = pull(plant_init, R_n), 
+                      R_p = pull(plant_init, R_p), 
+                      Q_n = pull(plant_init, Q_n), 
+                      Q_p = pull(plant_init, Q_p), 
+                      B = pull(plant_init, B), 
+                      V_b = if_else(first_virus == "PAV", V0_b, 0),
+                      V_c = if_else(first_virus == "RPV", V0_c, 0))
+  
+  # first virus model
+  first_virus_mod <- ode(y0_first_virus, seq(0, 12, length.out = 100),
+                         plant_virus_model, c(a_n = a_n, a_p = a_p)) %>%
+    as_tibble() %>%
+    mutate(across(everything(), as.double))
+  
+  # final time
+  first_virus_init <- first_virus_mod %>%
+    filter(time == 12)
+  
+  # virus initial conditions
+  y0_second_virus <- c(R_n = pull(first_virus_init, R_n), 
+                      R_p = pull(first_virus_init, R_p), 
+                      Q_n = pull(first_virus_init, Q_n), 
+                      Q_p = pull(first_virus_init, Q_p), 
+                      B = pull(first_virus_init, B), 
+                      V_b = if_else(first_virus == "PAV", pull(first_virus_init, V_b), V0_b),
+                      V_c = if_else(first_virus == "RPV", pull(first_virus_init, V_c), V0_c))
+  
+  # first virus model
+  second_virus_mod <- ode(y0_second_virus, seq(0, 19, length.out = 100),
+                         plant_virus_model, c(a_n = a_n, a_p = a_p)) %>%
+    as_tibble() %>%
+    mutate(across(everything(), as.double))
+  
+  # combine models
+  mod_out <- plant_mod %>%
+    full_join(first_virus_mod %>%
+                mutate(time = time + 11)) %>%
+    full_join(second_virus_mod %>%
+                mutate(time = time + 11 + 12)) %>%
     mutate(nutrient = nut_trt,
-           across(!nutrient, as.double),
-           nutrient = as.character(nutrient))
+           resident = first_virus,
+           invader = if_else(resident == "PAV", "RPV", "PAV"))
   
 }
+
+
+#### simulations ####
+
+low_pav_sim <- sim_fun("low", "low", "low", "PAV")
+n_pav_sim <- sim_fun("high", "low", "N", "PAV")
+p_pav_sim <- sim_fun("low", "high", "P", "PAV")
+np_pav_sim <- sim_fun("high", "high", "N+P", "PAV")
+
+low_rpv_sim <- sim_fun("low", "low", "low", "RPV")
+n_rpv_sim <- sim_fun("high", "low", "N", "RPV")
+p_rpv_sim <- sim_fun("low", "high", "P", "RPV")
+np_rpv_sim <- sim_fun("high", "high", "N+P", "RPV")
+
+
+#### virus figures ####
+
+virus_dat <- low_pav_sim %>%
+  full_join(n_pav_sim) %>%
+  full_join(p_pav_sim) %>%
+  full_join(np_pav_sim) %>%
+  full_join(low_rpv_sim) %>%
+  full_join(n_rpv_sim) %>%
+  full_join(p_rpv_sim) %>%
+  full_join(np_rpv_sim) %>%
+  mutate(V_b_rel = V_b / max(V_b),
+         V_c_rel = V_c / max(V_c)) %>%
+  select(time, nutrient, invader, resident, V_b_rel, V_c_rel) %>%
+  pivot_longer(cols = c(V_b_rel, V_c_rel),
+               names_to = "virus",
+               values_to = "concentration") %>%
+  mutate(virus = fct_recode(virus, "BYDV-PAV" = "V_b_rel",
+                            "CYDV-RPV" = "V_c_rel"))
+
+# facet by virus
+ggplot(virus_dat, aes(time, concentration, linetype = virus, color = nutrient)) +
+  geom_line() +
+  facet_wrap(~invader)
+
+# facet by nutrient
+ggplot(virus_dat, aes(time, concentration, linetype = virus, color = nutrient)) +
+  geom_line() +
+  facet_wrap(nutrient~invader, scales = "free")
+# RPV can growth with N or N+P
+# PAV can only growth with N+P
