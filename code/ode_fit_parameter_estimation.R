@@ -179,6 +179,7 @@ R0_n_lo <- a_n_hi * R0_const
 R0_n_hi <- a_n_hi * R0_const
 R0_p_lo <- a_p_hi * R0_const
 R0_p_hi <- a_p_hi * R0_const
+V0 <- 100000
 
 
 #### plant model ####
@@ -271,19 +272,13 @@ plant_wrapper <- function(g, m){
 }
 
 manipulate(plant_wrapper(g, m), g = slider(0.001, 1), m = slider(0.001, 1))
-# only fits the high N+P data
 # m ~ 0.05
 # g ~ 0.4
+# fits high N and P best
 # predicted biomass of other treatments way lower
 
 # set m so that we only estimate one parameter
 m <- 0.05
-
-#### start here ####
-# re-estimate g
-# re-estimate virus params
-# got low nut treatments to grow by using higher initial R values
-
 
 
 #### compare plant model to observations ####
@@ -302,7 +297,7 @@ a_p <- a_p_hi
 # cost function
 plant_cost <- function(input_plant){ 
   g = input_plant[1];
-  out = ode(y = c(R_n = a_n_hi*2, R_p = a_p_hi*2, Q_n = Q0_n, Q_p = Q0_p, B = B0),
+  out = ode(y = c(R_n = R0_n_hi, R_p = R0_p_hi, Q_n = Q0_n, Q_p = Q0_p, B = B0),
             times = times, func = plant_model, parms = c(g = g))
   return(modCost(model = out[ , c("time", "B")], obs = mock_NP, y = "value"))   
   # return(out[ , c("time", "B")]) #for troubleshooting
@@ -312,7 +307,7 @@ plant_cost <- function(input_plant){
 #### estimate plant parameters ####
 
 #initial guess
-input_plant <- c(0.33) 
+input_plant <- c(0.4) 
 
 # fit model
 fit_plant <- modFit(plant_cost, input_plant, lower = c(0))
@@ -325,14 +320,14 @@ fit_plant$ms # mean squared residuals
 #### visualize plant model fit ####
 
 # save value
-g <- fit_plant$par[1]; # 0.28
+g <- fit_plant$par[1]; # 0.22
 
 # nutrients
 a_n <- a_n_hi
 a_p <- a_p_hi
 
 # fit model
-pred_plant <- ode(y = c(R_n = a_n_hi*2, R_p = a_p_hi*2, Q_n = Q0_n, Q_p = Q0_p, B = B0),
+pred_plant <- ode(y = c(R_n = R0_n_hi, R_p = R0_p_hi, Q_n = Q0_n, Q_p = Q0_p, B = B0),
                   times = times, func = plant_model, parms = c(g)) %>%
   as_tibble() %>%
   mutate(across(everything(), as.double))
@@ -402,15 +397,15 @@ virus_init_fun <- function(N_level, P_level){
   
   # initial resource values
   if(N_level == "low"){
-    R0_n <- a_n_lo*2
+    R0_n <- R0_n_lo
   }else{
-    R0_n <- a_n_hi*2
+    R0_n <- R0_n_hi
   }
   
   if(P_level == "low"){
-    R0_p <- a_p_lo*2
+    R0_p <- R0_p_lo
   }else{
-    R0_p <- a_p_hi*2
+    R0_p <- R0_p_hi
   }
   
   plant_init <- ode(y = c(R_n = R0_n, R_p = R0_p, Q_n = Q0_n, Q_p = Q0_p, B = B0), 
@@ -424,12 +419,11 @@ virus_init_fun <- function(N_level, P_level){
                 Q_n = pull(plant_init, Q_n), 
                 Q_p = pull(plant_init, Q_p), 
                 B = pull(plant_init, B), 
-                V = 100000)
+                V = V0)
   
   return(y0_virus)
 }
  
-
 
 # initiate slider for ggplot
 manipulate(plot(1:5, cex=size), size = slider(0.5,10,step=0.5))
@@ -492,11 +486,10 @@ virus_wrapper <- function(r, c, species){
 # PAV
 z_n <- z_nb
 z_p <- z_pb
-manipulate(virus_wrapper(r, c, species = "PAV"), r = slider(0.001, 1), c = slider(0.001, 1))
-# fits P data the best
-# predicted peaks of N and N+P are a little late
-# r ~ 0.88
-# c ~ 0.5
+manipulate(virus_wrapper(r, c, species = "PAV"), r = slider(0.001, 2), c = slider(0.001, 1))
+# aiming to fit N+P with others close
+# r ~ 1.2
+# c ~ 0.8
 
 # RPV
 z_n <- z_nc
@@ -508,7 +501,7 @@ manipulate(virus_wrapper(r, c, species = "RPV"), r = slider(0.001, 2), c = slide
 # c ~ 0.8
 
 # set c so that we only estimate one parameter
-c_b <- 0.5
+c_b <- 0.8
 c_c <- 0.8
 
 
@@ -550,7 +543,7 @@ rpv_cost <- function(input_virus){
 #### estimate virus parameters ####
 
 #initial guess
-input_pav <- c(0.88)
+input_pav <- c(1.2)
 input_rpv <- c(1.4)
 
 # fit PAV model

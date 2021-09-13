@@ -32,21 +32,23 @@ z_nb <- 1.6e-18
 z_pb <- 2.6e-19
 z_nc <- 1.7e-18
 z_pc <- 2.6e-19
-m <- 0.04
-g <- 0.28
-c_b <- 0.5
+m <- 0.05
+g <- 0.29
+c_b <- 0.8
 c_c <- 0.8
-r_b <- 0.82
+r_b <- 1.2
 r_c <- 1.4
 
 # initial values
-R0_n_lo <- a_n_lo*2
-R0_p_lo <- a_p_lo*2
-R0_n_hi <- a_n_hi*2
-R0_p_hi <- a_p_hi*2
-Q0_n <- Qmin_n
-Q0_p <- Qmin_p
 B0 <- 1e-3
+Q0_const <- 10
+Q0_n <- Qmin_n * Q0_const
+Q0_p <- Qmin_p * Q0_const
+R0_const <- 3
+R0_n_lo <- a_n_hi * R0_const
+R0_n_hi <- a_n_hi * R0_const
+R0_p_lo <- a_p_hi * R0_const
+R0_p_hi <- a_p_hi * R0_const
 V0_b <- V0_c <- 100000
 
 
@@ -171,8 +173,29 @@ p_rpv_sim <- sim_fun("low", "high", "P", "RPV")
 np_rpv_sim <- sim_fun("high", "high", "N+P", "RPV")
 
 
-#### virus figures ####
+#### visualize ####
 
+# figure settings
+fig_theme <- theme_bw() +
+  theme(panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.spacing.x = unit(0,"line"),
+        axis.text.y = element_text(size = 8, color = "black"),
+        axis.text.x = element_text(size = 8, color = "black"),
+        axis.title = element_text(size = 10),
+        axis.line = element_line(color = "black"),
+        legend.text = element_text(size = 8),
+        legend.title = element_blank(),
+        legend.background = element_blank(),
+        legend.key.size = unit(5, "mm"),
+        strip.background = element_blank(),
+        strip.text = element_text(size = 10),
+        strip.placement = "outside",
+        plot.title = element_text(size = 12, vjust = 0))
+
+# combine/edit data
 virus_dat <- low_pav_sim %>%
   full_join(n_pav_sim) %>%
   full_join(p_pav_sim) %>%
@@ -181,23 +204,34 @@ virus_dat <- low_pav_sim %>%
   full_join(n_rpv_sim) %>%
   full_join(p_rpv_sim) %>%
   full_join(np_rpv_sim) %>%
-  mutate(V_b_rel = V_b / max(V_b),
-         V_c_rel = V_c / max(V_c)) %>%
-  select(time, nutrient, invader, resident, V_b_rel, V_c_rel) %>%
-  pivot_longer(cols = c(V_b_rel, V_c_rel),
-               names_to = "virus",
-               values_to = "concentration") %>%
-  mutate(virus = fct_recode(virus, "BYDV-PAV" = "V_b_rel",
-                            "CYDV-RPV" = "V_c_rel"))
+  mutate(PAV_rel = V_b / max(V_b),
+         RPV_rel = V_c / max(V_c)) %>%
+  rename(PAV_conc = V_b, RPV_conc = V_c) %>%
+  select(time, nutrient, invader, resident, PAV_conc, RPV_conc, PAV_rel, RPV_rel) %>%
+  pivot_longer(cols = c(PAV_conc, RPV_conc, PAV_rel, RPV_rel),
+               names_to = c("virus", ".value"),
+               names_pattern = "(.+)_(.+)") %>%
+  mutate(virus = fct_recode(virus, "BYDV-PAV" = "PAV",
+                            "CYDV-RPV" = "RPV"),
+         nutrient = fct_recode(nutrient, "+N" = "N",
+                               "+P" = "P",
+                               "+N+P" = "N+P") %>%
+           fct_relevel("low", "+N", "+P"))
+
+#### start here ####
+# decide how to best visualize results
+# maybe run simulations for longer time
 
 # facet by virus
-ggplot(virus_dat, aes(time, concentration, linetype = virus, color = nutrient)) +
-  geom_line() +
-  facet_wrap(~invader)
+ggplot(virus_dat, aes(time, concentration, linetype = nutrient, color = nutrient)) +
+  geom_line(size = 1.5) +
+  facet_wrap(virus~invader, scales = "free") +
+  scale_color_viridis_d(end = 0.9) +
+  fig_theme
 
 # facet by nutrient
-ggplot(virus_dat, aes(time, concentration, linetype = virus, color = nutrient)) +
+ggplot(filter(virus_dat, invader == "PAV"), 
+       aes(time, log(conc), linetype = virus, color = virus)) +
   geom_line() +
-  facet_wrap(nutrient~invader, scales = "free")
-# RPV can growth with N or N+P
-# PAV can only growth with N+P
+  facet_wrap(~ nutrient)
+# reducing V0 doesn't change how these look
