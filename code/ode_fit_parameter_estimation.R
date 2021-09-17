@@ -170,7 +170,7 @@ z_nc <- 1.7e-18
 z_pc <- 2.6e-19
  
 # initial values
-B0 <- 1e-3
+H0 <- 1e-3
 Q0_const <- 10
 Q0_n <- Qmin_n * Q0_const
 Q0_p <- Qmin_p * Q0_const
@@ -197,16 +197,16 @@ plant_model = function (t, yy, parms) {
   R_p = yy[2];
   Q_n = yy[3];
   Q_p = yy[4];
-  B = yy[5];
+  H = yy[5];
  
   # model
-  dR_n = a_n - (u_n * R_n * B) / (R_n + k_n);
-  dR_p = a_p - (u_p * R_p * B) / (R_p + k_p);
+  dR_n = a_n - (u_n * R_n * H) / (R_n + k_n);
+  dR_p = a_p - (u_p * R_p * H) / (R_p + k_p);
   dQ_n = (u_n * R_n) / (R_n + k_n) - min((1 - Qmin_n / Q_n), (1 - Qmin_p / Q_p)) * g * Q_n
   dQ_p = (u_p * R_p) / (R_p + k_p) - min((1 - Qmin_n / Q_n), (1 - Qmin_p / Q_p)) * g * Q_p
-  dB = min((1 - Qmin_n / Q_n), (1 - Qmin_p / Q_p)) * g * B - m * B
+  dH = min((1 - Qmin_n / Q_n), (1 - Qmin_p / Q_p)) * g * H - m * H
   
-  return(list(c(dR_n, dR_p, dQ_n, dQ_p, dB)))
+  return(list(c(dR_n, dR_p, dQ_n, dQ_p, dH)))
 }
 
 
@@ -215,7 +215,7 @@ plant_model = function (t, yy, parms) {
 # data
 mock <- dat5 %>%
   filter(inoc == "healthy") %>%
-  mutate(variable = "B",
+  mutate(variable = "H",
          value = full_mass_g,
          time = dpp)
 
@@ -228,28 +228,28 @@ times <- seq(0, max(dat5$dpp), length.out = 100)
 # wrapper function
 plant_wrapper <- function(g, m){
   
-  out_low <- ode(c(R_n = R0_n_lo, R_p = R0_p_lo, Q_n = Q0_n, Q_p = Q0_p, B = B0), 
+  out_low <- ode(c(R_n = R0_n_lo, R_p = R0_p_lo, Q_n = Q0_n, Q_p = Q0_p, H = H0), 
                  times, plant_model, c(g = g, a_n = a_n_lo, a_p = a_p_lo, m = m)) %>%
     as_tibble() %>%
     mutate(nutrient = "low",
            across(!nutrient, as.double),
            nutrient = as.character(nutrient))
   
-  out_N <- ode(c(R_n = R0_n_hi, R_p = R0_p_lo, Q_n = Q0_n, Q_p = Q0_p, B = B0),
+  out_N <- ode(c(R_n = R0_n_hi, R_p = R0_p_lo, Q_n = Q0_n, Q_p = Q0_p, H = H0),
                times, plant_model, c(g = g, a_n = a_n_hi, a_p = a_p_lo, m = m)) %>%
     as_tibble() %>%
     mutate(nutrient = "N",
            across(!nutrient, as.double),
            nutrient = as.character(nutrient))
   
-  out_P <- ode(c(R_n = R0_n_lo, R_p = R0_p_hi, Q_n = Q0_n, Q_p = Q0_p, B = B0),
+  out_P <- ode(c(R_n = R0_n_lo, R_p = R0_p_hi, Q_n = Q0_n, Q_p = Q0_p, H = H0),
                times, plant_model, c(g = g, a_n = a_n_lo, a_p = a_p_hi, m = m)) %>%
     as_tibble() %>%
     mutate(nutrient = "P",
            across(!nutrient, as.double),
            nutrient = as.character(nutrient))
   
-  out_NP <- ode(c(R_n = R0_n_hi, R_p = R0_p_hi, Q_n = Q0_n, Q_p = Q0_p, B = B0),
+  out_NP <- ode(c(R_n = R0_n_hi, R_p = R0_p_hi, Q_n = Q0_n, Q_p = Q0_p, H = H0),
                 times, plant_model, c(g = g, a_n = a_n_hi, a_p = a_p_hi, m = m)) %>%
     as_tibble() %>%
     mutate(nutrient = "N+P",
@@ -260,7 +260,7 @@ plant_wrapper <- function(g, m){
     full_join(out_N) %>%
     full_join(out_P) %>%
     full_join(out_NP) %>%
-    pivot_longer(cols = c(R_n, R_p, Q_n, Q_p, B),
+    pivot_longer(cols = c(R_n, R_p, Q_n, Q_p, H),
                  names_to = "variable",
                  values_to = "value")
   
@@ -297,10 +297,10 @@ a_p <- a_p_hi
 # cost function
 plant_cost <- function(input_plant){ 
   g = input_plant[1];
-  out = ode(y = c(R_n = R0_n_hi, R_p = R0_p_hi, Q_n = Q0_n, Q_p = Q0_p, B = B0),
+  out = ode(y = c(R_n = R0_n_hi, R_p = R0_p_hi, Q_n = Q0_n, Q_p = Q0_p, H = H0),
             times = times, func = plant_model, parms = c(g = g))
-  return(modCost(model = out[ , c("time", "B")], obs = mock_NP, y = "value"))   
-  # return(out[ , c("time", "B")]) #for troubleshooting
+  return(modCost(model = out[ , c("time", "H")], obs = mock_NP, y = "value"))   
+  # return(out[ , c("time", "H")]) #for troubleshooting
 }
 
 
@@ -320,14 +320,14 @@ fit_plant$ms # mean squared residuals
 #### visualize plant model fit ####
 
 # save value
-g <- fit_plant$par[1]; # 0.22
+g <- fit_plant$par[1]; # 0.29
 
 # nutrients
 a_n <- a_n_hi
 a_p <- a_p_hi
 
 # fit model
-pred_plant <- ode(y = c(R_n = R0_n_hi, R_p = R0_p_hi, Q_n = Q0_n, Q_p = Q0_p, B = B0),
+pred_plant <- ode(y = c(R_n = R0_n_hi, R_p = R0_p_hi, Q_n = Q0_n, Q_p = Q0_p, H = H0),
                   times = times, func = plant_model, parms = c(g)) %>%
   as_tibble() %>%
   mutate(across(everything(), as.double))
@@ -335,7 +335,7 @@ pred_plant <- ode(y = c(R_n = R0_n_hi, R_p = R0_p_hi, Q_n = Q0_n, Q_p = Q0_p, B 
 # visualize
 plant_fig <- ggplot(mock_NP, aes(time, value)) +
   geom_point() +
-  geom_line(data = pred_plant, aes(y = B)) +
+  geom_line(data = pred_plant, aes(y = H)) +
   labs(x = "Time (days)", y = "Plant biomass (g)", title = "(A) Plant growth rate") +
   fig_theme
 
@@ -355,18 +355,18 @@ virus_model = function (t, yy, parms) {
   R_p = yy[2];
   Q_n = yy[3];
   Q_p = yy[4];
-  B = yy[5];
+  H = yy[5];
   V = yy[6];
   
   # model
-  dR_n = a_n - (u_n * R_n * B) / (R_n + k_n);
-  dR_p = a_p - (u_p * R_p * B) / (R_p + k_p);
+  dR_n = a_n - (u_n * R_n * H) / (R_n + k_n);
+  dR_p = a_p - (u_p * R_p * H) / (R_p + k_p);
   dQ_n = (u_n * R_n) / (R_n + k_n) - min((1 - Qmin_n / Q_n), (1 - Qmin_p / Q_p)) * g * Q_n - min((1 - q_n / Q_n), (1 - q_p / Q_p)) * z_n * r * V
   dQ_p = (u_p * R_p) / (R_p + k_p) - min((1 - Qmin_n / Q_n), (1 - Qmin_p / Q_p)) * g * Q_p - min((1 - q_n / Q_n), (1 - q_p / Q_p)) * z_p * r * V
-  dB = min((1 - Qmin_n / Q_n), (1 - Qmin_p / Q_p)) * g * B - m * B
+  dH = min((1 - Qmin_n / Q_n), (1 - Qmin_p / Q_p)) * g * H - m * H
   dV = min((1 - q_n / Q_n), (1 - q_p / Q_p)) * r * V - c * V
   
-  return(list(c(dR_n, dR_p, dQ_n, dQ_p, dB, dV)))
+  return(list(c(dR_n, dR_p, dQ_n, dQ_p, dH, dV)))
 }
 
 
@@ -408,7 +408,7 @@ virus_init_fun <- function(N_level, P_level){
     R0_p <- R0_p_hi
   }
   
-  plant_init <- ode(y = c(R_n = R0_n, R_p = R0_p, Q_n = Q0_n, Q_p = Q0_p, B = B0), 
+  plant_init <- ode(y = c(R_n = R0_n, R_p = R0_p, Q_n = Q0_n, Q_p = Q0_p, H = H0), 
                     times = seq(0, 11), func = plant_model, parms = c(g)) %>%
     as_tibble() %>%
     mutate(across(everything(), as.double)) %>%
@@ -418,7 +418,7 @@ virus_init_fun <- function(N_level, P_level){
                 R_p = pull(plant_init, R_p), 
                 Q_n = pull(plant_init, Q_n), 
                 Q_p = pull(plant_init, Q_p), 
-                B = pull(plant_init, B), 
+                H = pull(plant_init, H), 
                 V = V0)
   
   return(y0_virus)
@@ -472,7 +472,7 @@ virus_wrapper <- function(r, c, species){
     full_join(out_N) %>%
     full_join(out_P) %>%
     full_join(out_NP) %>%
-    pivot_longer(cols = c(R_n, R_p, Q_n, Q_p, B, V),
+    pivot_longer(cols = c(R_n, R_p, Q_n, Q_p, H, V),
                  names_to = "variable",
                  values_to = "value")
   
@@ -581,10 +581,15 @@ z_p <- z_pb
 pred_pav <- ode(y = virus_init_fun("high", "high"),
                 times = times, func = virus_model, parms = c(r_b)) %>%
   as_tibble() %>%
-  mutate(across(everything(), as.double))
+  mutate(across(everything(), as.double),
+         time = time + 11)
+
+# add time to data
+pav_NP2 <- pav_NP %>%
+  mutate(time = time + 11)
 
 # visualize
-pav_fig <- ggplot(pav_NP, aes(time, value)) +
+pav_fig <- ggplot(pav_NP2, aes(time, value)) +
   stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0) +
   stat_summary(geom = "point", fun = "mean") +
   geom_line(data = pred_pav, aes(y = V)) +
@@ -599,10 +604,15 @@ z_p <- z_pc
 pred_rpv <- ode(y = virus_init_fun("high", "high"), 
                 times = times, func = virus_model, parms = c(r_c)) %>%
   as_tibble() %>%
-  mutate(across(everything(), as.double))
+  mutate(across(everything(), as.double),
+         time = time + 11)
+
+# add time to data
+rpv_NP2 <- rpv_NP %>%
+  mutate(time = time + 11)
 
 # visualize
-rpv_fig <- ggplot(rpv_NP, aes(time, value)) +
+rpv_fig <- ggplot(rpv_NP2, aes(time, value)) +
   stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0) +
   stat_summary(geom = "point", fun = "mean") +
   geom_line(data = pred_rpv, aes(y = V)) +

@@ -41,7 +41,7 @@ r_b <- 1.2
 r_c <- 1.4
 
 # initial values
-B0 <- 1e-3
+H0 <- 1e-3
 Q0_const <- 10
 Q0_n <- Qmin_n * Q0_const
 Q0_p <- Qmin_p * Q0_const
@@ -66,20 +66,20 @@ plant_virus_model = function (t, yy, parms) {
   R_p = yy[2];
   Q_n = yy[3];
   Q_p = yy[4];
-  B = yy[5];
+  H = yy[5];
   V_b = yy[6];
   V_c = yy[7];
   
   # model
-  dR_n = a_n - (u_n * R_n * B) / (R_n + k_n);
-  dR_p = a_p - (u_p * R_p * B) / (R_p + k_p);
+  dR_n = a_n - (u_n * R_n * H) / (R_n + k_n);
+  dR_p = a_p - (u_p * R_p * H) / (R_p + k_p);
   dQ_n = (u_n * R_n) / (R_n + k_n) - min((1 - Qmin_n / Q_n), (1 - Qmin_p / Q_p)) * g * Q_n - min((1 - q_nb / Q_n), (1 - q_pb / Q_p)) * z_nb * r_b * V_b - min((1 - q_nc / Q_n), (1 - q_pc / Q_p)) * z_nc * r_c * V_c
   dQ_p = (u_p * R_p) / (R_p + k_p) - min((1 - Qmin_n / Q_n), (1 - Qmin_p / Q_p)) * g * Q_p - min((1 - q_nb / Q_n), (1 - q_pb / Q_p)) * z_pb * r_b * V_b - min((1 - q_nc / Q_n), (1 - q_pc / Q_p)) * z_pc * r_c * V_c
-  dB = min((1 - Qmin_n / Q_n), (1 - Qmin_p / Q_p)) * g * B - m * B
+  dH = min((1 - Qmin_n / Q_n), (1 - Qmin_p / Q_p)) * g * H - m * H
   dV_b = min((1 - q_nb / Q_n), (1 - q_pb / Q_p)) * r_b * V_b - c_b * V_b
   dV_c = min((1 - q_nc / Q_n), (1 - q_pc / Q_p)) * r_c * V_c - c_c * V_c
   
-  return(list(c(dR_n, dR_p, dQ_n, dQ_p, dB, dV_b, dV_c)))
+  return(list(c(dR_n, dR_p, dQ_n, dQ_p, dH, dV_b, dV_c)))
 }
 
 
@@ -105,7 +105,7 @@ sim_fun <- function(N_level, P_level, nut_trt, first_virus){
   }
   
   # plant model
-  plant_mod <- ode(c(R_n = R0_n, R_p = R0_p, Q_n = Q0_n, Q_p = Q0_p, B = B0, V_b = 0, V_c = 0),
+  plant_mod <- ode(c(R_n = R0_n, R_p = R0_p, Q_n = Q0_n, Q_p = Q0_p, H = H0, V_b = 0, V_c = 0),
                    seq(0, 11, length.out = 100), plant_virus_model, c(a_n = a_n, a_p = a_p)) %>%
     as_tibble() %>%
     mutate(across(everything(), as.double))
@@ -119,7 +119,7 @@ sim_fun <- function(N_level, P_level, nut_trt, first_virus){
                       R_p = pull(plant_init, R_p), 
                       Q_n = pull(plant_init, Q_n), 
                       Q_p = pull(plant_init, Q_p), 
-                      B = pull(plant_init, B), 
+                      H = pull(plant_init, H), 
                       V_b = if_else(first_virus == "PAV", V0_b, 0),
                       V_c = if_else(first_virus == "RPV", V0_c, 0))
   
@@ -138,7 +138,7 @@ sim_fun <- function(N_level, P_level, nut_trt, first_virus){
                       R_p = pull(first_virus_init, R_p), 
                       Q_n = pull(first_virus_init, Q_n), 
                       Q_p = pull(first_virus_init, Q_p), 
-                      B = pull(first_virus_init, B), 
+                      H = pull(first_virus_init, H), 
                       V_b = if_else(first_virus == "PAV", pull(first_virus_init, V_b), V0_b),
                       V_c = if_else(first_virus == "RPV", pull(first_virus_init, V_c), V0_c))
   
@@ -174,7 +174,7 @@ p_rpv_sim <- sim_fun("low", "high", "P", "RPV")
 np_rpv_sim <- sim_fun("high", "high", "N+P", "RPV")
 
 
-#### visualize ####
+#### virus figure ####
 
 # figure settings
 fig_theme <- theme_bw() +
@@ -193,9 +193,9 @@ fig_theme <- theme_bw() +
         legend.key.width = unit(7, "mm"),
         legend.key.heigh = unit(5, "mm"),
         strip.background = element_blank(),
-        strip.text = element_text(size = 12, hjust = 0),
+        strip.text = element_text(size = 11, hjust = 0),
         strip.placement = "outside",
-        plot.title = element_text(size = 12, vjust = 0))
+        plot.title = element_text(size = 11, vjust = 0))
 
 # combine
 comb_dat <- low_pav_sim %>%
@@ -225,13 +225,13 @@ virus_dat <- comb_dat %>%
 
 pav_dat <- virus_dat %>%
   filter(virus == "BYDV-PAV") %>%
-  mutate(scenario = case_when(invader == "PAV" ~ "(A) BYDV-PAV invades CYDV-RPV",
-                              invader == "RPV" ~ "(B) CYDV-RPV invades BYDV-PAV"))
+  mutate(scenario = case_when(invader == "PAV" ~ "(A) BYDV-PAV invades",
+                              invader == "RPV" ~ "(B) BYDV-PAV resident"))
 
 rpv_dat <- virus_dat %>%
   filter(virus == "CYDV-RPV") %>%
-  mutate(scenario = case_when(invader == "PAV" ~ "(C) BYDV-PAV invades CYDV-RPV",
-                              invader == "RPV" ~ "(D) CYDV-RPV invades BYDV-PAV"))
+  mutate(scenario = case_when(invader == "PAV" ~ "(C) CYDV-RPV resident",
+                              invader == "RPV" ~ "(D) CYDV-RPV invades"))
 
 # virus figures
 pav_fig <- ggplot(pav_dat, aes(time, rel, linetype = nutrient, color = nutrient)) +
@@ -241,7 +241,7 @@ pav_fig <- ggplot(pav_dat, aes(time, rel, linetype = nutrient, color = nutrient)
   scale_linetype(name = "Nutrient") +
   labs(x = "Time (days)", y = "BYDV-PAV relative titer") +
   fig_theme +
-  theme(legend.position = c(0.07, 0.77),
+  theme(legend.position = c(0.1, 0.7),
         axis.title.x = element_blank())
 
 rpv_fig <- ggplot(rpv_dat, aes(time, rel, linetype = nutrient, color = nutrient)) +
@@ -253,27 +253,33 @@ rpv_fig <- ggplot(rpv_dat, aes(time, rel, linetype = nutrient, color = nutrient)
   theme(legend.position = "none")
 
 # combine
-tiff("output/invasion_simulation_figure.tiff", width = 6.5, height = 6.5, units = "in", res = 300)
+tiff("output/invasion_simulation_figure.tiff", width = 4.5, height = 4.5, units = "in", res = 300)
 plot_grid(pav_fig, rpv_fig,
           nrow = 2,
           rel_heights = c(0.95, 1))
 dev.off()
 
-#### start here ####
-# work on limiting nutrient figure
-# want to demonstrate why virus concentrations are so high with high N+P
+
+#### plant figure with PAV data ####
 
 # edit plant dat
 plant_dat <- comb_dat %>%
+  mutate(Qlim_n = Qmin_n / Q_n,
+         Qlim_p = Qmin_p / Q_p,
+         qlim_n = q_nb / Q_n, # used PAV q's, but they are equal to RPV's
+         qlim_p = q_pb / Q_p) %>%
   rowwise() %>%
-  mutate(Q_min = min(Q_n, Q_p)) %>%
+  mutate(Qlim = max(Qlim_n, Qlim_p),
+         qlim = max(qlim_n, qlim_p)) %>%
   ungroup() %>%
   mutate(nutrient = fct_recode(nutrient, "+N" = "N",
                                "+P" = "P",
                                "+N+P" = "N+P") %>%
            fct_relevel("low", "+N", "+P"),
-         min_nut = case_when(Q_min == Q_n ~ "Q[N]",
-                             Q_min == Q_p ~ "Q[P]"))
+         lim_nut_H = case_when(Qlim == Qlim_n ~ "Q[N]",
+                               Qlim == Qlim_p ~ "Q[P]"),
+         lim_nut_V = case_when(qlim == qlim_n ~ "Q[N]",
+                               qlim == qlim_p ~ "Q[P]"))
   
 pav_invader_dat <- plant_dat %>%
   filter(invader == "PAV")
@@ -293,7 +299,7 @@ pav_Rn_fig <- ggplot(pav_invader_dat, aes(time, R_n, linetype = nutrient, color 
   scale_linetype(name = "Nutrient") +
   labs(x = "Time (days)", y = "Environment N (g)", title = "(A)") +
   fig_theme +
-  theme(legend.position = c(0.7, 0.77))
+  theme(legend.position = c(0.77, 0.77))
 
 pav_Rp_fig <- ggplot(pav_invader_dat, aes(time, R_p, linetype = nutrient, color = nutrient)) +
   geom_line(size = 1.2) +
@@ -302,10 +308,10 @@ pav_Rp_fig <- ggplot(pav_invader_dat, aes(time, R_p, linetype = nutrient, color 
   fig_theme +
   theme(legend.position = "none")
 
-pav_B_fig <- ggplot(pav_invader_dat, aes(time, B, linetype = nutrient, color = nutrient)) +
+pav_H_fig <- ggplot(pav_invader_dat, aes(time, H, linetype = nutrient, color = nutrient)) +
   geom_line(size = 1.2) +
   scale_color_viridis_d(end = 0.9) +
-  labs(x = "Time (days)", y = "Biomass (g)", title = "(C)") +
+  labs(x = "Time (days)", y = "Plant biomass (g)", title = "(C)") +
   fig_theme +
   theme(legend.position = "none")
 
@@ -322,24 +328,60 @@ pav_Qn_fig <- ggplot(pav_invader_dat, aes(time, Q_n)) +
 pav_Qp_fig <- ggplot(pav_invader_dat, aes(time, Q_p)) +
   geom_hline(yintercept = Qmin_p, color = "black") +
   geom_text(data = Qp_lab, aes(label = label), parse = T, color = "black", fontface = "italic", 
-            size = 3, hjust = 0, vjust = 0, nudge_y = 5e-5) +
+            size = 3, hjust = 0, vjust = 0, nudge_y = 4e-5) +
   geom_line(size = 1.2, aes(linetype = nutrient, color = nutrient)) +
   scale_color_viridis_d(end = 0.9) +
   labs(x = "Time (days)", y = "Plant P concentration", title = "(E)") +
   fig_theme +
   theme(legend.position = "none")
 
-pav_min_fig <- ggplot(pav_invader_dat, aes(time, Q_min, linetype = nutrient, color = nutrient)) +
+pav_lim_fig <- ggplot(pav_invader_dat, aes(time, qlim, linetype = nutrient, color = nutrient)) +
   geom_line(size = 1.2) +
-  facet_wrap(~min_nut) +
+  #facet_wrap(~ lim_nut_V) + 
+  scale_color_viridis_d(end = 0.9) +
+  labs(x = "Time (days)", title = "(F)", 
+       y = expression(paste("Limiting nutrient ratio (", Q[min], "/Q)", sep = ""))) +
+  fig_theme +
+  theme(legend.position = "none")
+
+ggplot(pav_invader_dat, aes(time, Qlim, linetype = nutrient, color = nutrient)) +
+  geom_line(size = 1.2) +
+  #facet_wrap(~ lim_nut_H) + 
   scale_color_viridis_d(end = 0.9) +
   labs(x = "Time (days)", y = "Limiting nutrient", title = "(F)") +
   fig_theme +
   theme(legend.position = "none")
+# same as the virus one because the qmin values were set equal to Qmin
 
-pav_top_fig <- plot_grid(pav_Rn_fig, pav_Rp_fig, pav_B_fig,
+# combine figures
+pav_top_fig <- plot_grid(pav_Rn_fig, pav_Rp_fig, pav_H_fig,
                          nrow = 1)
-pav_bot_fig <- plot_grid(pav_Qn_fig, pav_Qp_fig, pav_NP_fig,
+pav_bot_fig <- plot_grid(pav_Qn_fig, pav_Qp_fig, pav_lim_fig,
                          nrow = 1)
+
+tiff("output/pav_invasion_plant_simulation_figure.tiff", width = 6.5, height = 4.5, units = "in", res = 300)
 plot_grid(pav_top_fig, pav_bot_fig,
           nrow = 2)
+dev.off()
+
+
+#### plant figure with RPV data ####
+
+# recreate figures
+rpv_Rn_fig <- pav_Rn_fig %+% rpv_invader_dat
+rpv_Rp_fig <- pav_Rp_fig %+% rpv_invader_dat
+rpv_H_fig <- pav_H_fig %+% rpv_invader_dat
+rpv_Qn_fig <- pav_Qn_fig %+% rpv_invader_dat
+rpv_Qp_fig <- pav_Qp_fig %+% rpv_invader_dat
+rpv_lim_fig <- pav_lim_fig %+% rpv_invader_dat
+
+# combine figures
+rpv_top_fig <- plot_grid(rpv_Rn_fig, rpv_Rp_fig, rpv_H_fig,
+                         nrow = 1)
+rpv_bot_fig <- plot_grid(rpv_Qn_fig, rpv_Qp_fig, rpv_lim_fig,
+                         nrow = 1)
+
+tiff("output/rpv_invasion_plant_simulation_figure.tiff", width = 6.5, height = 4.5, units = "in", res = 300)
+plot_grid(rpv_top_fig, rpv_bot_fig,
+          nrow = 2)
+dev.off()
