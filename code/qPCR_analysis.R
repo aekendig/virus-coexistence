@@ -9,7 +9,7 @@ rm(list=ls())
 # load packages
 library(tidyverse)
 library(cowplot)
-library(brms)
+library(glmmTMB)
 
 # import data
 dat <- read_csv("intermediate-data/qPCR_expt_data_cleaned.csv")
@@ -71,7 +71,7 @@ dat2 %>%
   geom_density()
 # no clear separation
 
-# remove failed invasions
+# remove failed resident establishment
 # contaminated single inoculations
 # and missing quantities
 dat3 <- dat2 %>%
@@ -149,7 +149,7 @@ dat4 %>%
   filter(invasion == "I" & resident_est == 0) 
 # 6 (only added one additional)
 
-# remove failed invasions
+# remove failed resident establishment
 dat5 <- dat4 %>%
   filter(!(invasion == "I" & resident_est == 0))
 # recovered almost 100 samples
@@ -351,50 +351,51 @@ ggplot(RPVIdat, aes(dpiI, log_quant.mg)) +
   geom_line(data = RPVIsim) +
   facet_wrap(~nutrient)
 
-# model 1: each nutrient treatment has a different growth rate
-PAVImod1 <- lm(log_quant.mg ~ dpiI + highN:dpiI + highP:dpiI + highN:highP:dpiI, data = PAVIdat)
-summary(PAVImod1)
-RPVImod1 <- lm(log_quant.mg ~ dpiI + highN:dpiI + highP:dpiI + highN:highP:dpiI, data = RPVIdat)
-summary(RPVImod1)
+# model
+PAVImod <- glmmTMB(log_quant.mg ~ dpiI + highN:dpiI + highP:dpiI + highN:highP:dpiI + (1|set), data = PAVIdat)
+summary(PAVImod)
+RPVImod <- glmmTMB(log_quant.mg ~ dpiI + highN:dpiI + highP:dpiI + highN:highP:dpiI + (1|set), data = RPVIdat)
+summary(RPVImod)
 
-# model 2: N and P each have a different growth rate, no interaction
-PAVImod2 <- lm(log_quant.mg ~ dpiI + highN:dpiI + highP:dpiI, data = PAVIdat)
-summary(PAVImod2)
-RPVImod2 <- lm(log_quant.mg ~ dpiI + highN:dpiI + highP:dpiI, data = RPVIdat)
-summary(RPVImod2)
-
-# model 3: only N causes a different growth rate
-PAVImod3 <- lm(log_quant.mg ~ dpiI + highN:dpiI, data = PAVIdat)
-summary(PAVImod3)
-RPVImod3 <- lm(log_quant.mg ~ dpiI + highN:dpiI, data = RPVIdat)
-summary(RPVImod3)
-
-# model 4: only P causes a different growth rate
-PAVImod4 <- lm(log_quant.mg ~ dpiI + highP:dpiI, data = PAVIdat)
-summary(PAVImod4)
-RPVImod4 <- lm(log_quant.mg ~ dpiI + highP:dpiI, data = RPVIdat)
-summary(RPVImod4)
-
-# model 5: all growth rates are the same
-PAVImod5 <- lm(log_quant.mg ~ dpiI, data = PAVIdat)
-summary(PAVImod5)
-RPVImod5 <- lm(log_quant.mg ~ dpiI, data = RPVIdat)
-summary(RPVImod5)
-
-# compare
-anova(PAVImod1, PAVImod2) # no effect of losing interaction
-anova(PAVImod3, PAVImod5) # no effect of losing N
-anova(PAVImod4, PAVImod5) # no effect of losing P
-
-anova(RPVImod1, RPVImod2) # no effect of losing interaction
-anova(RPVImod3, RPVImod5) # no effect of losing N
-anova(RPVImod4, RPVImod5) # no effect of losing P
+# # model 2: N and P each have a different growth rate, no interaction
+# PAVImod2 <- lm(log_quant.mg ~ dpiI + highN:dpiI + highP:dpiI, data = PAVIdat)
+# summary(PAVImod2)
+# RPVImod2 <- lm(log_quant.mg ~ dpiI + highN:dpiI + highP:dpiI, data = RPVIdat)
+# summary(RPVImod2)
+# 
+# # model 3: only N causes a different growth rate
+# PAVImod3 <- lm(log_quant.mg ~ dpiI + highN:dpiI, data = PAVIdat)
+# summary(PAVImod3)
+# RPVImod3 <- lm(log_quant.mg ~ dpiI + highN:dpiI, data = RPVIdat)
+# summary(RPVImod3)
+# 
+# # model 4: only P causes a different growth rate
+# PAVImod4 <- lm(log_quant.mg ~ dpiI + highP:dpiI, data = PAVIdat)
+# summary(PAVImod4)
+# RPVImod4 <- lm(log_quant.mg ~ dpiI + highP:dpiI, data = RPVIdat)
+# summary(RPVImod4)
+# 
+# # model 5: all growth rates are the same
+# PAVImod5 <- lm(log_quant.mg ~ dpiI, data = PAVIdat)
+# summary(PAVImod5)
+# RPVImod5 <- lm(log_quant.mg ~ dpiI, data = RPVIdat)
+# summary(RPVImod5)
+# 
+# # compare
+# anova(PAVImod1, PAVImod2) # no effect of losing interaction
+# anova(PAVImod3, PAVImod5) # no effect of losing N
+# anova(PAVImod4, PAVImod5) # no effect of losing P
+# 
+# anova(RPVImod1, RPVImod2) # no effect of losing interaction
+# anova(RPVImod3, RPVImod5) # no effect of losing N
+# anova(RPVImod4, RPVImod5) # no effect of losing P
 
 # visualize
 PAVIsim1 <- PAVIdat %>%
   select(nutrient, highN, highP, dpiI) %>%
   unique() %>%
-  mutate(log_quant.mg = predict(PAVImod5, newdata = .),
+  mutate(set = NA) %>%
+  mutate(log_quant.mg = predict(PAVImod, newdata = ., re.form = NA),
          quant.mg = exp(log_quant.mg))
 
 ggplot(PAVIdat, aes(dpiI, quant.mg)) +
@@ -410,7 +411,8 @@ ggplot(PAVIdat, aes(dpiI, log_quant.mg)) +
 RPVIsim1 <- RPVIdat %>%
   select(nutrient, highN, highP, dpiI) %>%
   unique() %>%
-  mutate(quant.mg = exp(predict(RPVImod5, newdata = .)))
+  mutate(set = NA) %>%
+  mutate(quant.mg = exp(predict(RPVImod, newdata = ., re.form = NA)))
 
 ggplot(RPVIdat, aes(dpiI, quant.mg)) +
   geom_point() +
@@ -452,73 +454,90 @@ ggplot(RPVURdat, aes(dpiUR, log_quant.mg, color = nutrient)) +
   facet_wrap(~ role)
 # nutrient affects peak
 
-# linear model with no effects of nutrients
-PAVURmod1 <- lm(log_quant.mg ~ dpiUR, data = PAVURdat)
+# # linear model with no effects of nutrients
+# PAVURmod1 <- lm(log_quant.mg ~ dpiUR, data = PAVURdat)
+# summary(PAVURmod1)
+# RPVURmod1 <- lm(log_quant.mg ~ dpiUR, data = RPVURdat)
+# summary(RPVURmod1)
+# 
+# # polynomial model with no effects of nutrients
+# PAVURmod2 <- lm(log_quant.mg ~ dpiUR + I(dpiUR^2), data = PAVURdat)
+# summary(PAVURmod2)
+# RPVURmod2 <- lm(log_quant.mg ~ dpiUR + I(dpiUR^2), data = RPVURdat)
+# summary(RPVURmod2)
+# 
+# # compare shapes
+# anova(PAVURmod1, PAVURmod2) # not different
+# anova(RPVURmod1, RPVURmod2) # quadratic
+
+# polynomial model
+PAVURmod1 <- glmmTMB(log_quant.mg ~ highN * highP * role  * (dpiUR + I(dpiUR^2)) + (1|set), data = PAVURdat)
 summary(PAVURmod1)
-RPVURmod1 <- lm(log_quant.mg ~ dpiUR, data = RPVURdat)
+RPVURmod1 <- glmmTMB(log_quant.mg ~ highN * highP * role  * (dpiUR + I(dpiUR^2)) + (1|set), data = RPVURdat)
 summary(RPVURmod1)
 
-# polynomial model with no effects of nutrients
-PAVURmod2 <- lm(log_quant.mg ~ dpiUR + I(dpiUR^2), data = PAVURdat)
+# linear model
+PAVURmod2 <- glmmTMB(log_quant.mg ~ highN * highP * role  * dpiUR + (1|set), data = PAVURdat)
 summary(PAVURmod2)
-RPVURmod2 <- lm(log_quant.mg ~ dpiUR + I(dpiUR^2), data = RPVURdat)
+RPVURmod2 <- glmmTMB(log_quant.mg ~ highN * highP * role  * dpiUR + (1|set), data = RPVURdat)
 summary(RPVURmod2)
 
-# compare shapes
-anova(PAVURmod1, PAVURmod2) # not different
-anova(RPVURmod1, RPVURmod2) # quadratic
+# compare models
+AIC(PAVURmod1, PAVURmod2) # linear
+AIC(RPVURmod1, RPVURmod2) # polynomial
 
-# full model
-PAVURmod3 <- lm(log_quant.mg ~ highN * highP * role  * dpiUR, data = PAVURdat)
-summary(PAVURmod3)
-RPVURmod3 <- lm(log_quant.mg ~ highN * highP * role  * (dpiUR + I(dpiUR^2)), data = RPVURdat)
-summary(RPVURmod3)
+# save model
+PAVURmod <- PAVURmod2
+RPVURmod <- RPVURmod1
 
-drop1(PAVURmod3, test = "F")
-drop1(RPVURmod3, test = "F")
+# drop1(PAVURmod3, test = "F")
+# drop1(RPVURmod3, test = "F")
+# 
+# # remove 4-way interactions
+# PAVURmod4 <- update(PAVURmod3, .~. -highN:highP:role:dpiUR)
+# summary(PAVURmod4)
+# RPVURmod4 <- update(RPVURmod3, .~. -highN:highP:role:dpiUR-highN:highP:role:I(dpiUR^2))
+# summary(RPVURmod4)
+# 
+# drop1(PAVURmod4, test = "F")
+# drop1(RPVURmod4, test = "F")
+# 
+# # remove 3-way interactions
+# PAVURmod5 <- update(PAVURmod4, .~. -highN:highP:role-highN:highP:dpiUR-highN:role:dpiUR-highP:role:dpiUR)
+# summary(PAVURmod5)
+# RPVURmod5 <- update(RPVURmod4, .~. -highN:highP:role-highN:highP:dpiUR-highN:role:dpiUR-highP:role:dpiUR-
+#                       highN:highP:I(dpiUR^2)-highN:role:I(dpiUR^2)-highP:role:I(dpiUR^2))
+# summary(RPVURmod5)
+# 
+# drop1(PAVURmod5, test = "F")
+# drop1(RPVURmod5, test = "F")
+# 
+# # remove 2-way interactions
+# PAVURmod6 <- lm(log_quant.mg ~ highN + highP + role  + dpiUR, data = PAVURdat)
+# summary(PAVURmod6)
+# RPVURmod6 <- lm(log_quant.mg ~ highN + highP + role  + dpiUR + I(dpiUR^2), data = RPVURdat)
+# summary(RPVURmod6)
+# 
+# drop1(PAVURmod6, test = "F") # none sig
+# drop1(RPVURmod6, test = "F") # keep time
+# 
+# # simplified model
+# PAVURmod7 <- lm(log_quant.mg ~ 1, data = PAVURdat)
+# summary(PAVURmod7)
+# summary(RPVURmod2)
+# 
+# add1(PAVURmod7, ~ highN + highP + role + dpiUR, test = "F") # no effect
+# add1(RPVURmod2, ~ .+ highN + highP + role, test = "F") # no effect
+# 
+# #plot(PAVURmod7)
+# #plot(RPVURmod2)
+# 
+# # PAV value
+# exp(coef(PAVURmod7)[1])
 
-# remove 4-way interactions
-PAVURmod4 <- update(PAVURmod3, .~. -highN:highP:role:dpiUR)
-summary(PAVURmod4)
-RPVURmod4 <- update(RPVURmod3, .~. -highN:highP:role:dpiUR-highN:highP:role:I(dpiUR^2))
-summary(RPVURmod4)
 
-drop1(PAVURmod4, test = "F")
-drop1(RPVURmod4, test = "F")
-
-# remove 3-way interactions
-PAVURmod5 <- update(PAVURmod4, .~. -highN:highP:role-highN:highP:dpiUR-highN:role:dpiUR-highP:role:dpiUR)
-summary(PAVURmod5)
-RPVURmod5 <- update(RPVURmod4, .~. -highN:highP:role-highN:highP:dpiUR-highN:role:dpiUR-highP:role:dpiUR-
-                      highN:highP:I(dpiUR^2)-highN:role:I(dpiUR^2)-highP:role:I(dpiUR^2))
-summary(RPVURmod5)
-
-drop1(PAVURmod5, test = "F")
-drop1(RPVURmod5, test = "F")
-
-# remove 2-way interactions
-PAVURmod6 <- lm(log_quant.mg ~ highN + highP + role  + dpiUR, data = PAVURdat)
-summary(PAVURmod6)
-RPVURmod6 <- lm(log_quant.mg ~ highN + highP + role  + dpiUR + I(dpiUR^2), data = RPVURdat)
-summary(RPVURmod6)
-
-drop1(PAVURmod6, test = "F") # none sig
-drop1(RPVURmod6, test = "F") # keep time
-
-# simplified model
-PAVURmod7 <- lm(log_quant.mg ~ 1, data = PAVURdat)
-summary(PAVURmod7)
-summary(RPVURmod2)
-
-add1(PAVURmod7, ~ highN + highP + role + dpiUR, test = "F") # no effect
-add1(RPVURmod2, ~ .+ highN + highP + role, test = "F") # no effect
-
-#plot(PAVURmod7)
-#plot(RPVURmod2)
-
-# PAV value
-exp(coef(PAVURmod7)[1])
-
+#### start here ####
+# update simulation datasets for new model fits
 
 #### visualize ####
 
@@ -571,19 +590,24 @@ legFig <- PAVdat %>%
 
 PAVISimFig <- PAVdat %>%
   filter(role == "invader") %>%
-  select(role, dpiI) %>%
+  select(role, dpiI, highN, highP) %>%
   unique() %>%
-  mutate(quant.mg = predict(PAVImod5, newdata = .),
-         quant.se = predict(PAVImod5, newdata = ., se.fit = T)$se.fit,
+  mutate(set = NA) %>%
+  mutate(quant.mg = predict(PAVImod, newdata = ., re.form = NA),
+         quant.se = predict(PAVImod, newdata = ., se.fit = T, re.form = NA)$se.fit,
          rel_quant.mg = exp(quant.mg)/maxPAV_quant.mg,
          rel_quant.max = exp(quant.mg + quant.se)/maxPAV_quant.mg,
          rel_quant.min = exp(quant.mg - quant.se)/maxPAV_quant.mg,
          Virus = "PAV") %>%
   full_join(tibble(dpiI = seq(min(RPVURdat$dpiI), max(RPVURdat$dpiI), length.out = 50),
                    dpiUR = seq(min(RPVURdat$dpiUR), max(RPVURdat$dpiUR), length.out = 50)) %>%
-              mutate(role = "resident") %>%
-              mutate(quant.mg = predict(RPVURmod2, newdata = .),
-                     quant.se = predict(RPVURmod2, newdata = ., se.fit = T)$se.fit,
+              expand_grid(tibble(highN = c(0, 1, 0, 1),
+                                 highP = c(0, 0, 1, 1),
+                                 nutrient = c("low", "+N", "+P", "+N+P"))) %>%
+              mutate(role = "resident",
+                     set = NA) %>%
+              mutate(quant.mg = predict(RPVURmod, newdata = ., re.form = NA),
+                     quant.se = predict(RPVURmod, newdata = ., se.fit = T, re.form = NA)$se.fit,
                      rel_quant.mg = exp(quant.mg)/maxRPV_quant.mg,
                      rel_quant.max = exp(quant.mg + quant.se)/maxRPV_quant.mg,
                      rel_quant.min = exp(quant.mg - quant.se)/maxRPV_quant.mg,

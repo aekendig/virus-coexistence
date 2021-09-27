@@ -420,7 +420,7 @@ cor.test(~ quant_mean + quant_var, data = samp_d)
 # the high variance ones are also the high mean ones
 
 # decided not to do below because:
-# the undetected samples don't have detected replacemens
+# the undetected samples don't have detected replacements
 # by removing the high variance samples, we're removing the high concentration samples
 
 # indicate which samples should be removed
