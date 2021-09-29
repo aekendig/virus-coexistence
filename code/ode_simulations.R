@@ -221,40 +221,46 @@ virus_dat <- comb_dat %>%
          nutrient = fct_recode(nutrient, "+N" = "N",
                                "+P" = "P",
                                "+N+P" = "N+P") %>%
-           fct_relevel("low", "+N", "+P"))
+           fct_relevel("low", "+N", "+P"),
+         log_conc = log10(conc + 1),
+         dpiR = time - 11)
 
-pav_dat <- virus_dat %>%
-  filter(virus == "BYDV-PAV") %>%
-  mutate(scenario = case_when(invader == "PAV" ~ "(A) BYDV-PAV invades",
-                              invader == "RPV" ~ "(B) BYDV-PAV resident"))
+res_dat <- virus_dat %>%
+  filter((virus == "BYDV-PAV" & invader == "RPV") | (virus == "CYDV-RPV" & invader == "PAV")) %>%
+  mutate(scenario = case_when(invader == "PAV" ~ "(A) CYDV-RPV resident",
+                              invader == "RPV" ~ "(B) BYDV-PAV resident")) %>%
+  filter(dpiR > 0)
 
-rpv_dat <- virus_dat %>%
-  filter(virus == "CYDV-RPV") %>%
-  mutate(scenario = case_when(invader == "PAV" ~ "(C) CYDV-RPV resident",
-                              invader == "RPV" ~ "(D) CYDV-RPV invades"))
+inv_dat <- virus_dat %>%
+  filter((virus == "BYDV-PAV" & invader == "PAV") | (virus == "CYDV-RPV" & invader == "RPV")) %>%
+  mutate(scenario = case_when(invader == "PAV" ~ "(C) BYDV-PAV invades",
+                              invader == "RPV" ~ "(D) CYDV-RPV invades")) %>%
+  filter(dpiR > 12)
 
 # virus figures
-pav_fig <- ggplot(pav_dat, aes(time, rel, linetype = nutrient, color = nutrient)) +
+res_fig <- ggplot(res_dat, aes(dpiR, log_conc, linetype = nutrient, color = nutrient)) +
   geom_line(size = 1.2) +
   facet_wrap(~scenario, scales = "free") +
-  scale_color_viridis_d(end = 0.9, name = "Nutrient") +
+  scale_color_viridis_d(end = 0.7, name = "Nutrient") +
   scale_linetype(name = "Nutrient") +
-  labs(x = "Time (days)", y = "BYDV-PAV relative titer") +
+  labs(x = "Time (days)", y = expression(paste("Resident virus titer (", log[10], ")", sep = ""))) +
+  scale_y_continuous(limits = c(0, 8.2)) +
   fig_theme +
-  theme(legend.position = c(0.1, 0.7),
+  theme(legend.position = c(0.1, 0.3),
         axis.title.x = element_blank())
 
-rpv_fig <- ggplot(rpv_dat, aes(time, rel, linetype = nutrient, color = nutrient)) +
+inv_fig <- ggplot(inv_dat, aes(dpiR, log_conc, linetype = nutrient, color = nutrient)) +
   geom_line(size = 1.2) +
   facet_wrap(~scenario, scales = "free") +
-  scale_color_viridis_d(end = 0.9) +
-  labs(x = "Time (days)", y = "CYDV-RPV relative titer") +
+  scale_color_viridis_d(end = 0.7) +
+  labs(x = "Time (days)", y = expression(paste("Invading virus titer (", log[10], ")", sep = ""))) +
+  scale_y_continuous(limits = c(0, 8.2)) +
   fig_theme +
   theme(legend.position = "none")
 
 # combine
 tiff("output/invasion_simulation_figure.tiff", width = 4.5, height = 4.5, units = "in", res = 300)
-plot_grid(pav_fig, rpv_fig,
+plot_grid(res_fig, inv_fig,
           nrow = 2,
           rel_heights = c(0.95, 1))
 dev.off()
@@ -295,7 +301,7 @@ Qp_lab <- tibble(time = 0, Q_p = Qmin_p, label = "Q['min,P']")
 # show one invader in main text and other in supplement because they look about the same
 pav_Rn_fig <- ggplot(pav_invader_dat, aes(time, R_n, linetype = nutrient, color = nutrient)) +
   geom_line(size = 1.2) +
-  scale_color_viridis_d(end = 0.9, name = "Nutrient") +
+  scale_color_viridis_d(end = 0.7, name = "Nutrient") +
   scale_linetype(name = "Nutrient") +
   labs(x = "Time (days)", y = "Environment N (g)", title = "(A)") +
   fig_theme +
@@ -303,14 +309,14 @@ pav_Rn_fig <- ggplot(pav_invader_dat, aes(time, R_n, linetype = nutrient, color 
 
 pav_Rp_fig <- ggplot(pav_invader_dat, aes(time, R_p, linetype = nutrient, color = nutrient)) +
   geom_line(size = 1.2) +
-  scale_color_viridis_d(end = 0.9) +
+  scale_color_viridis_d(end = 0.7) +
   labs(x = "Time (days)", y = "Environment P (g)", title = "(B)") +
   fig_theme +
   theme(legend.position = "none")
 
 pav_H_fig <- ggplot(pav_invader_dat, aes(time, H, linetype = nutrient, color = nutrient)) +
   geom_line(size = 1.2) +
-  scale_color_viridis_d(end = 0.9) +
+  scale_color_viridis_d(end = 0.7) +
   labs(x = "Time (days)", y = "Plant biomass (g)", title = "(C)") +
   fig_theme +
   theme(legend.position = "none")
@@ -320,7 +326,7 @@ pav_Qn_fig <- ggplot(pav_invader_dat, aes(time, Q_n)) +
   geom_text(data = Qn_lab, aes(label = label), parse = T, color = "black", fontface = "italic",
             size = 3, hjust = 0, vjust = 0, nudge_y = 1e-4) +
   geom_line(size = 1.2, aes(linetype = nutrient, color = nutrient)) +
-  scale_color_viridis_d(end = 0.9) +
+  scale_color_viridis_d(end = 0.7) +
   labs(x = "Time (days)", y = "Plant N concentration", title = "(D)") +
   fig_theme +
   theme(legend.position = "none")
@@ -330,7 +336,7 @@ pav_Qp_fig <- ggplot(pav_invader_dat, aes(time, Q_p)) +
   geom_text(data = Qp_lab, aes(label = label), parse = T, color = "black", fontface = "italic", 
             size = 3, hjust = 0, vjust = 0, nudge_y = 4e-5) +
   geom_line(size = 1.2, aes(linetype = nutrient, color = nutrient)) +
-  scale_color_viridis_d(end = 0.9) +
+  scale_color_viridis_d(end = 0.7) +
   labs(x = "Time (days)", y = "Plant P concentration", title = "(E)") +
   fig_theme +
   theme(legend.position = "none")
@@ -338,7 +344,7 @@ pav_Qp_fig <- ggplot(pav_invader_dat, aes(time, Q_p)) +
 pav_lim_fig <- ggplot(pav_invader_dat, aes(time, qlim, linetype = nutrient, color = nutrient)) +
   geom_line(size = 1.2) +
   #facet_wrap(~ lim_nut_V) + 
-  scale_color_viridis_d(end = 0.9) +
+  scale_color_viridis_d(end = 0.7) +
   labs(x = "Time (days)", title = "(F)", 
        y = expression(paste("Limiting nutrient ratio (", Q[min], "/Q)", sep = ""))) +
   fig_theme +
@@ -347,7 +353,7 @@ pav_lim_fig <- ggplot(pav_invader_dat, aes(time, qlim, linetype = nutrient, colo
 ggplot(pav_invader_dat, aes(time, Qlim, linetype = nutrient, color = nutrient)) +
   geom_line(size = 1.2) +
   #facet_wrap(~ lim_nut_H) + 
-  scale_color_viridis_d(end = 0.9) +
+  scale_color_viridis_d(end = 0.7) +
   labs(x = "Time (days)", y = "Limiting nutrient", title = "(F)") +
   fig_theme +
   theme(legend.position = "none")
