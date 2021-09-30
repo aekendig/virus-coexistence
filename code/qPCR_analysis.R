@@ -14,6 +14,29 @@ library(glmmTMB)
 # import data
 dat <- read_csv("intermediate-data/qPCR_expt_data_cleaned.csv")
 
+# function for exporting model summary
+mod_sum <- function(mod, filename){
+  
+  # fixed effect coefficients
+  mod_coef <- data.frame(coef(summary(mod))$cond) %>%
+    mutate(Variable = row.names(coef(summary(mod))$cond))
+  colnames(mod_coef) <- c("Estimate", "Std.error", "Z", "P", "Variable") 
+  mod_coef <- mod_coef %>%
+    relocate(Variable)
+  
+  # random effects
+  mod_ran <- data.frame(lme4::formatVC(summary(mod)$varcor$cond))
+  
+  # sample size
+  mod_n <- tibble(N = as.numeric(summary(mod)$nobs))
+  
+  # output
+  write.table(mod_coef, paste0("output/", filename,".csv"), col.names = T, row.names = F, sep=",")
+  write.table(mod_ran, paste0("output/", filename,".csv"), col.names = T, row.names = F, sep=",", append=TRUE)
+  write.table(mod_n, paste0("output/", filename,".csv"), col.names = T, row.names = F, sep=",", append=TRUE)
+
+}
+
 
 #### edit data ####
 
@@ -421,13 +444,17 @@ ggplot(RPVIdat, aes(dpiI, quant.mg)) +
   geom_line(data = RPVIsim1) +
   facet_wrap(~nutrient)
 
-# r values
-coef(PAVImod5)[2]
-coef(RPVImod5)[2]
+# # r values
+# coef(PAVImod5)[2]
+# coef(RPVImod5)[2]
+# 
+# # N0 values
+# exp(coef(PAVImod5)[1])
+# exp(coef(RPVImod5)[1])
 
-# N0 values
-exp(coef(PAVImod5)[1])
-exp(coef(RPVImod5)[1])
+# save
+mod_sum(PAVImod, "pav_invasion_model")
+mod_sum(RPVImod, "rpv_invasion_model")
 
 
 #### compare resident to single ####
@@ -491,6 +518,10 @@ AIC(RPVURmod1, RPVURmod2) # polynomial
 # save model
 PAVURmod <- PAVURmod2
 RPVURmod <- RPVURmod1
+
+# export
+mod_sum(PAVURmod, "pav_established_model")
+mod_sum(RPVURmod, "rpv_established_model")
 
 # drop1(PAVURmod3, test = "F")
 # drop1(RPVURmod3, test = "F")
