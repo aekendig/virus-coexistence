@@ -223,6 +223,9 @@ RPVdat <- dat5 %>%
          rel_quant.mg = quant.mg/max(quant.mg, na.rm = T),
          rel_log_quant.mg = log_quant.mg/max(log_quant.mg))
 
+# save
+write_csv(dat5, "intermediate-data/qPCR_analysis_script_data_cleaned.csv")
+
 
 #### estimate r, K, and N0 parameters ####
 
@@ -444,13 +447,13 @@ ggplot(RPVIdat, aes(dpiI, quant.mg)) +
   geom_line(data = RPVIsim1) +
   facet_wrap(~nutrient)
 
-# # r values
-# coef(PAVImod5)[2]
-# coef(RPVImod5)[2]
-# 
-# # N0 values
-# exp(coef(PAVImod5)[1])
-# exp(coef(RPVImod5)[1])
+# r values
+fixef(PAVImod)$cond[2]
+fixef(RPVImod)$cond[2]
+
+# N0 values
+exp(fixef(PAVImod)$cond[1])
+exp(fixef(RPVImod)$cond[1])
 
 # save
 mod_sum(PAVImod, "pav_invasion_model")

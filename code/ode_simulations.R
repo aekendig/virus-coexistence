@@ -300,34 +300,39 @@ Qp_lab <- tibble(time = 0, Q_p = Qmin_p, label = "Q['min,P']")
 # plant figures
 # show one invader in main text and other in supplement because they look about the same
 pav_Rn_fig <- ggplot(pav_invader_dat, aes(time, R_n, linetype = nutrient, color = nutrient)) +
-  geom_line(size = 1.2) +
-  scale_color_viridis_d(end = 0.7, name = "Nutrient") +
-  scale_linetype(name = "Nutrient") +
-  labs(x = "Time (days)", y = "Environment N (g)", title = "(A)") +
+  geom_line(aes(size = lim_nut_V)) +
+  scale_color_viridis_d(end = 0.7) +
+  scale_size_manual(values = c(1.2, 0.6)) +
+  labs(x = "Time (days)", y = "Environment N (g)", title = "(C)") +
   fig_theme +
-  theme(legend.position = c(0.77, 0.77))
+  theme(legend.position = "none")
 
 pav_Rp_fig <- ggplot(pav_invader_dat, aes(time, R_p, linetype = nutrient, color = nutrient)) +
-  geom_line(size = 1.2) +
+  geom_line(aes(size = lim_nut_V)) +
   scale_color_viridis_d(end = 0.7) +
-  labs(x = "Time (days)", y = "Environment P (g)", title = "(B)") +
+  scale_size_manual(values = c(1.2, 0.6)) +
+  labs(x = "Time (days)", y = "Environment P (g)", title = "(D)") +
   fig_theme +
   theme(legend.position = "none")
 
 pav_H_fig <- ggplot(pav_invader_dat, aes(time, H, linetype = nutrient, color = nutrient)) +
-  geom_line(size = 1.2) +
-  scale_color_viridis_d(end = 0.7) +
-  labs(x = "Time (days)", y = "Plant biomass (g)", title = "(C)") +
+  geom_line(aes(size = lim_nut_V)) +
+  scale_color_viridis_d(end = 0.7, name = "Nutrient") +
+  scale_linetype(name = "Nutrient") +
+  scale_size_manual(values = c(1.2, 0.6), guide = "none") +
+  labs(x = "Time (days)", y = "Plant biomass (g)", title = "(B)") +
   fig_theme +
-  theme(legend.position = "none")
+  theme(legend.position = c(0.23, 0.68)) +
+  guides(color = guide_legend(override.aes = list(size = 1.2)))
 
 pav_Qn_fig <- ggplot(pav_invader_dat, aes(time, Q_n)) +
   geom_hline(yintercept = Qmin_n, color = "black") +
   geom_text(data = Qn_lab, aes(label = label), parse = T, color = "black", fontface = "italic",
             size = 3, hjust = 0, vjust = 0, nudge_y = 1e-4) +
-  geom_line(size = 1.2, aes(linetype = nutrient, color = nutrient)) +
+  geom_line(aes(linetype = nutrient, color = nutrient, size = lim_nut_V)) +
   scale_color_viridis_d(end = 0.7) +
-  labs(x = "Time (days)", y = "Plant N concentration", title = "(D)") +
+  scale_size_manual(values = c(1.2, 0.6)) +
+  labs(x = "Time (days)", y = "Plant N concentration", title = "(E)") +
   fig_theme +
   theme(legend.position = "none")
 
@@ -335,34 +340,38 @@ pav_Qp_fig <- ggplot(pav_invader_dat, aes(time, Q_p)) +
   geom_hline(yintercept = Qmin_p, color = "black") +
   geom_text(data = Qp_lab, aes(label = label), parse = T, color = "black", fontface = "italic", 
             size = 3, hjust = 0, vjust = 0, nudge_y = 4e-5) +
-  geom_line(size = 1.2, aes(linetype = nutrient, color = nutrient)) +
+  geom_line(aes(linetype = nutrient, color = nutrient, size = lim_nut_V)) +
   scale_color_viridis_d(end = 0.7) +
-  labs(x = "Time (days)", y = "Plant P concentration", title = "(E)") +
+  scale_size_manual(values = c(1.2, 0.6)) +
+  labs(x = "Time (days)", y = "Plant P concentration", title = "(F)") +
   fig_theme +
   theme(legend.position = "none")
 
 pav_lim_fig <- ggplot(pav_invader_dat, aes(time, qlim, linetype = nutrient, color = nutrient)) +
-  geom_line(size = 1.2) +
-  #facet_wrap(~ lim_nut_V) + 
-  scale_color_viridis_d(end = 0.7) +
-  labs(x = "Time (days)", title = "(F)", 
+  geom_line(aes(size = lim_nut_V)) +
+  scale_color_viridis_d(end = 0.7, guide = "none") +
+  scale_linetype(guide = "none") +
+  scale_size_manual(values = c(1.2, 0.6), name = "Limiting nutrient",
+                    labels = c("N", "P")) +
+  labs(x = "Time (days)", title = "(A)", 
        y = expression(paste("Limiting nutrient ratio (", Q[min], "/Q)", sep = ""))) +
   fig_theme +
-  theme(legend.position = "none")
+  theme(legend.position = c(0.3, 0.8))
 
 ggplot(pav_invader_dat, aes(time, Qlim, linetype = nutrient, color = nutrient)) +
-  geom_line(size = 1.2) +
-  #facet_wrap(~ lim_nut_H) + 
+  geom_line(aes(size = lim_nut_H)) +
   scale_color_viridis_d(end = 0.7) +
-  labs(x = "Time (days)", y = "Limiting nutrient", title = "(F)") +
+  scale_size_manual(values = c(1.2, 0.6)) +
+  labs(x = "Time (days)", title = "(F)", 
+       y = expression(paste("Limiting nutrient ratio (", Q[min], "/Q)", sep = ""))) +
   fig_theme +
   theme(legend.position = "none")
 # same as the virus one because the qmin values were set equal to Qmin
 
 # combine figures
-pav_top_fig <- plot_grid(pav_Rn_fig, pav_Rp_fig, pav_H_fig,
+pav_top_fig <- plot_grid(pav_lim_fig, pav_H_fig, pav_Rn_fig,  
                          nrow = 1)
-pav_bot_fig <- plot_grid(pav_Qn_fig, pav_Qp_fig, pav_lim_fig,
+pav_bot_fig <- plot_grid(pav_Rp_fig, pav_Qn_fig, pav_Qp_fig, 
                          nrow = 1)
 
 tiff("output/pav_invasion_plant_simulation_figure.tiff", width = 6.5, height = 4.5, units = "in", res = 300)
@@ -382,9 +391,9 @@ rpv_Qp_fig <- pav_Qp_fig %+% rpv_invader_dat
 rpv_lim_fig <- pav_lim_fig %+% rpv_invader_dat
 
 # combine figures
-rpv_top_fig <- plot_grid(rpv_Rn_fig, rpv_Rp_fig, rpv_H_fig,
+rpv_top_fig <- plot_grid(rpv_lim_fig, rpv_H_fig, rpv_Rn_fig,  
                          nrow = 1)
-rpv_bot_fig <- plot_grid(rpv_Qn_fig, rpv_Qp_fig, rpv_lim_fig,
+rpv_bot_fig <- plot_grid(rpv_Rp_fig, rpv_Qn_fig, rpv_Qp_fig, 
                          nrow = 1)
 
 tiff("output/rpv_invasion_plant_simulation_figure.tiff", width = 6.5, height = 4.5, units = "in", res = 300)
