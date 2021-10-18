@@ -212,7 +212,9 @@ PAVdat <- dat5 %>%
          log10_quant.mg = log10(quant.mg + 1),
          role = PAV_role,
          rel_quant.mg = quant.mg/max(quant.mg, na.rm = T),
-         rel_log_quant.mg = log_quant.mg/max(log_quant.mg))
+         rel_log_quant.mg = log_quant.mg/max(log_quant.mg),
+         quant.plant = quant.mg * shoot_mass.g,
+         log_quant.plant = log(quant.plant + 1))
 
 RPVdat <- dat5 %>%
   filter(!is.na(RPV_role) & !is.na(RPV_quant.mg)) %>%
@@ -221,7 +223,9 @@ RPVdat <- dat5 %>%
          log10_quant.mg = log10(quant.mg + 1),
          role = RPV_role,
          rel_quant.mg = quant.mg/max(quant.mg, na.rm = T),
-         rel_log_quant.mg = log_quant.mg/max(log_quant.mg))
+         rel_log_quant.mg = log_quant.mg/max(log_quant.mg),
+         quant.plant = quant.mg * shoot_mass.g,
+         log_quant.plant = log(quant.plant + 1))
 
 # save
 write_csv(dat5, "intermediate-data/qPCR_analysis_script_data_cleaned.csv")
@@ -365,6 +369,10 @@ ggplot(PAVIdat, aes(dpiI, log_quant.mg)) +
   geom_line(data = PAVIsim) +
   facet_wrap(~nutrient)
 
+ggplot(PAVIdat, aes(dpiI, log_quant.plant)) +
+  geom_point() +
+  facet_wrap(~nutrient)
+
 # simulated data/starting values
 RPVIsim <- RPVIdat %>%
   select(dpiI) %>%
@@ -379,11 +387,21 @@ ggplot(RPVIdat, aes(dpiI, log_quant.mg)) +
   geom_line(data = RPVIsim) +
   facet_wrap(~nutrient)
 
-# model
+ggplot(RPVIdat, aes(dpiI, log_quant.plant)) +
+  geom_point() +
+  facet_wrap(~nutrient)
+
+# model with log-transformed titer
 PAVImod <- glmmTMB(log_quant.mg ~ dpiI + highN:dpiI + highP:dpiI + highN:highP:dpiI + (1|set), data = PAVIdat)
 summary(PAVImod)
 RPVImod <- glmmTMB(log_quant.mg ~ dpiI + highN:dpiI + highP:dpiI + highN:highP:dpiI + (1|set), data = RPVIdat)
 summary(RPVImod)
+
+# model with plant-scale titer
+PAVImod2 <- glmmTMB(log_quant.plant ~ dpiI + highN:dpiI + highP:dpiI + highN:highP:dpiI + (1|set), data = PAVIdat)
+summary(PAVImod2)
+RPVImod2 <- glmmTMB(log_quant.plant ~ dpiI + highN:dpiI + highP:dpiI + highN:highP:dpiI + (1|set), data = RPVIdat)
+summary(RPVImod2)
 
 # # model 2: N and P each have a different growth rate, no interaction
 # PAVImod2 <- lm(log_quant.mg ~ dpiI + highN:dpiI + highP:dpiI, data = PAVIdat)
@@ -418,7 +436,7 @@ summary(RPVImod)
 # anova(RPVImod3, RPVImod5) # no effect of losing N
 # anova(RPVImod4, RPVImod5) # no effect of losing P
 
-# visualize
+# visualize model 1
 PAVIsim1 <- PAVIdat %>%
   select(nutrient, highN, highP, dpiI) %>%
   unique() %>%
@@ -445,6 +463,35 @@ RPVIsim1 <- RPVIdat %>%
 ggplot(RPVIdat, aes(dpiI, quant.mg)) +
   geom_point() +
   geom_line(data = RPVIsim1) +
+  facet_wrap(~nutrient)
+
+# visualize model 2
+PAVIsim2 <- PAVIdat %>%
+  select(nutrient, highN, highP, dpiI) %>%
+  unique() %>%
+  mutate(set = NA) %>%
+  mutate(log_quant.plant = predict(PAVImod2, newdata = ., re.form = NA),
+         quant.plant = exp(log_quant.plant))
+
+ggplot(PAVIdat, aes(dpiI, quant.plant)) +
+  geom_point() +
+  geom_line(data = PAVIsim2) +
+  facet_wrap(~nutrient)
+
+ggplot(PAVIdat, aes(dpiI, log_quant.plant)) +
+  geom_point() +
+  geom_line(data = PAVIsim2) +
+  facet_wrap(~nutrient)
+
+RPVIsim2 <- RPVIdat %>%
+  select(nutrient, highN, highP, dpiI) %>%
+  unique() %>%
+  mutate(set = NA) %>%
+  mutate(quant.plant = exp(predict(RPVImod2, newdata = ., re.form = NA)))
+
+ggplot(RPVIdat, aes(dpiI, quant.plant)) +
+  geom_point() +
+  geom_line(data = RPVIsim2) +
   facet_wrap(~nutrient)
 
 # r values
@@ -479,12 +526,24 @@ ggplot(PAVURdat, aes(dpiUR, log_quant.mg, color = nutrient)) +
   facet_wrap(~ role)
 # role affects intercept and linearity
 
+ggplot(PAVURdat, aes(dpiUR, log_quant.plant, color = nutrient)) +
+  stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0) +
+  stat_summary(geom = "line", fun = "mean") +
+  stat_summary(geom = "point", fun = "mean") +
+  facet_wrap(~ role)
+
 ggplot(RPVURdat, aes(dpiUR, log_quant.mg, color = nutrient)) +
   stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0) +
   stat_summary(geom = "line", fun = "mean") +
   stat_summary(geom = "point", fun = "mean") +
   facet_wrap(~ role)
 # nutrient affects peak
+
+ggplot(RPVURdat, aes(dpiUR, log_quant.plant, color = nutrient)) +
+  stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0) +
+  stat_summary(geom = "line", fun = "mean") +
+  stat_summary(geom = "point", fun = "mean") +
+  facet_wrap(~ role)
 
 # # linear model with no effects of nutrients
 # PAVURmod1 <- lm(log_quant.mg ~ dpiUR, data = PAVURdat)
@@ -525,6 +584,23 @@ RPVURmod <- RPVURmod1
 # export
 mod_sum(PAVURmod, "pav_established_model")
 mod_sum(RPVURmod, "rpv_established_model")
+
+# polynomial model with total titer
+PAVURmod3 <- glmmTMB(log_quant.plant ~ highN * highP * role  * (dpiUR + I(dpiUR^2)) + (1|set), data = PAVURdat)
+summary(PAVURmod3)
+RPVURmod3 <- glmmTMB(log_quant.plant ~ highN * highP * role  * (dpiUR + I(dpiUR^2)) + (1|set), data = RPVURdat)
+summary(RPVURmod3)
+
+# linear model
+PAVURmod4 <- glmmTMB(log_quant.plant ~ highN * highP * role  * dpiUR + (1|set), data = PAVURdat)
+summary(PAVURmod4)
+RPVURmod4 <- glmmTMB(log_quant.plant ~ highN * highP * role  * dpiUR + (1|set), data = RPVURdat)
+summary(RPVURmod4)
+
+# compare models
+AIC(PAVURmod3, PAVURmod4) # linear (by 3)
+AIC(RPVURmod3, RPVURmod4) # polynomial
+
 
 # drop1(PAVURmod3, test = "F")
 # drop1(RPVURmod3, test = "F")
