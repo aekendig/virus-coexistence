@@ -391,7 +391,7 @@ ggplot(RPVIdat, aes(dpiI, log_quant.plant)) +
   geom_point() +
   facet_wrap(~nutrient)
 
-# model with log-transformed titer
+# model with titer concentration
 PAVImod <- glmmTMB(log_quant.mg ~ dpiI + highN:dpiI + highP:dpiI + highN:highP:dpiI + (1|set), data = PAVIdat)
 summary(PAVImod)
 RPVImod <- glmmTMB(log_quant.mg ~ dpiI + highN:dpiI + highP:dpiI + highN:highP:dpiI + (1|set), data = RPVIdat)
@@ -502,9 +502,15 @@ fixef(RPVImod)$cond[2]
 exp(fixef(PAVImod)$cond[1])
 exp(fixef(RPVImod)$cond[1])
 
+# marginal N effect
+dpiN_RPV <- fixef(RPVImod2)$cond[2] + fixef(RPVImod2)$cond[3]
+(dpiN_RPV - fixef(RPVImod2)$cond[2]) / fixef(RPVImod2)$cond[2]
+
 # save
 mod_sum(PAVImod, "pav_invasion_model")
 mod_sum(RPVImod, "rpv_invasion_model")
+mod_sum(PAVImod2, "pav_invasion_per_plant_model")
+mod_sum(RPVImod2, "rpv_invasion_per_plant_model")
 
 
 #### compare resident to single ####
@@ -600,6 +606,10 @@ summary(RPVURmod4)
 # compare models
 AIC(PAVURmod3, PAVURmod4) # linear (by 3)
 AIC(RPVURmod3, RPVURmod4) # polynomial
+
+# export
+mod_sum(PAVURmod4, "pav_established_per_plant_model")
+mod_sum(RPVURmod3, "rpv_established_per_plant_model")
 
 
 # drop1(PAVURmod3, test = "F")
