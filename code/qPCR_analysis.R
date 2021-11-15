@@ -76,7 +76,7 @@ dat2 %>%
 
 dat2 %>%
   filter(invasion == "I" & resident_est == 0) 
-# 32 failed invasions
+# 32 failed establishments
 
 dat2 %>%
   filter(invasion == "S" & uninvaded_cont == 1)

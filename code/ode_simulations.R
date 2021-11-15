@@ -52,6 +52,14 @@ R0_p_lo <- a_p_hi * R0_const
 R0_p_hi <- a_p_hi * R0_const
 V0_b <- V0_c <- 100000
 
+# time intervals
+plant_days <- 11
+res_days <- 12
+inv_days <- 19
+
+# to-do create long-term simulation to demonstrate that values equilibrate
+# inv_days <- 1000-plant_days-res_days
+
 
 #### model ####
 
@@ -106,13 +114,13 @@ sim_fun <- function(N_level, P_level, nut_trt, first_virus){
   
   # plant model
   plant_mod <- ode(c(R_n = R0_n, R_p = R0_p, Q_n = Q0_n, Q_p = Q0_p, H = H0, V_b = 0, V_c = 0),
-                   seq(0, 11, length.out = 100), plant_virus_model, c(a_n = a_n, a_p = a_p)) %>%
+                   seq(0, plant_days, length.out = 100), plant_virus_model, c(a_n = a_n, a_p = a_p)) %>%
     as_tibble() %>%
     mutate(across(everything(), as.double))
     
   # final time
   plant_init <- plant_mod %>%
-    filter(time == 11)
+    filter(time == plant_days)
   
   # virus initial conditions
   y0_first_virus <- c(R_n = pull(plant_init, R_n), 
@@ -124,26 +132,26 @@ sim_fun <- function(N_level, P_level, nut_trt, first_virus){
                       V_c = if_else(first_virus == "RPV", V0_c, 0))
   
   # first virus model
-  first_virus_mod <- ode(y0_first_virus, seq(0, 12, length.out = 100),
+  first_virus_mod <- ode(y0_first_virus, seq(0, res_days, length.out = 100),
                          plant_virus_model, c(a_n = a_n, a_p = a_p)) %>%
     as_tibble() %>%
     mutate(across(everything(), as.double))
   
   # final time
   first_virus_init <- first_virus_mod %>%
-    filter(time == 12)
+    filter(time == res_days)
   
   # virus initial conditions
-  y0_second_virus <- c(R_n = pull(first_virus_init, R_n), 
-                      R_p = pull(first_virus_init, R_p), 
-                      Q_n = pull(first_virus_init, Q_n), 
-                      Q_p = pull(first_virus_init, Q_p), 
-                      H = pull(first_virus_init, H), 
+  y0_second_virus <- c(R_n = pull(first_virus_init, R_n),
+                      R_p = pull(first_virus_init, R_p),
+                      Q_n = pull(first_virus_init, Q_n),
+                      Q_p = pull(first_virus_init, Q_p),
+                      H = pull(first_virus_init, H),
                       V_b = if_else(first_virus == "PAV", pull(first_virus_init, V_b), V0_b),
                       V_c = if_else(first_virus == "RPV", pull(first_virus_init, V_c), V0_c))
   
   # first virus model
-  second_virus_mod <- ode(y0_second_virus, seq(0, 19, length.out = 100),
+  second_virus_mod <- ode(y0_second_virus, seq(0, inv_days, length.out = 100),
                          plant_virus_model, c(a_n = a_n, a_p = a_p)) %>%
     as_tibble() %>%
     mutate(across(everything(), as.double))
@@ -151,9 +159,9 @@ sim_fun <- function(N_level, P_level, nut_trt, first_virus){
   # combine models
   mod_out <- plant_mod %>%
     full_join(first_virus_mod %>%
-                mutate(time = time + 11)) %>%
+                mutate(time = time + plant_days)) %>%
     full_join(second_virus_mod %>%
-                mutate(time = time + 11 + 12)) %>%
+                mutate(time = time + plant_days + res_days)) %>%
     mutate(nutrient = nut_trt,
            resident = first_virus,
            invader = if_else(resident == "PAV", "RPV", "PAV"))
@@ -223,7 +231,7 @@ virus_dat <- comb_dat %>%
                                "+N+P" = "N+P") %>%
            fct_relevel("low", "+N", "+P"),
          log_conc = log10(conc + 1),
-         dpiR = time - 11)
+         dpiR = time - plant_days)
 
 res_dat <- virus_dat %>%
   filter((virus == "BYDV-PAV" & invader == "RPV") | (virus == "CYDV-RPV" & invader == "PAV")) %>%
@@ -235,7 +243,7 @@ inv_dat <- virus_dat %>%
   filter((virus == "BYDV-PAV" & invader == "PAV") | (virus == "CYDV-RPV" & invader == "RPV")) %>%
   mutate(scenario = case_when(invader == "PAV" ~ "(C) BYDV-PAV invades",
                               invader == "RPV" ~ "(D) CYDV-RPV invades")) %>%
-  filter(dpiR > 12)
+  filter(dpiR > 0)
 
 # virus figures
 res_fig <- ggplot(res_dat, aes(dpiR, log_conc, linetype = nutrient, color = nutrient)) +

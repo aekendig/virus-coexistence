@@ -271,7 +271,7 @@ plant_wrapper <- function(g, m){
     facet_wrap(~ variable, scales = "free")
 }
 
-manipulate(plant_wrapper(g, m), g = slider(0.001, 1), m = slider(0.001, 1))
+manipulate(plant_wrapper(g, m), g = slider(0.001, 4), m = slider(0.001, 4))
 # m ~ 0.05
 # g ~ 0.4
 # fits high N and P best
@@ -344,7 +344,7 @@ plant_fig <- ggplot(mock_NP, aes(time, value)) +
 
 virus_model = function (t, yy, parms) { 
   
-  # supply rates
+  # unknown parameters and supply rates
   r = parms[1];
   a_n = ifelse(length(parms) > 1, parms[2], a_n);
   a_p = ifelse(length(parms) > 2, parms[3], a_p);
@@ -483,39 +483,43 @@ virus_wrapper <- function(r, c, species){
     facet_wrap(~ variable, scales = "free")
 }
 
+# ignore declines in virus titer
+# these lead to parameter values that prevent persistence
+
 # PAV
 z_n <- z_nb
 z_p <- z_pb
-manipulate(virus_wrapper(r, c, species = "PAV"), r = slider(0.001, 2), c = slider(0.001, 1))
+manipulate(virus_wrapper(r, c, species = "PAV"), r = slider(0.001, 6), c = slider(0.001, 1))
 # aiming to fit N+P with others close
-# r ~ 1.2
-# c ~ 0.8
+# r ~ 0.3
+# c ~ 0.02
+# only use through dpi = 19
 
 # RPV
 z_n <- z_nc
 z_p <- z_pc
 manipulate(virus_wrapper(r, c, species = "RPV"), r = slider(0.001, 2), c = slider(0.001, 1))
-# fits P data the best because of peak timing (again)
-# over predicts N and N+P
-# r ~ 1.4
-# c ~ 0.8
+# aiming to fit N+P with others close
+# r ~ 0.6
+# c ~ 0.1
+# only use through dpi = 16
 
 # set c so that we only estimate one parameter
-c_b <- 0.8
-c_c <- 0.8
+c_b <- 0.02
+c_c <- 0.1
 
 
 #### compare virus model to observations ####
 
 # data
 pav_NP <- pav %>%
-  filter(nutrient == "N+P") %>%
+  filter(nutrient == "N+P" & dpi <= 19) %>%
   rename("name" = "variable") %>%
   select(name, time, value) %>%
   data.frame()
 
 rpv_NP <- rpv %>%
-  filter(nutrient == "N+P") %>%
+  filter(nutrient == "N+P" & dpi <= 16) %>%
   rename("name" = "variable") %>%
   select(name, time, value) %>%
   data.frame()
@@ -524,18 +528,22 @@ rpv_NP <- rpv %>%
 a_n <- a_n_hi
 a_p <- a_p_hi
 
+# times
+times_pav <- seq(0, max(pav_NP$time), length.out = 100)
+times_rpv <- seq(0, max(rpv_NP$time), length.out = 100)
+
 # cost functions
 pav_cost <- function(input_virus){ 
   r = input_virus[1];
   out = ode(y = virus_init_fun("high", "high"), 
-            times = times, func = virus_model, parms = c(r = r))
+            times = times_pav, func = virus_model, parms = c(r = r))
   return(modCost(model = out[ , c("time", "V")], obs = pav_NP, y = "value"))   
 }
 
 rpv_cost <- function(input_virus){ 
   r = input_virus[1];
   out = ode(y = virus_init_fun("high", "high"), 
-            times = times, func = virus_model, parms = c(r = r))
+            times = times_rpv, func = virus_model, parms = c(r = r))
   return(modCost(model = out[ , c("time", "V")], obs = rpv_NP, y = "value"))   
 }
 
@@ -543,8 +551,8 @@ rpv_cost <- function(input_virus){
 #### estimate virus parameters ####
 
 #initial guess
-input_pav <- c(1.2)
-input_rpv <- c(1.4)
+input_pav <- c(0.3)
+input_rpv <- c(0.6)
 
 # fit PAV model
 z_n <- z_nb
@@ -579,13 +587,17 @@ c <- c_b
 z_n <- z_nb
 z_p <- z_pb
 pred_pav <- ode(y = virus_init_fun("high", "high"),
-                times = times, func = virus_model, parms = c(r_b)) %>%
+                times = times_pav, func = virus_model, parms = c(r_b)) %>%
   as_tibble() %>%
   mutate(across(everything(), as.double),
          time = time + 11)
 
 # add time to data
-pav_NP2 <- pav_NP %>%
+pav_NP2 <- pav %>%
+  filter(nutrient == "N+P") %>%
+  rename("name" = "variable") %>%
+  select(name, time, value) %>%
+  data.frame() %>%
   mutate(time = time + 11)
 
 # visualize
@@ -593,8 +605,9 @@ pav_fig <- ggplot(pav_NP2, aes(time, value)) +
   stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0) +
   stat_summary(geom = "point", fun = "mean") +
   geom_line(data = pred_pav, aes(y = V)) +
-  labs(x = "Time (days)", y = expression(paste("PAV concentration (", g^-1, ")", sep = "")), title = "(B) PAV growth rate") +
-  fig_theme
+  labs(x = "Time (days)", y = expression(paste("BYDV-PAV conc. (", g^-1, ")", sep = "")), title = "(B) BYDV-PAV growth rate") +
+  fig_theme +
+  theme(plot.title = element_text(size = 9, vjust = 0, hjust = 0.5))
 
 # fit RPV model
 r_c <- fit_rpv$par[1];
@@ -602,13 +615,17 @@ c <- c_c
 z_n <- z_nc
 z_p <- z_pc
 pred_rpv <- ode(y = virus_init_fun("high", "high"), 
-                times = times, func = virus_model, parms = c(r_c)) %>%
+                times = times_rpv, func = virus_model, parms = c(r_c)) %>%
   as_tibble() %>%
   mutate(across(everything(), as.double),
          time = time + 11)
 
 # add time to data
-rpv_NP2 <- rpv_NP %>%
+rpv_NP2 <- rpv %>%
+  filter(nutrient == "N+P") %>%
+  rename("name" = "variable") %>%
+  select(name, time, value) %>%
+  data.frame() %>%
   mutate(time = time + 11)
 
 # visualize
@@ -616,9 +633,9 @@ rpv_fig <- ggplot(rpv_NP2, aes(time, value)) +
   stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0) +
   stat_summary(geom = "point", fun = "mean") +
   geom_line(data = pred_rpv, aes(y = V)) +
-  labs(x = "Time (days)", y = expression(paste("RPV concentration (", g^-1, ")", sep = "")), title = "(C) RPV growth rate") +
+  labs(x = "Time (days)", y = expression(paste("CYDV-RPV conc. (", g^-1, ")", sep = "")), title = "(C) CYDV-RPV growth rate") +
   fig_theme +
-  theme(plot.title = element_text(size = 9, vjust = 0, hjust = 0.3))
+  theme(plot.title = element_text(size = 9, vjust = 0, hjust = 0.5))
 
 
 #### output ####
