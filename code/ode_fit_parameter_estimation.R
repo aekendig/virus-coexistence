@@ -641,7 +641,7 @@ rpv_fig <- ggplot(rpv_NP2, aes(time, value)) +
 #### output ####
 
 # figure
-tiff("output/growth_rate_fit_figure.tiff", width = 6.5, height = 2, units = "in", res = 300)
+pdf("output/growth_rate_fit_figure.pdf", width = 6.5, height = 2)
 plot_grid(plant_fig, pav_fig, rpv_fig,
           nrow = 1)
 dev.off()

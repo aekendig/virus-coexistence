@@ -35,10 +35,10 @@ z_nc <- 1.7e-18
 z_pc <- 2.6e-19
 m <- 0.05
 g <- 0.29
-c_b <- 0.8
-c_c <- 0.8
-r_b <- 1.2
-r_c <- 1.4
+c_b <- 0.02
+c_c <- 0.1
+r_b <- 0.28
+r_c <- 0.63
 
 # initial values
 H0 <- 1e-3
@@ -50,15 +50,31 @@ R0_n_lo <- a_n_hi * R0_const
 R0_n_hi <- a_n_hi * R0_const
 R0_p_lo <- a_p_hi * R0_const
 R0_p_hi <- a_p_hi * R0_const
-V0_b <- V0_c <- 100000
 
-# time intervals
-plant_days <- 11
-res_days <- 12
-inv_days <- 19
+# figure settings
+fig_theme <- theme_bw() +
+  theme(panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.spacing.x = unit(0,"line"),
+        axis.text.y = element_text(size = 8, color = "black"),
+        axis.text.x = element_text(size = 8, color = "black"),
+        axis.title = element_text(size = 10),
+        axis.line = element_line(color = "black"),
+        legend.text = element_text(size = 8),
+        legend.title = element_text(size = 8),
+        legend.background = element_blank(),
+        legend.key.width = unit(7, "mm"),
+        legend.key.heigh = unit(5, "mm"),
+        strip.background = element_blank(),
+        strip.text = element_text(size = 11, hjust = 0),
+        strip.placement = "outside",
+        plot.title = element_text(size = 11, vjust = 0))
 
-# to-do create long-term simulation to demonstrate that values equilibrate
-# inv_days <- 1000-plant_days-res_days
+# figure labels
+Qn_lab <- tibble(time = 0, Q_n = Qmin_n, label = "Q['min,N']")
+Qp_lab <- tibble(time = 0, Q_p = Qmin_p, label = "Q['min,P']")
 
 
 #### model ####
@@ -169,8 +185,131 @@ sim_fun <- function(N_level, P_level, nut_trt, first_virus){
 }
 
 
-#### simulations ####
+#### long-term plant ####
 
+# time intervals
+plant_days <- 11
+res_days <- 12
+inv_days <- 500-plant_days-res_days
+# ran with 1000 days and system equilibrates by 500
+
+# viruses
+V0_b <- V0_c <- 0
+
+# simulations
+low_plant_sim <- sim_fun("low", "low", "low", "PAV")
+n_plant_sim <- sim_fun("high", "low", "N", "PAV")
+p_plant_sim <- sim_fun("low", "high", "P", "PAV")
+np_plant_sim <- sim_fun("high", "high", "N+P", "PAV")
+
+
+#### long-term plant figure ####
+
+# combine
+plant_dat <- low_plant_sim %>%
+  full_join(n_plant_sim) %>%
+  full_join(p_plant_sim) %>%
+  full_join(np_plant_sim) %>%
+  mutate(Qlim_n = Qmin_n / Q_n,
+         Qlim_p = Qmin_p / Q_p) %>%
+  rowwise() %>%
+  mutate(Qlim = max(Qlim_n, Qlim_p)) %>%
+  ungroup() %>%
+  mutate(nutrient = fct_recode(nutrient, "+N" = "N",
+                               "+P" = "P",
+                               "+N+P" = "N+P") %>%
+           fct_relevel("low", "+N", "+P"),
+         lim_nut_H = case_when(Qlim == Qlim_n ~ "Q[N]",
+                               Qlim == Qlim_p ~ "Q[P]"))
+
+# panels
+plant_Rn_fig <- ggplot(plant_dat, aes(time, R_n, linetype = nutrient, color = nutrient)) +
+  geom_line(aes(size = lim_nut_H)) +
+  scale_color_viridis_d(end = 0.7) +
+  scale_size_manual(values = c(1.2, 0.6)) +
+  labs(x = "Time (days)", y = "Environment N (g)", title = "(C)") +
+  fig_theme +
+  theme(legend.position = "none")
+
+plant_Rp_fig <- ggplot(plant_dat, aes(time, R_p, linetype = nutrient, color = nutrient)) +
+  geom_line(aes(size = lim_nut_H)) +
+  scale_color_viridis_d(end = 0.7) +
+  scale_size_manual(values = c(1.2, 0.6)) +
+  labs(x = "Time (days)", y = "Environment P (g)", title = "(D)") +
+  fig_theme +
+  theme(legend.position = "none")
+
+plant_H_fig <- ggplot(plant_dat, aes(time, H, linetype = nutrient, color = nutrient)) +
+  geom_line(aes(size = lim_nut_H)) +
+  scale_color_viridis_d(end = 0.7, guide = "none") +
+  scale_linetype(guide = "none") +
+  scale_size_manual(values = c(1.2, 0.6), name = "Limiting nutrient",
+                    labels = c("N", "P")) +
+  labs(x = "Time (days)", y = "Plant biomass (g)", title = "(B)") +
+  fig_theme +
+  theme(legend.position = c(0.5, 0.5))
+
+plant_Qn_fig <- ggplot(plant_dat, aes(time, Q_n)) +
+  geom_hline(yintercept = Qmin_n, color = "black") +
+  geom_text(data = Qn_lab, aes(label = label), parse = T, color = "black", fontface = "italic",
+            size = 3, hjust = 0, vjust = 0, nudge_y = -3e-3) +
+  geom_line(aes(linetype = nutrient, color = nutrient, size = lim_nut_H)) +
+  scale_color_viridis_d(end = 0.7) +
+  scale_size_manual(values = c(1.2, 0.6)) +
+  labs(x = "Time (days)", y = "Plant N concentration", title = "(E)") +
+  fig_theme +
+  theme(legend.position = "none")
+
+plant_Qp_fig <- ggplot(plant_dat, aes(time, Q_p)) +
+  geom_hline(yintercept = Qmin_p, color = "black") +
+  geom_text(data = Qp_lab, aes(label = label), parse = T, color = "black", fontface = "italic", 
+            size = 3, hjust = 0, vjust = 0, nudge_y = -1e-3) +
+  geom_line(aes(linetype = nutrient, color = nutrient, size = lim_nut_H)) +
+  scale_color_viridis_d(end = 0.7) +
+  scale_size_manual(values = c(1.2, 0.6)) +
+  labs(x = "Time (days)", y = "Plant P concentration", title = "(F)") +
+  fig_theme +
+  theme(legend.position = "none")
+
+plant_lim_fig <- ggplot(plant_dat, aes(time, Qlim, linetype = nutrient, color = nutrient)) +
+  geom_line(aes(size = lim_nut_H)) +
+  scale_color_viridis_d(end = 0.7, name = "Nutrient supply") +
+  scale_linetype(name = "Nutrient supply") +
+  scale_size_manual(values = c(1.2, 0.6), guide= "none") +
+  labs(x = "Time (days)", title = "(A)", 
+       y = expression(paste("Limiting nutrient ratio (", Q[min], "/Q)", sep = ""))) +
+  fig_theme +
+  theme(legend.position = c(0.5, 0.4)) +
+  guides(color = guide_legend(override.aes = list(size = 1.2)))
+
+# combine figures
+plant_top_fig <- plot_grid(plant_lim_fig, plant_H_fig, plant_Rn_fig,  
+                         nrow = 1)
+plant_bot_fig <- plot_grid(plant_Rp_fig, plant_Qn_fig, plant_Qp_fig, 
+                         nrow = 1)
+
+pdf("output/long_term_plant_simulation_figure.pdf", width = 6.5, height = 4.5)
+plot_grid(plant_top_fig, plant_bot_fig,
+          nrow = 2)
+dev.off()
+
+
+#### single virus ####
+
+#### start here ####
+
+
+#### virus invasion ####
+
+# time intervals
+plant_days <- 11
+res_days <- 12
+inv_days <- 19
+
+# viruses
+V0_b <- V0_c <- 100000
+
+# simulations
 low_pav_sim <- sim_fun("low", "low", "low", "PAV")
 n_pav_sim <- sim_fun("high", "low", "N", "PAV")
 p_pav_sim <- sim_fun("low", "high", "P", "PAV")
@@ -184,26 +323,7 @@ np_rpv_sim <- sim_fun("high", "high", "N+P", "RPV")
 
 #### virus figure ####
 
-# figure settings
-fig_theme <- theme_bw() +
-  theme(panel.background = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        panel.border = element_blank(),
-        panel.spacing.x = unit(0,"line"),
-        axis.text.y = element_text(size = 8, color = "black"),
-        axis.text.x = element_text(size = 8, color = "black"),
-        axis.title = element_text(size = 10),
-        axis.line = element_line(color = "black"),
-        legend.text = element_text(size = 8),
-        legend.title = element_text(size = 8),
-        legend.background = element_blank(),
-        legend.key.width = unit(7, "mm"),
-        legend.key.heigh = unit(5, "mm"),
-        strip.background = element_blank(),
-        strip.text = element_text(size = 11, hjust = 0),
-        strip.placement = "outside",
-        plot.title = element_text(size = 11, vjust = 0))
+
 
 # combine
 comb_dat <- low_pav_sim %>%
@@ -276,7 +396,7 @@ dev.off()
 
 #### plant figure with PAV data ####
 
-# edit plant dat
+# edit plant dat (change name, plant_dat used above)
 plant_dat <- comb_dat %>%
   mutate(Qlim_n = Qmin_n / Q_n,
          Qlim_p = Qmin_p / Q_p,
@@ -301,9 +421,6 @@ pav_invader_dat <- plant_dat %>%
 rpv_invader_dat <- plant_dat %>%
   filter(invader == "RPV")
 
-# labels
-Qn_lab <- tibble(time = 0, Q_n = Qmin_n, label = "Q['min,N']")
-Qp_lab <- tibble(time = 0, Q_p = Qmin_p, label = "Q['min,P']")
 
 # plant figures
 # show one invader in main text and other in supplement because they look about the same
