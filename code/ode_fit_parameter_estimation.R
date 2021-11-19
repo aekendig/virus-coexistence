@@ -174,7 +174,7 @@ H0 <- 1e-3
 Q0_const <- 10
 Q0_n <- Qmin_n * Q0_const
 Q0_p <- Qmin_p * Q0_const
-R0_const <- 3
+R0_const <- 10
 R0_n_lo <- a_n_hi * R0_const
 R0_n_hi <- a_n_hi * R0_const
 R0_p_lo <- a_p_hi * R0_const
@@ -217,13 +217,17 @@ mock <- dat5 %>%
   filter(inoc == "healthy") %>%
   mutate(variable = "H",
          value = full_mass_g,
-         time = dpp)
+         time = dpp,
+         nutrient = fct_recode(nutrient, "+N" = "N",
+                               "+P" = "P",
+                               "+N+P" = "N+P") %>%
+           fct_relevel("low", "+N", "+P"))
 
 # initiate slider for ggplot
 manipulate(plot(1:5, cex=size), size = slider(0.5,10,step=0.5))
 
 # time 
-times <- seq(0, max(dat5$dpp), length.out = 100)
+times <- seq(0, max(dat5$dpp)*2, length.out = 100)
 
 # wrapper function
 plant_wrapper <- function(g, m){
@@ -238,21 +242,21 @@ plant_wrapper <- function(g, m){
   out_N <- ode(c(R_n = R0_n_hi, R_p = R0_p_lo, Q_n = Q0_n, Q_p = Q0_p, H = H0),
                times, plant_model, c(g = g, a_n = a_n_hi, a_p = a_p_lo, m = m)) %>%
     as_tibble() %>%
-    mutate(nutrient = "N",
+    mutate(nutrient = "+N",
            across(!nutrient, as.double),
            nutrient = as.character(nutrient))
   
   out_P <- ode(c(R_n = R0_n_lo, R_p = R0_p_hi, Q_n = Q0_n, Q_p = Q0_p, H = H0),
                times, plant_model, c(g = g, a_n = a_n_lo, a_p = a_p_hi, m = m)) %>%
     as_tibble() %>%
-    mutate(nutrient = "P",
+    mutate(nutrient = "+P",
            across(!nutrient, as.double),
            nutrient = as.character(nutrient))
   
   out_NP <- ode(c(R_n = R0_n_hi, R_p = R0_p_hi, Q_n = Q0_n, Q_p = Q0_p, H = H0),
                 times, plant_model, c(g = g, a_n = a_n_hi, a_p = a_p_hi, m = m)) %>%
     as_tibble() %>%
-    mutate(nutrient = "N+P",
+    mutate(nutrient = "+N+P",
            across(!nutrient, as.double),
            nutrient = as.character(nutrient))
   
@@ -262,23 +266,37 @@ plant_wrapper <- function(g, m){
     full_join(out_NP) %>%
     pivot_longer(cols = c(R_n, R_p, Q_n, Q_p, H),
                  names_to = "variable",
-                 values_to = "value")
+                 values_to = "value") %>%
+    mutate(nutrient = fct_relevel(nutrient, "low", "+N", "+P"))
   
-  ggplot(out, aes(x = time, y = value, color = nutrient)) +
+  # use to visualize all values
+  # ggplot(out, aes(x = time, y = value, color = nutrient)) +
+  #   geom_line() +
+  #   stat_summary(data = mock, geom = "errorbar", width = 0, fun.data = "mean_se") +
+  #   stat_summary(data = mock, geom = "point", size = 2, fun = "mean") +
+  #   facet_wrap(~ variable, scales = "free")
+  
+  # overall mean of mock
+  mock_mean <- mock %>%
+    group_by(nutrient) %>%
+    summarize(value = mean(value)) %>%
+    ungroup()
+  
+  ggplot(filter(out, variable == "H"), aes(x = time, y = value)) +
     geom_line() +
-    stat_summary(data = mock, geom = "errorbar", width = 0, fun.data = "mean_se") +
-    stat_summary(data = mock, geom = "point", size = 2, fun = "mean") +
-    facet_wrap(~ variable, scales = "free")
+    geom_hline(data = mock_mean, aes(yintercept = value), linetype = "dashed") +
+    geom_point(data = mock) +
+    facet_wrap(~ nutrient, scales = "free")
 }
 
-manipulate(plant_wrapper(g, m), g = slider(0.001, 4), m = slider(0.001, 4))
-# m ~ 0.05
-# g ~ 0.4
-# fits high N and P best
+manipulate(plant_wrapper(g, m), g = slider(0.001, 1), m = slider(0.0001, 1))
+# m ~ 0.02
+# g ~ 0.30
+# N+P has the most data
 # predicted biomass of other treatments way lower
 
 # set m so that we only estimate one parameter
-m <- 0.05
+m <- 0.02
 
 
 #### compare plant model to observations ####
@@ -294,6 +312,9 @@ mock_NP <- mock %>%
 a_n <- a_n_hi
 a_p <- a_p_hi
 
+# time
+times <- seq(0, max(dat5$dpp), length.out = 100)
+
 # cost function
 plant_cost <- function(input_plant){ 
   g = input_plant[1];
@@ -307,7 +328,7 @@ plant_cost <- function(input_plant){
 #### estimate plant parameters ####
 
 #initial guess
-input_plant <- c(0.4) 
+input_plant <- c(0.3) 
 
 # fit model
 fit_plant <- modFit(plant_cost, input_plant, lower = c(0))
@@ -320,24 +341,18 @@ fit_plant$ms # mean squared residuals
 #### visualize plant model fit ####
 
 # save value
-g <- fit_plant$par[1]; # 0.29
+g <- fit_plant$par[1]; # 0.23
 
-# nutrients
-a_n <- a_n_hi
-a_p <- a_p_hi
+# time 
+times <- seq(0, max(dat5$dpp)*3, length.out = 100)
 
-# fit model
-pred_plant <- ode(y = c(R_n = R0_n_hi, R_p = R0_p_hi, Q_n = Q0_n, Q_p = Q0_p, H = H0),
-                  times = times, func = plant_model, parms = c(g)) %>%
-  as_tibble() %>%
-  mutate(across(everything(), as.double))
+# figure
+plant_wrapper(g, m) +
+  fig_theme +
+  labs(x = "Time (days)", y = "Plant biomass (g)")
 
-# visualize
-plant_fig <- ggplot(mock_NP, aes(time, value)) +
-  geom_point() +
-  geom_line(data = pred_plant, aes(y = H)) +
-  labs(x = "Time (days)", y = "Plant biomass (g)", title = "(A) Plant growth rate") +
-  fig_theme
+
+#### start here: fit virus parameters ####
 
 
 #### virus model ####

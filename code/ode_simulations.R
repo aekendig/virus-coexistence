@@ -33,8 +33,8 @@ z_nb <- 1.6e-18
 z_pb <- 2.6e-19
 z_nc <- 1.7e-18
 z_pc <- 2.6e-19
-m <- 0.05
-g <- 0.29
+m <- 0.05 # update
+g <- 0.29 # update
 c_b <- 0.02
 c_c <- 0.1
 r_b <- 0.28
@@ -45,7 +45,7 @@ H0 <- 1e-3
 Q0_const <- 10
 Q0_n <- Qmin_n * Q0_const
 Q0_p <- Qmin_p * Q0_const
-R0_const <- 3
+R0_const <- 10
 R0_n_lo <- a_n_hi * R0_const
 R0_n_hi <- a_n_hi * R0_const
 R0_p_lo <- a_p_hi * R0_const
