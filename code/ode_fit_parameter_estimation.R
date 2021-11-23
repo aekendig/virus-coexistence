@@ -226,9 +226,6 @@ mock <- dat5 %>%
 # initiate slider for ggplot
 manipulate(plot(1:5, cex=size), size = slider(0.5,10,step=0.5))
 
-# time 
-times <- seq(0, max(dat5$dpp)*2, length.out = 100)
-
 # wrapper function
 plant_wrapper <- function(g, m){
   
@@ -275,19 +272,22 @@ plant_wrapper <- function(g, m){
   #   stat_summary(data = mock, geom = "errorbar", width = 0, fun.data = "mean_se") +
   #   stat_summary(data = mock, geom = "point", size = 2, fun = "mean") +
   #   facet_wrap(~ variable, scales = "free")
+  # equilibrium well before 1000
   
-  # overall mean of mock
   mock_mean <- mock %>%
     group_by(nutrient) %>%
     summarize(value = mean(value)) %>%
     ungroup()
-  
+
   ggplot(filter(out, variable == "H"), aes(x = time, y = value)) +
     geom_line() +
     geom_hline(data = mock_mean, aes(yintercept = value), linetype = "dashed") +
     geom_point(data = mock) +
     facet_wrap(~ nutrient, scales = "free")
 }
+
+# time 
+times <- seq(0, max(dat5$dpp)*2, length.out = 100)
 
 manipulate(plant_wrapper(g, m), g = slider(0.001, 1), m = slider(0.0001, 1))
 # m ~ 0.02
@@ -303,7 +303,7 @@ m <- 0.02
 
 # data
 mock_NP <- mock %>%
-  filter(nutrient == "N+P") %>%
+  filter(nutrient == "+N+P") %>%
   rename("name" = "variable") %>%
   select(name, time, value) %>%
   data.frame()
@@ -345,14 +345,15 @@ g <- fit_plant$par[1]; # 0.23
 
 # time 
 times <- seq(0, max(dat5$dpp)*3, length.out = 100)
+times <- seq(0, 1300, length.out = 100)
 
 # figure
 plant_wrapper(g, m) +
-  fig_theme +
+  # fig_theme +
   labs(x = "Time (days)", y = "Plant biomass (g)")
 
 
-#### start here: fit virus parameters ####
+#### fit virus parameters ####
 
 
 #### virus model ####
@@ -392,13 +393,21 @@ pav <- dat5 %>%
   filter(inoc == "PAV") %>%
   mutate(variable = "V",
          value = conc_PAV,
-         time = dpi)
+         time = dpi,
+         nutrient = fct_recode(nutrient, "+N" = "N",
+                               "+P" = "P",
+                               "+N+P" = "N+P") %>%
+           fct_relevel("low", "+N", "+P"))
 
 rpv <- dat5 %>%
   filter(inoc == "RPV") %>%
   mutate(variable = "V",
          value = conc_RPV,
-         time = dpi)
+         time = dpi,
+         nutrient = fct_recode(nutrient, "+N" = "N",
+                               "+P" = "P",
+                               "+N+P" = "N+P") %>%
+           fct_relevel("low", "+N", "+P"))
 
 # min dpp
 min(pav$dpp)
@@ -413,18 +422,22 @@ virus_init_fun <- function(N_level, P_level){
   # initial resource values
   if(N_level == "low"){
     R0_n <- R0_n_lo
+    a_n <- a_n_lo
   }else{
     R0_n <- R0_n_hi
+    a_n <- a_n_hi
   }
   
   if(P_level == "low"){
     R0_p <- R0_p_lo
+    a_p <- a_p_lo
   }else{
     R0_p <- R0_p_hi
+    a_p <- a_p_hi
   }
   
   plant_init <- ode(y = c(R_n = R0_n, R_p = R0_p, Q_n = Q0_n, Q_p = Q0_p, H = H0), 
-                    times = seq(0, 11), func = plant_model, parms = c(g)) %>%
+                    times = seq(0, 11, length.out = 100), func = plant_model, parms = c(g, a_n, a_p)) %>%
     as_tibble() %>%
     mutate(across(everything(), as.double)) %>%
     filter(time == 11)
@@ -442,9 +455,6 @@ virus_init_fun <- function(N_level, P_level){
 
 # initiate slider for ggplot
 manipulate(plot(1:5, cex=size), size = slider(0.5,10,step=0.5))
-
-# time 
-times <- seq(0, max(dat5$dpi), length.out = 100)
 
 # wrapper function
 virus_wrapper <- function(r, c, species){
@@ -465,21 +475,21 @@ virus_wrapper <- function(r, c, species){
   out_N <- ode(virus_init_fun("high", "low"), 
                times, virus_model, c(r = r, a_n = a_n_hi, a_p = a_p_lo, c = c)) %>%
     as_tibble() %>%
-    mutate(nutrient = "N",
+    mutate(nutrient = "+N",
            across(!nutrient, as.double),
            nutrient = as.character(nutrient))
   
   out_P <- ode(virus_init_fun("low", "high"), 
                times, virus_model, c(r = r, a_n = a_n_lo, a_p = a_p_hi, c = c)) %>%
     as_tibble() %>%
-    mutate(nutrient = "P",
+    mutate(nutrient = "+P",
            across(!nutrient, as.double),
            nutrient = as.character(nutrient))
   
   out_NP <- ode(virus_init_fun("high", "high"), 
                 times, virus_model, c(r = r, a_n = a_n_hi, a_p = a_p_hi, c = c)) %>%
     as_tibble() %>%
-    mutate(nutrient = "N+P",
+    mutate(nutrient = "+N+P",
            across(!nutrient, as.double),
            nutrient = as.character(nutrient))
   
@@ -491,20 +501,33 @@ virus_wrapper <- function(r, c, species){
                  names_to = "variable",
                  values_to = "value")
   
-  ggplot(out, aes(x = time, y = value, color = nutrient)) +
+  # use to visualize all variables
+  # ggplot(out, aes(x = time, y = value, color = nutrient)) +
+  #   geom_line() +
+  #   stat_summary(data = virus, geom = "errorbar", width = 0, fun.data = "mean_se") +
+  #   stat_summary(data = virus, geom = "point", size = 2, fun = "mean") +
+  #   facet_wrap(~ variable, scales = "free")
+
+  virus_mean <- virus %>%
+    group_by(nutrient) %>%
+    summarize(value = mean(value)) %>%
+    ungroup()
+
+  ggplot(filter(out, variable == "V"), aes(x = time, y = value)) +
     geom_line() +
+    geom_hline(data = virus_mean, aes(yintercept = value), linetype = "dashed") +
     stat_summary(data = virus, geom = "errorbar", width = 0, fun.data = "mean_se") +
     stat_summary(data = virus, geom = "point", size = 2, fun = "mean") +
-    facet_wrap(~ variable, scales = "free")
+    facet_wrap(~ nutrient, scales = "free")
 }
 
-# ignore declines in virus titer
-# these lead to parameter values that prevent persistence
+# time 
+times <- seq(0, max(dat5$dpi) * 2, length.out = 100)
 
 # PAV
 z_n <- z_nb
 z_p <- z_pb
-manipulate(virus_wrapper(r, c, species = "PAV"), r = slider(0.001, 6), c = slider(0.001, 1))
+manipulate(virus_wrapper(r, c, species = "PAV"), r = slider(g, 5), c = slider(m, 1))
 # aiming to fit N+P with others close
 # r ~ 0.3
 # c ~ 0.02
@@ -513,7 +536,7 @@ manipulate(virus_wrapper(r, c, species = "PAV"), r = slider(0.001, 6), c = slide
 # RPV
 z_n <- z_nc
 z_p <- z_pc
-manipulate(virus_wrapper(r, c, species = "RPV"), r = slider(0.001, 2), c = slider(0.001, 1))
+manipulate(virus_wrapper(r, c, species = "RPV"), r = slider(g, 2), c = slider(m, 1))
 # aiming to fit N+P with others close
 # r ~ 0.6
 # c ~ 0.1
