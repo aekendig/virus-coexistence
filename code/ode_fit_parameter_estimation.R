@@ -1,5 +1,9 @@
 ## Goal: estimate plant and virus growth rates
 
+#### start here:
+# delete non "full" functions and remove "full" word
+# fit pathogen parameters
+
 
 #### set up ####
 
@@ -170,11 +174,11 @@ z_nc <- 1.7e-18
 z_pc <- 2.6e-19
  
 # initial values
-H0 <- 1e-3
+H0 <- 1e-2 # changed this 11/24/21 from 1e-3
 Q0_const <- 10
 Q0_n <- Qmin_n * Q0_const
 Q0_p <- Qmin_p * Q0_const
-R0_const <- 10
+R0_const <- 10 # used to be 3, which was based on nutrients supplied, maybe change back
 R0_n_lo <- a_n_hi * R0_const
 R0_n_hi <- a_n_hi * R0_const
 R0_p_lo <- a_p_hi * R0_const
@@ -209,22 +213,85 @@ plant_model = function (t, yy, parms) {
   return(list(c(dR_n, dR_p, dQ_n, dQ_p, dH)))
 }
 
+plant_model_full = function (t, yy, parms) { 
+  
+  # supply rates
+  m = parms[1];
+  g = ifelse(length(parms) == 2, parms[2], g);
+  
+  # set initial values
+  R_n_low = yy[1];
+  R_p_low = yy[2];
+  Q_n_low = yy[3];
+  Q_p_low = yy[4];
+  H_low = yy[5];
+  
+  R_n_n = yy[6];
+  R_p_n = yy[7];
+  Q_n_n = yy[8];
+  Q_p_n = yy[9];
+  H_n = yy[10];
+  
+  R_n_p = yy[11];
+  R_p_p = yy[12];
+  Q_n_p = yy[13];
+  Q_p_p = yy[14];
+  H_p = yy[15];
+  
+  R_n_np = yy[16];
+  R_p_np = yy[17];
+  Q_n_np = yy[18];
+  Q_p_np = yy[19];
+  H_np = yy[20];
+  
+  # model
+  dR_n_low = a_n_lo - (u_n * R_n_low * H_low) / (R_n_low + k_n);
+  dR_p_low = a_p_lo - (u_p * R_p_low * H_low) / (R_p_low + k_p);
+  dQ_n_low = (u_n * R_n_low) / (R_n_low + k_n) - min((1 - Qmin_n / Q_n_low), (1 - Qmin_p / Q_p_low)) * g * Q_n_low
+  dQ_p_low = (u_p * R_p_low) / (R_p_low + k_p) - min((1 - Qmin_n / Q_n_low), (1 - Qmin_p / Q_p_low)) * g * Q_p_low
+  dH_low = min((1 - Qmin_n / Q_n_low), (1 - Qmin_p / Q_p_low)) * g * H_low - m * H_low
+  
+  dR_n_n = a_n_hi - (u_n * R_n_n * H_n) / (R_n_n + k_n);
+  dR_p_n = a_p_lo - (u_p * R_p_n * H_n) / (R_p_n + k_p);
+  dQ_n_n = (u_n * R_n_n) / (R_n_n + k_n) - min((1 - Qmin_n / Q_n_n), (1 - Qmin_p / Q_p_n)) * g * Q_n_n
+  dQ_p_n = (u_p * R_p_n) / (R_p_n + k_p) - min((1 - Qmin_n / Q_n_n), (1 - Qmin_p / Q_p_n)) * g * Q_p_n
+  dH_n = min((1 - Qmin_n / Q_n_n), (1 - Qmin_p / Q_p_n)) * g * H_n - m * H_n
+  
+  dR_n_p = a_n_lo - (u_n * R_n_p * H_p) / (R_n_p + k_n);
+  dR_p_p = a_p_hi - (u_p * R_p_p * H_p) / (R_p_p + k_p);
+  dQ_n_p = (u_n * R_n_p) / (R_n_p + k_n) - min((1 - Qmin_n / Q_n_p), (1 - Qmin_p / Q_p_p)) * g * Q_n_p
+  dQ_p_p = (u_p * R_p_p) / (R_p_p + k_p) - min((1 - Qmin_n / Q_n_p), (1 - Qmin_p / Q_p_p)) * g * Q_p_p
+  dH_p = min((1 - Qmin_n / Q_n_p), (1 - Qmin_p / Q_p_p)) * g * H_p - m * H_p
+  
+  dR_n_np = a_n_hi - (u_n * R_n_np * H_np) / (R_n_np + k_n);
+  dR_p_np = a_p_hi - (u_p * R_p_np * H_np) / (R_p_np + k_p);
+  dQ_n_np = (u_n * R_n_np) / (R_n_np + k_n) - min((1 - Qmin_n / Q_n_np), (1 - Qmin_p / Q_p_np)) * g * Q_n_np
+  dQ_p_np = (u_p * R_p_np) / (R_p_np + k_p) - min((1 - Qmin_n / Q_n_np), (1 - Qmin_p / Q_p_np)) * g * Q_p_np
+  dH_np = min((1 - Qmin_n / Q_n_np), (1 - Qmin_p / Q_p_np)) * g * H_np - m * H_np
+  
+  return(list(c(dR_n_low, dR_p_low, dQ_n_low, dQ_p_low, dH_low,
+                dR_n_n, dR_p_n, dQ_n_n, dQ_p_n, dH_n,
+                dR_n_p, dR_p_p, dQ_n_p, dQ_p_p, dH_p,
+                dR_n_np, dR_p_np, dQ_n_np, dQ_p_np, dH_np)))
+}
+
 
 #### visualize plant parameters ####
 
 # data
 mock <- dat5 %>%
   filter(inoc == "healthy") %>%
-  mutate(variable = "H",
+  mutate(variable = case_when(nutrient == "low" ~ "H_low",
+                              nutrient == "N" ~ "H_n",
+                              nutrient == "P" ~ "H_p",
+                              nutrient == "N+P" ~ "H_np"),
+         variable2 = "H",
          value = full_mass_g,
          time = dpp,
          nutrient = fct_recode(nutrient, "+N" = "N",
                                "+P" = "P",
                                "+N+P" = "N+P") %>%
            fct_relevel("low", "+N", "+P"))
-
-# initiate slider for ggplot
-manipulate(plot(1:5, cex=size), size = slider(0.5,10,step=0.5))
 
 # wrapper function
 plant_wrapper <- function(g, m){
@@ -286,41 +353,84 @@ plant_wrapper <- function(g, m){
     facet_wrap(~ nutrient, scales = "free")
 }
 
+plant_wrapper_full <- function(m, g){
+  
+  out <- ode(c(R_n_low = R0_n_lo, R_p_low = R0_p_lo, Q_n_low = Q0_n, Q_p_low = Q0_p, H_low = H0,
+               R_n_n = R0_n_hi, R_p_n = R0_p_lo, Q_n_n = Q0_n, Q_p_n = Q0_p, H_n = H0,
+               R_n_p = R0_n_lo, R_p_p = R0_p_hi, Q_n_p = Q0_n, Q_p_p = Q0_p, H_p = H0,
+               R_n_np = R0_n_hi, R_p_np = R0_p_hi, Q_n_np = Q0_n, Q_p_np = Q0_p, H_np = H0),
+             times, plant_model_full, c(m = m, g = g)) %>%
+    as_tibble() %>%
+    mutate(across(everything(), as.double)) %>%
+    pivot_longer(cols = -time,
+                 names_to = "variable",
+                 values_to = "value") %>%
+    mutate(nutrient = case_when(str_ends(variable, "low") == T ~ "low",
+                                str_ends(variable, "np") == T ~ "+N+P",
+                                str_ends(variable, "n") == T ~ "+N",
+                                str_ends(variable, "p") == T ~ "+P"),
+           variable2 = case_when(str_starts(variable, "R_n") == T ~ "R_n",
+                                 str_starts(variable, "R_p") == T ~ "R_p",
+                                 str_starts(variable, "Q_n") == T ~ "Q_n",
+                                 str_starts(variable, "Q_p") == T ~ "Q_p",
+                                 str_starts(variable, "H") == T ~ "H"))
+  
+  # use to visualize all variables
+  # ggplot(out, aes(x = time, y = value, color = nutrient)) +
+  #   geom_line() +
+  #   stat_summary(data = mock, geom = "errorbar", width = 0, fun.data = "mean_se") +
+  #   stat_summary(data = mock, geom = "point", size = 2, fun = "mean") +
+  #   facet_wrap(~ variable2, scales = "free")
+  
+  mock_mean <- mock %>%
+    group_by(nutrient) %>%
+    summarize(value = mean(value)) %>%
+    ungroup()
+
+  # visualize only H
+  ggplot(filter(out, variable2 == "H"), aes(x = time, y = value)) +
+    geom_line() +
+    geom_hline(data = mock_mean, aes(yintercept = value), linetype = "dashed") +
+    geom_point(data = mock) +
+    facet_wrap(~ nutrient, scales = "free")
+
+  # return(out)
+}
+
+# initiate slider for ggplot
+manipulate(plot(1:5, cex=size), size = slider(0.5,10,step=0.5))
+
 # time 
 times <- seq(0, max(dat5$dpp)*2, length.out = 100)
 
-manipulate(plant_wrapper(g, m), g = slider(0.001, 1), m = slider(0.0001, 1))
-# m ~ 0.02
-# g ~ 0.30
-# N+P has the most data
-# predicted biomass of other treatments way lower
+manipulate(plant_wrapper_full(m, g), m = slider(0, 0.1), g = slider(0, 1))
+# g ~ 0.144
+# m ~ 0.004
 
-# set m so that we only estimate one parameter
-m <- 0.02
+# set g so that we only estimate one parameter
+g <- 0.144
 
 
 #### compare plant model to observations ####
 
 # data
-mock_NP <- mock %>%
-  filter(nutrient == "+N+P") %>%
+mock_fit <- mock %>%
   rename("name" = "variable") %>%
   select(name, time, value) %>%
   data.frame()
-
-# nutrient supply rates
-a_n <- a_n_hi
-a_p <- a_p_hi
 
 # time
 times <- seq(0, max(dat5$dpp), length.out = 100)
 
 # cost function
 plant_cost <- function(input_plant){ 
-  g = input_plant[1];
-  out = ode(y = c(R_n = R0_n_hi, R_p = R0_p_hi, Q_n = Q0_n, Q_p = Q0_p, H = H0),
-            times = times, func = plant_model, parms = c(g = g))
-  return(modCost(model = out[ , c("time", "H")], obs = mock_NP, y = "value"))   
+  m = input_plant[1];
+  out = ode(y = c(R_n_low = R0_n_lo, R_p_low = R0_p_lo, Q_n_low = Q0_n, Q_p_low = Q0_p, H_low = H0,
+                  R_n_n = R0_n_hi, R_p_n = R0_p_lo, Q_n_n = Q0_n, Q_p_n = Q0_p, H_n = H0,
+                  R_n_p = R0_n_lo, R_p_p = R0_p_hi, Q_n_p = Q0_n, Q_p_p = Q0_p, H_p = H0,
+                  R_n_np = R0_n_hi, R_p_np = R0_p_hi, Q_n_np = Q0_n, Q_p_np = Q0_p, H_np = H0),
+            times = times, func = plant_model_full, parms = c(m = m))
+  return(modCost(model = out[ , c("time", "H_low", "H_n", "H_p", "H_np")], obs = mock_fit, y = "value"))   
   # return(out[ , c("time", "H")]) #for troubleshooting
 }
 
@@ -328,7 +438,7 @@ plant_cost <- function(input_plant){
 #### estimate plant parameters ####
 
 #initial guess
-input_plant <- c(0.3) 
+input_plant <- c(0.004) 
 
 # fit model
 fit_plant <- modFit(plant_cost, input_plant, lower = c(0))
@@ -341,14 +451,13 @@ fit_plant$ms # mean squared residuals
 #### visualize plant model fit ####
 
 # save value
-g <- fit_plant$par[1]; # 0.23
+m <- fit_plant$par[1]; # 0.007
 
 # time 
-times <- seq(0, max(dat5$dpp)*3, length.out = 100)
-times <- seq(0, 1300, length.out = 100)
+times <- seq(0, max(dat5$dpp)*2, length.out = 100)
 
 # figure
-plant_wrapper(g, m) +
+plant_wrapper_full(m, g) +
   # fig_theme +
   labs(x = "Time (days)", y = "Plant biomass (g)")
 
