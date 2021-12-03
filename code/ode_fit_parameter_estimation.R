@@ -21,6 +21,7 @@ library(FME)
 library(manipulate)
 library(minpack.lm)
 library(cowplot)
+library(lemon)
 
 # import data
 sdat <- read_csv("./edi.411.2/data/sample_exp_molc_data.csv")
@@ -174,7 +175,7 @@ H0 <- 1e-2 # changed this 11/24/21 from 1e-3
 Q0_const <- 10
 Q0_n <- Qmin_n * Q0_const
 Q0_p <- Qmin_p * Q0_const
-R0_const <- 10 # used to be 3, which was based on nutrients supplied, maybe change back
+R0_const <- 10 # used to be 3, which was based on nutrients supplied, but nutrients are also in the seed
 R0_n_lo <- a_n_hi * R0_const
 R0_n_hi <- a_n_hi * R0_const
 R0_p_lo <- a_p_hi * R0_const
@@ -283,7 +284,8 @@ plant_wrapper <- function(m, g){
     mutate(nutrient = case_when(str_ends(variable, "low") == T ~ "low",
                                 str_ends(variable, "np") == T ~ "+N+P",
                                 str_ends(variable, "n") == T ~ "+N",
-                                str_ends(variable, "p") == T ~ "+P"),
+                                str_ends(variable, "p") == T ~ "+P") %>%
+             fct_relevel("low", "+N", "+P"),
            variable2 = case_when(str_starts(variable, "R_n") == T ~ "R_n",
                                  str_starts(variable, "R_p") == T ~ "R_p",
                                  str_starts(variable, "Q_n") == T ~ "Q_n",
@@ -297,19 +299,28 @@ plant_wrapper <- function(m, g){
   #   stat_summary(data = mock, geom = "point", size = 2, fun = "mean") +
   #   facet_wrap(~ variable2, scales = "free")
   
-  mock_mean <- mock %>%
-    group_by(nutrient) %>%
-    summarize(value = mean(value)) %>%
-    ungroup()
+  # mock_mean <- mock %>%
+  #   group_by(nutrient) %>%
+  #   summarize(value = mean(value)) %>%
+  #   ungroup()
+  # 
+  # # visualize only H
+  # ggplot(filter(out, variable2 == "H"), aes(x = time, y = value)) +
+  #   geom_line() +
+  #   geom_hline(data = mock_mean, aes(yintercept = value), linetype = "dashed") +
+  #   geom_point(data = mock) +
+  #   facet_wrap(~ nutrient, scales = "free")
 
-  # visualize only H
-  ggplot(filter(out, variable2 == "H"), aes(x = time, y = value)) +
+  # figure for supplement
+  ggplot(filter(out, variable2 == "H"), 
+         aes(x = time, y = value, linetype = nutrient, color = nutrient)) +
     geom_line() +
-    geom_hline(data = mock_mean, aes(yintercept = value), linetype = "dashed") +
     geom_point(data = mock) +
-    facet_wrap(~ nutrient, scales = "free")
-
-  # return(out)
+    facet_rep_wrap(~ nutrient, nrow = 1) +
+    scale_color_viridis_d(end = 0.7, name = "Nutrient supply") +
+    scale_linetype(name = "Nutrient supply") +
+    labs(x = "Time (days)", y = "Plant biomass (g)", title = "(A)") +
+    fig_theme
 }
 
 # initiate slider for ggplot
@@ -368,12 +379,10 @@ fit_plant$ms # mean squared residuals
 m <- fit_plant$par[1]; # 0.007
 
 # time 
-times <- seq(0, max(dat5$dpp)*2, length.out = 100)
+times <- seq(0, max(dat5$dpp), length.out = 100)
 
 # figure
-plant_wrapper(m, g) +
-  fig_theme +
-  labs(x = "Time (days)", y = "Plant biomass (g)")
+plant_fig <- plant_wrapper(m, g)
 
 
 #### fit virus parameters ####
@@ -565,31 +574,31 @@ virus_wrapper <- function(c, r, species, plant_time){
   #   stat_summary(data = virus, geom = "point", size = 2, fun = "mean") +
   #   facet_wrap(~ variable2, scales = "free")
   
-  virus_mean <- virus %>%
-    group_by(nutrient) %>%
-    summarize(value = mean(value)) %>%
-    ungroup()
-
-  # average raw data
-  ggplot(filter(out, variable2 == "V"), aes(x = time, y = value)) +
-    geom_line() +
-    geom_hline(data = virus_mean, aes(yintercept = value), linetype = "dashed") +
-    stat_summary(data = virus, geom = "errorbar", width = 0, fun.data = "mean_se") +
-    stat_summary(data = virus, geom = "point", size = 2, fun = "mean") +
-    facet_wrap(~ nutrient, scales = "free")
-  
-  # raw data points
+  # virus_mean <- virus %>%
+  #   group_by(nutrient) %>%
+  #   summarize(value = mean(value)) %>%
+  #   ungroup()
+  # 
+  # # average raw data
   # ggplot(filter(out, variable2 == "V"), aes(x = time, y = value)) +
   #   geom_line() +
-  #   geom_point(data = virus) +
+  #   geom_hline(data = virus_mean, aes(yintercept = value), linetype = "dashed") +
+  #   stat_summary(data = virus, geom = "errorbar", width = 0, fun.data = "mean_se") +
+  #   stat_summary(data = virus, geom = "point", size = 2, fun = "mean") +
   #   facet_wrap(~ nutrient, scales = "free")
+  
+  # raw data points
+  ggplot(filter(out, variable2 == "V"), aes(x = time, y = value)) +
+    geom_line() +
+    # geom_point(data = virus) +
+    facet_wrap(~ nutrient, scales = "free")
 }
 
 # initiate slider for ggplot
 manipulate(plot(1:5, cex=size), size = slider(0.5,10,step=0.5))
 
 # time 
-times <- seq(0, max(dat5$dpi) * 25, length.out = 100)
+times <- seq(0, max(dat5$dpi), length.out = 100)
 
 # PAV
 z_n <- z_nb
@@ -599,20 +608,17 @@ manipulate(virus_wrapper(c, r, species = "PAV", plant_time = plant_days), c = sl
 # r ~ 0.092
 # c ~ 0.0056
 
-#### start here ####
 # RPV
 z_n <- z_nc
 z_p <- z_pc
 V0 <- V0_init * 5
-manipulate(virus_wrapper(c, r, species = "RPV", plant_time = plant_days), c = slider(0, 0.1), r = slider(0, 1))
-# aiming to fit N+P with others close
-# r ~ 0.28
-# c ~ 0.022
-# only use through dpi = 16
+manipulate(virus_wrapper(c, r, species = "RPV", plant_time = plant_days), c = slider(0, 0.5), r = slider(0, 1))
+# r ~ 0.27
+# c ~ 0.005
 
 # set c so that we only estimate one parameter
 r_b <- 0.09
-r_c <- 0.1
+r_c <- r_b * 3
 
 
 #### compare virus model to observations ####
@@ -627,10 +633,6 @@ rpv_fit <- rpv %>%
   rename("name" = "variable") %>%
   select(name, time, value) %>%
   data.frame()
-
-# times
-times_pav <- seq(0, max(pav_fit$time), length.out = 100)
-times_rpv <- seq(0, max(rpv_fit$time), length.out = 100)
 
 # cost functions
 pav_cost <- function(input_virus){ 
@@ -650,9 +652,13 @@ rpv_cost <- function(input_virus){
 
 #### estimate virus parameters ####
 
+# times
+times_pav <- seq(0, max(pav_fit$time), length.out = 100)
+times_rpv <- seq(0, max(rpv_fit$time), length.out = 100)
+
 #initial guess
 input_pav <- c(0.0055)
-input_rpv <- c(0.6)
+input_rpv <- c(0.005)
 
 # fit PAV model
 z_n <- z_nb
@@ -667,7 +673,7 @@ fit_pav$ms # mean squared residuals
 # fit RPV model
 z_n <- z_nc
 z_p <- z_pc
-c <- c_c
+r <- r_c
 fit_rpv <- modFit(rpv_cost, input_rpv, lower = c(0))
 summary(fit_rpv)
 deviance(fit_rpv)
@@ -677,64 +683,67 @@ fit_rpv$ms # mean squared residuals
 
 #### visualize virus model fit ####
 
-
 # fit PAV model
-c <- fit_pav$par[1];
+c <- c_b <- fit_pav$par[1]
 r <- r_b
 z_n <- z_nb
 z_p <- z_pb
-times <- seq(0, max(dat5$dpi) * 25, length.out = 100)
-times <- seq(0, 100, length.out = 100)
+times <- seq(0, max(dat5$dpi), length.out = 100)
 
 # quick figure
-virus_wrapper(c, r, species = "PAV", plant_time = plant_days) +
+virus_wrapper(c, r, species = "PAV", plant_time = (plant_days + 12)) +
   fig_theme
 
-pred_pav <- ode(y = virus_init_fun(plant_days),
-                times = times_pav, func = virus_model, parms = c(c_b)) %>%
-  as_tibble() %>%
-  mutate(across(everything(), as.double))
-
-# add time to data
-pav_fit2 <- pav_fit %>%
-  mutate(time = time + plant_days)
-
-# visualize
-ggplot(pav_fit2, aes(time, value)) +
-  stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0) +
-  stat_summary(geom = "point", fun = "mean") +
-  geom_line(data = pred_pav, aes(y = V)) +
-  labs(x = "Time (days)", y = expression(paste("BYDV-PAV conc. (", g^-1, ")", sep = "")), title = "(B) BYDV-PAV growth rate") +
-  fig_theme +
-  theme(plot.title = element_text(size = 9, vjust = 0, hjust = 0.5))
+# pred_pav <- ode(y = virus_init_fun(plant_days),
+#                 times = times_pav, func = virus_model, parms = c(c_b)) %>%
+#   as_tibble() %>%
+#   mutate(across(everything(), as.double))
+# 
+# # add time to data
+# pav_fit2 <- pav_fit %>%
+#   mutate(time = time + plant_days)
+# 
+# # visualize
+# ggplot(pav_fit2, aes(time, value)) +
+#   stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0) +
+#   stat_summary(geom = "point", fun = "mean") +
+#   geom_line(data = pred_pav, aes(y = V)) +
+#   labs(x = "Time (days)", y = expression(paste("BYDV-PAV conc. (", g^-1, ")", sep = "")), title = "(B) BYDV-PAV growth rate") +
+#   fig_theme +
+#   theme(plot.title = element_text(size = 9, vjust = 0, hjust = 0.5))
 
 # fit RPV model
-r_c <- fit_rpv$par[1];
-c <- c_c
+c <- c_c <- fit_rpv$par[1]
+r <- r_c
 z_n <- z_nc
 z_p <- z_pc
-pred_rpv <- ode(y = virus_init_fun("high", "high"), 
-                times = times_rpv, func = virus_model, parms = c(r_c)) %>%
-  as_tibble() %>%
-  mutate(across(everything(), as.double),
-         time = time + 11)
 
-# add time to data
-rpv_NP2 <- rpv %>%
-  filter(nutrient == "N+P") %>%
-  rename("name" = "variable") %>%
-  select(name, time, value) %>%
-  data.frame() %>%
-  mutate(time = time + 11)
+# quick figure
+virus_wrapper(c, r, species = "RPV", plant_time = (plant_days + 12)) +
+  fig_theme
 
-# visualize
-rpv_fig <- ggplot(rpv_NP2, aes(time, value)) +
-  stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0) +
-  stat_summary(geom = "point", fun = "mean") +
-  geom_line(data = pred_rpv, aes(y = V)) +
-  labs(x = "Time (days)", y = expression(paste("CYDV-RPV conc. (", g^-1, ")", sep = "")), title = "(C) CYDV-RPV growth rate") +
-  fig_theme +
-  theme(plot.title = element_text(size = 9, vjust = 0, hjust = 0.5))
+# pred_rpv <- ode(y = virus_init_fun("high", "high"), 
+#                 times = times_rpv, func = virus_model, parms = c(r_c)) %>%
+#   as_tibble() %>%
+#   mutate(across(everything(), as.double),
+#          time = time + 11)
+# 
+# # add time to data
+# rpv_NP2 <- rpv %>%
+#   filter(nutrient == "N+P") %>%
+#   rename("name" = "variable") %>%
+#   select(name, time, value) %>%
+#   data.frame() %>%
+#   mutate(time = time + 11)
+# 
+# # visualize
+# rpv_fig <- ggplot(rpv_NP2, aes(time, value)) +
+#   stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0) +
+#   stat_summary(geom = "point", fun = "mean") +
+#   geom_line(data = pred_rpv, aes(y = V)) +
+#   labs(x = "Time (days)", y = expression(paste("CYDV-RPV conc. (", g^-1, ")", sep = "")), title = "(C) CYDV-RPV growth rate") +
+#   fig_theme +
+#   theme(plot.title = element_text(size = 9, vjust = 0, hjust = 0.5))
 
 
 #### output ####
