@@ -311,16 +311,9 @@ plant_wrapper <- function(m, g){
   #   geom_point(data = mock) +
   #   facet_wrap(~ nutrient, scales = "free")
 
-  # figure for supplement
-  ggplot(filter(out, variable2 == "H"), 
-         aes(x = time, y = value, linetype = nutrient, color = nutrient)) +
-    geom_line() +
-    geom_point(data = mock) +
-    facet_rep_wrap(~ nutrient, nrow = 1) +
-    scale_color_viridis_d(end = 0.7, name = "Nutrient supply") +
-    scale_linetype(name = "Nutrient supply") +
-    labs(x = "Time (days)", y = "Plant biomass (g)", title = "(A)") +
-    fig_theme
+  # data for supplement
+  dat_out <- filter(out, variable2 == "H")
+  return(dat_out)
 }
 
 # initiate slider for ggplot
@@ -382,7 +375,10 @@ m <- fit_plant$par[1]; # 0.007
 times <- seq(0, max(dat5$dpp), length.out = 100)
 
 # figure
-plant_fig <- plant_wrapper(m, g)
+plant_wrapper(m, g)
+
+# data for plant figure
+plant_pred_dat <- plant_wrapper(m, g)
 
 
 #### fit virus parameters ####
@@ -553,7 +549,8 @@ virus_wrapper <- function(c, r, species, plant_time){
     mutate(nutrient = case_when(str_ends(variable, "low") == T ~ "low",
                                 str_ends(variable, "np") == T ~ "+N+P",
                                 str_ends(variable, "n") == T ~ "+N",
-                                str_ends(variable, "p") == T ~ "+P"),
+                                str_ends(variable, "p") == T ~ "+P") %>%
+             fct_relevel("low", "+N", "+P"),
            variable2 = case_when(str_starts(variable, "R_n") == T ~ "R_n",
                                  str_starts(variable, "R_p") == T ~ "R_p",
                                  str_starts(variable, "Q_n") == T ~ "Q_n",
@@ -588,10 +585,14 @@ virus_wrapper <- function(c, r, species, plant_time){
   #   facet_wrap(~ nutrient, scales = "free")
   
   # raw data points
-  ggplot(filter(out, variable2 == "V"), aes(x = time, y = value)) +
-    geom_line() +
-    # geom_point(data = virus) +
-    facet_wrap(~ nutrient, scales = "free")
+  # ggplot(filter(out, variable2 == "V"), aes(x = time, y = value)) +
+  #   geom_line() +
+  #   # geom_point(data = virus) +
+  #   facet_wrap(~ nutrient, scales = "free")
+  
+  # figure for supplement
+  dat_out <- filter(out, variable2 == "V")
+  return(dat_out)
 }
 
 # initiate slider for ggplot
@@ -691,26 +692,10 @@ z_p <- z_pb
 times <- seq(0, max(dat5$dpi), length.out = 100)
 
 # quick figure
-virus_wrapper(c, r, species = "PAV", plant_time = (plant_days + 12)) +
-  fig_theme
+virus_wrapper(c, r, species = "PAV", plant_time = (plant_days + 12))
 
-# pred_pav <- ode(y = virus_init_fun(plant_days),
-#                 times = times_pav, func = virus_model, parms = c(c_b)) %>%
-#   as_tibble() %>%
-#   mutate(across(everything(), as.double))
-# 
-# # add time to data
-# pav_fit2 <- pav_fit %>%
-#   mutate(time = time + plant_days)
-# 
-# # visualize
-# ggplot(pav_fit2, aes(time, value)) +
-#   stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0) +
-#   stat_summary(geom = "point", fun = "mean") +
-#   geom_line(data = pred_pav, aes(y = V)) +
-#   labs(x = "Time (days)", y = expression(paste("BYDV-PAV conc. (", g^-1, ")", sep = "")), title = "(B) BYDV-PAV growth rate") +
-#   fig_theme +
-#   theme(plot.title = element_text(size = 9, vjust = 0, hjust = 0.5))
+# data for supp. figure
+pav_pred_dat <- virus_wrapper(c, r, species = "PAV", plant_time = (plant_days + 12))
 
 # fit RPV model
 c <- c_c <- fit_rpv$par[1]
@@ -719,39 +704,51 @@ z_n <- z_nc
 z_p <- z_pc
 
 # quick figure
-virus_wrapper(c, r, species = "RPV", plant_time = (plant_days + 12)) +
-  fig_theme
+virus_wrapper(c, r, species = "RPV", plant_time = (plant_days + 12))
 
-# pred_rpv <- ode(y = virus_init_fun("high", "high"), 
-#                 times = times_rpv, func = virus_model, parms = c(r_c)) %>%
-#   as_tibble() %>%
-#   mutate(across(everything(), as.double),
-#          time = time + 11)
-# 
-# # add time to data
-# rpv_NP2 <- rpv %>%
-#   filter(nutrient == "N+P") %>%
-#   rename("name" = "variable") %>%
-#   select(name, time, value) %>%
-#   data.frame() %>%
-#   mutate(time = time + 11)
-# 
-# # visualize
-# rpv_fig <- ggplot(rpv_NP2, aes(time, value)) +
-#   stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0) +
-#   stat_summary(geom = "point", fun = "mean") +
-#   geom_line(data = pred_rpv, aes(y = V)) +
-#   labs(x = "Time (days)", y = expression(paste("CYDV-RPV conc. (", g^-1, ")", sep = "")), title = "(C) CYDV-RPV growth rate") +
-#   fig_theme +
-#   theme(plot.title = element_text(size = 9, vjust = 0, hjust = 0.5))
+# data for supp. figure
+rpv_pred_dat <- virus_wrapper(c, r, species = "RPV", plant_time = (plant_days + 12))
 
 
 #### output ####
 
+#### start here ####
+# format times  to match up
+# reorder groups
+# put group names on left side
+
+fig_pred_dat <- plant_pred_dat %>%
+  mutate(fitType = "Plant~biomass~(g)") %>%
+  full_join(pav_pred_dat %>%
+              mutate(fitType = "BYDV-PAV~conc.~(g^-1)")) %>%
+  full_join(rpv_pred_dat %>%
+              mutate(fitType = "CYDV-RPV~conc.~(g^-1)"))
+
+fig_raw_dat <- mock_fit %>%
+  mutate(fitType = "Plant~biomass~(g)") %>%
+  full_join(pav_fit %>%
+              mutate(fitType = "BYDV-PAV~conc.~(g^-1)")) %>%
+  full_join(rpv_fit %>%
+              mutate(fitType = "CYDV-RPV~conc.~(g^-1)")) %>%
+  mutate(nutrient = case_when(str_ends(name, "low") == T ~ "low",
+                              str_ends(name, "np") == T ~ "+N+P",
+                              str_ends(name, "n") == T ~ "+N",
+                              str_ends(name, "p") == T ~ "+P") %>%
+           fct_relevel("low", "+N", "+P"))
+
+ggplot(fig_pred_dat, aes(x = time, y = value, linetype = nutrient, color = nutrient)) +
+  geom_line() +
+  geom_point(data = fig_raw_dat) +
+  facet_rep_grid(fitType ~ nutrient, labeller=label_parsed) +
+  scale_color_viridis_d(end = 0.7, name = "Nutrient supply") +
+  scale_linetype(name = "Nutrient supply") +
+  labs(x = "Time (days)") +
+  fig_theme
+
 # figure
-pdf("output/growth_rate_fit_figure.pdf", width = 6.5, height = 2)
+pdf("output/growth_rate_fit_figure.pdf", width = 6.5, height = 6)
 plot_grid(plant_fig, pav_fig, rpv_fig,
-          nrow = 1)
+          nrow = 3)
 dev.off()
 
 # parameters
