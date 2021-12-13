@@ -35,17 +35,18 @@ fig_theme <- theme_bw() +
         panel.spacing.x = unit(0,"line"),
         axis.text.y = element_text(size = 7, color = "black"),
         axis.text.x = element_text(size = 7, color = "black"),
-        axis.title = element_text(size = 9),
+        axis.title.x = element_text(size = 8),
+        axis.title.y = element_blank(),
         axis.line = element_line(color = "black"),
-        legend.text = element_text(size = 8),
+        legend.text = element_text(size = 7),
         legend.title = element_blank(),
         legend.background = element_blank(),
         legend.position = "none",
         legend.key.size = unit(5, "mm"),
         strip.background = element_blank(),
-        strip.text = element_text(size = 9),
+        strip.text = element_text(size = 8),
         strip.placement = "outside",
-        plot.title = element_text(size = 9, vjust = 0))
+        plot.title = element_text(size = 8, vjust = 0))
 
 
 #### edit data ####
@@ -175,7 +176,7 @@ H0 <- 1e-2 # changed this 11/24/21 from 1e-3
 Q0_const <- 10
 Q0_n <- Qmin_n * Q0_const
 Q0_p <- Qmin_p * Q0_const
-R0_const <- 10 # used to be 3, which was based on nutrients supplied, but nutrients are also in the seed
+R0_const <- 10 # used to be 3, which was based on nutrients supplied before biomass was measured, but nutrients are also in the seed
 R0_n_lo <- a_n_hi * R0_const
 R0_n_hi <- a_n_hi * R0_const
 R0_p_lo <- a_p_hi * R0_const
@@ -713,42 +714,43 @@ rpv_pred_dat <- virus_wrapper(c, r, species = "RPV", plant_time = (plant_days + 
 #### output ####
 
 #### start here ####
-# format times  to match up
 # reorder groups
-# put group names on left side
 
 fig_pred_dat <- plant_pred_dat %>%
   mutate(fitType = "Plant~biomass~(g)") %>%
   full_join(pav_pred_dat %>%
-              mutate(fitType = "BYDV-PAV~conc.~(g^-1)")) %>%
+              mutate(fitType = "BYDV-PAV~conc.~(g^-1)",
+                     time = time + plant_days)) %>%
   full_join(rpv_pred_dat %>%
-              mutate(fitType = "CYDV-RPV~conc.~(g^-1)"))
+              mutate(fitType = "CYDV-RPV~conc.~(g^-1)",
+                     time = time + plant_days)) %>%
+  mutate(fitType = fct_relevel(fitType, "Plant~biomass~(g)"))
 
 fig_raw_dat <- mock_fit %>%
   mutate(fitType = "Plant~biomass~(g)") %>%
   full_join(pav_fit %>%
-              mutate(fitType = "BYDV-PAV~conc.~(g^-1)")) %>%
+              mutate(fitType = "BYDV-PAV~conc.~(g^-1)",
+                     time = time + plant_days)) %>%
   full_join(rpv_fit %>%
-              mutate(fitType = "CYDV-RPV~conc.~(g^-1)")) %>%
+              mutate(fitType = "CYDV-RPV~conc.~(g^-1)",
+                     time = time + plant_days)) %>%
   mutate(nutrient = case_when(str_ends(name, "low") == T ~ "low",
                               str_ends(name, "np") == T ~ "+N+P",
                               str_ends(name, "n") == T ~ "+N",
                               str_ends(name, "p") == T ~ "+P") %>%
-           fct_relevel("low", "+N", "+P"))
+           fct_relevel("low", "+N", "+P"),
+         fitType = fct_relevel(fitType, "Plant~biomass~(g)"))
 
+pdf("output/growth_rate_fit_figure.pdf", width = 6.5, height = 5)
 ggplot(fig_pred_dat, aes(x = time, y = value, linetype = nutrient, color = nutrient)) +
   geom_line() +
-  geom_point(data = fig_raw_dat) +
-  facet_rep_grid(fitType ~ nutrient, labeller=label_parsed) +
+  geom_point(data = fig_raw_dat, alpha = 0.5) +
+  facet_rep_grid(fitType ~ nutrient, labeller = label_parsed,
+                 scales = "free_y", switch = "y") +
   scale_color_viridis_d(end = 0.7, name = "Nutrient supply") +
   scale_linetype(name = "Nutrient supply") +
   labs(x = "Time (days)") +
   fig_theme
-
-# figure
-pdf("output/growth_rate_fit_figure.pdf", width = 6.5, height = 6)
-plot_grid(plant_fig, pav_fig, rpv_fig,
-          nrow = 3)
 dev.off()
 
 # parameters
