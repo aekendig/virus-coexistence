@@ -10,6 +10,7 @@ rm(list=ls())
 library(tidyverse)
 library(deSolve)
 library(cowplot)
+library(lemon)
 
 
 #### parameters ####
@@ -69,7 +70,7 @@ fig_theme <- theme_bw() +
         legend.key.width = unit(7, "mm"),
         legend.key.heigh = unit(5, "mm"),
         strip.background = element_blank(),
-        strip.text = element_text(size = 8, hjust = 0, face = "bold"),
+        strip.text.x = element_text(size = 8, hjust = 0.5),
         strip.placement = "outside",
         plot.title = element_text(size = 8, vjust = 0, face = "bold"))
 
@@ -334,7 +335,7 @@ dev.off()
 # time intervals
 plant_days <- 11
 res_days <- 12
-inv_days <- 19
+inv_days <- 100-plant_days-res_days
 
 # viruses
 V0_b <- V0_c <- 0
@@ -356,7 +357,7 @@ dev.off()
 # time intervals
 plant_days <- 11
 res_days <- 12
-inv_days <- 19
+inv_days <- 100-plant_days-res_days
 
 # PAV with plant
 V0_b <- V0_init
@@ -392,7 +393,7 @@ np_rpv_second_sim <- sim_fun("high", "high", "N+P", "PAV", plant_days, res_days,
 # time intervals
 plant_days <- 11
 res_days <- 12
-inv_days <- 19
+inv_days <- 100-plant_days-res_days
 
 # viruses
 V0_b <- V0_c <- V0_init
@@ -423,7 +424,7 @@ pav_second_sim <- sim_dat_fun(low_pav_second_sim, n_pav_second_sim,
   filter(time > (plant_days + res_days)) %>%
   mutate(virus_conc = PAV_log10,
          virus = invader,
-         scenario = "(B) Invade alone")
+         scenario = "(B) Invader alone")
 
 rpv_first_sim <- sim_dat_fun(low_rpv_first_sim, n_rpv_first_sim, 
                              p_rpv_first_sim, np_rpv_first_sim) %>%
@@ -437,33 +438,33 @@ rpv_second_sim <- sim_dat_fun(low_rpv_second_sim, n_rpv_second_sim,
   filter(time > (plant_days + res_days)) %>%
   mutate(virus_conc = RPV_log10,
          virus = invader,
-         scenario = "(B) Invade alone")
+         scenario = "(B) Invader alone")
 
 pav_res_sim <- sim_dat_fun(low_rpv_inv_sim, n_rpv_inv_sim, 
                            p_rpv_inv_sim, np_rpv_inv_sim) %>%
   filter(time > plant_days) %>%
   mutate(virus_conc = PAV_log10,
          virus = resident,
-         scenario = "(C) Resident virus")
+         scenario = "(C) Resident")
 
 rpv_inv_sim <- pav_res_sim %>%
   filter(time > (plant_days + res_days)) %>%
   mutate(virus_conc = RPV_log10,
          virus = invader,
-         scenario = "(A) Invade resident virus")
+         scenario = "(A) Invader")
 
 rpv_res_sim <- sim_dat_fun(low_pav_inv_sim, n_pav_inv_sim, 
                            p_pav_inv_sim, np_pav_inv_sim) %>%
   filter(time > plant_days) %>%
   mutate(virus_conc = RPV_log10,
          virus = resident,
-         scenario = "(C) Resident virus")
+         scenario = "(C) Resident")
 
 pav_inv_sim <- rpv_res_sim %>%
   filter(time > (plant_days + res_days)) %>%
   mutate(virus_conc = PAV_log10,
          virus = invader,
-         scenario = "(A) Invade resident virus")
+         scenario = "(A) Invader")
 
 # combine
 virus_sim <- pav_inv_sim %>%
@@ -473,282 +474,56 @@ virus_sim <- pav_inv_sim %>%
   full_join(pav_res_sim) %>%
   full_join(rpv_res_sim) %>%
   full_join(pav_first_sim) %>%
-  full_join(rpv_first_sim)
+  full_join(rpv_first_sim) %>%
+  mutate(fac_lab_y = case_when(virus == "PAV" ~ "BYDV-PAV~titer~(log[10])",
+                               virus == "RPV" ~ "CYDV-RPV~titer~(log[10])"),
+         fac_lab_x = str_replace_all(scenario, " ", "~"),
+         fac_lab_x = paste0("bold(", fac_lab_x, ")"))
 
 
 #### virus figure ####
 
-# facet labels
-fac_lab <- c(PAV = "BYDV-PAV~titer~(log[10])",
-             RPV = "BYDV-PAV~titer~(log[10])")
+# tried to align strip x labels left, 
+# but resident alone only shows full text with hjust = 0.5
 
-#### start here ####
-# add in axes
-# move y labels to left
-# only x strip text is bold
-# parse labels
-
+pdf("output/invasion_simulation_figure.pdf", width = 6.5, height = 3.75)
 ggplot(virus_sim, 
        aes(x = time, y = virus_conc, color = nutrient, linetype = nutrient)) +
   geom_line(aes(size = lim_nut_H)) +
-  facet_grid(rows = vars(virus),
-             cols = vars(scenario),
-             labeller = labeller(virus = fac_lab)) +
+  facet_rep_grid(rows = vars(fac_lab_y),
+                 cols = vars(fac_lab_x),
+                 labeller = label_parsed,
+                 switch = "y",
+                 scales = "free_y") +
   scale_color_viridis_d(end = 0.7, name = "Nutrient\nsupply") +
   scale_linetype(name = "Nutrient\nsupply") +
   scale_size_manual(values = c(1.2, 0.6), name = "Limiting\nnutrient",
                     labels = c("N", "P")) +
   labs(x = "Time (days)") +
   fig_theme +
-  theme(axis.title.y = element_blank())
-
-
-
-#### single virus figures ####
-
-# PAV only figures
-
-
-pav_first_fig <- ggplot(pav_first_sim, 
-                        aes(x = time, y = PAV_log10, color = nutrient, linetype = nutrient)) +
-  geom_line(aes(size = lim_nut_H)) +
-  scale_color_viridis_d(end = 0.7, name = "Nutrient supply") +
-  scale_linetype(name = "Nutrient supply") +
-  scale_size_manual(values = c(1.2, 0.6), guide= "none") +
-  labs(x = "Time (days)", title = "(A) Single virus", 
-       y = expression(paste("BYDV-PAV titer (", log[10], ")", sep = ""))) +
-  fig_theme 
-
-
-
-pav_second_fig <- ggplot(pav_second_sim, 
-                         aes(x = time, y = PAV_log10, color = nutrient, linetype = nutrient)) +
-  geom_line(aes(size = lim_nut_H)) +
-  scale_color_viridis_d(end = 0.7, name = "Nutrient supply") +
-  scale_linetype(name = "Nutrient supply") +
-  scale_size_manual(values = c(1.2, 0.6), guide= "none") +
-  labs(title = "(B) Invade alone", 
-       y = expression(paste("BYDV-PAV titer (", log[10], ")", sep = ""))) +
-  fig_theme +
-  theme(legend.position = "none",
-        axis.title = element_blank())
-
-# RPV only figures
-
-
-rpv_first_fig <- ggplot(rpv_first_sim, 
-                        aes(x = time, y = RPV_log10, color = nutrient, linetype = nutrient)) +
-  geom_line(aes(size = lim_nut_H)) +
-  scale_color_viridis_d(end = 0.7, name = "Nutrient supply") +
-  scale_linetype(name = "Nutrient supply") +
-  scale_size_manual(values = c(1.2, 0.6), guide= "none") +
-  labs(x = "Time (days)", title = "(B)", 
-       y = expression(paste("CYDV-RPV titer (", log[10], ")", sep = ""))) +
-  fig_theme 
-
-
-
-rpv_second_fig <- ggplot(rpv_second_sim, 
-                         aes(x = time, y = RPV_log10, color = nutrient, linetype = nutrient)) +
-  geom_line(aes(size = lim_nut_H)) +
-  scale_color_viridis_d(end = 0.7, name = "Nutrient supply") +
-  scale_linetype(name = "Nutrient supply") +
-  scale_size_manual(values = c(1.2, 0.6), guide= "none") +
-  labs(x = "Time (days)", 
-       y = expression(paste("CYDV-RPV titer (", log[10], ")", sep = ""))) +
-  fig_theme 
-
-
-
-
-
-#### virus invasion figures ####
-
-# edit data
-
-
-# pav invades
-pav_inv_fig <- ggplot(pav_inv_sim %>% filter(time > (plant_days + res_days)), 
-       aes(x = time, y = PAV_log10, color = nutrient, linetype = nutrient)) +
-  geom_line(aes(size = lim_nut_H)) +
-  scale_color_viridis_d(end = 0.7, name = "Nutrient supply") +
-  scale_linetype(name = "Nutrient supply") +
-  scale_size_manual(values = c(1.2, 0.6), guide= "none") +
-  labs(title = "(A) Invade other virus", 
-       y = expression(paste("BYDV-PAV titer (", log[10], ")", sep = ""))) +
-  fig_theme +
-  theme(axis.title.x = element_blank())
-
-# rpv invades
-rpv_inv_fig <- ggplot(rpv_inv_sim %>% filter(time > (plant_days + res_days)), 
-       aes(x = time, y = RPV_log10, color = nutrient, linetype = nutrient)) +
-  geom_line(aes(size = lim_nut_H)) +
-  scale_color_viridis_d(end = 0.7, name = "Nutrient supply") +
-  scale_linetype(name = "Nutrient supply") +
-  scale_size_manual(values = c(1.2, 0.6), guide= "none") +
-  labs(x = "Time (days)",
-       y = expression(paste("CYDV-RPV titer (", log[10], ")", sep = ""))) +
-  fig_theme +
-  theme(legend.position = "none")
-
-# PAV resident
-pav_res_fig <- ggplot(rpv_inv_sim, 
-       aes(x = time, y = PAV_log10, color = nutrient, linetype = nutrient)) +
-  geom_line(aes(size = lim_nut_H)) +
-  scale_color_viridis_d(end = 0.7, name = "Nutrient supply") +
-  scale_linetype(name = "Nutrient supply") +
-  scale_size_manual(values = c(1.2, 0.6), guide= "none") +
-  labs(x = "Time (days)", title = "(A) Single virus", 
-       y = expression(paste("BYDV-PAV titer (", log[10], ")", sep = ""))) +
-  fig_theme 
-
-repv_res_fig <- ggplot(pav_inv_sim, 
-       aes(x = time, y = RPV_log10, color = nutrient, linetype = nutrient)) +
-  geom_line(aes(size = lim_nut_H)) +
-  scale_color_viridis_d(end = 0.7, name = "Nutrient supply") +
-  scale_linetype(name = "Nutrient supply") +
-  scale_size_manual(values = c(1.2, 0.6), guide= "none") +
-  labs(x = "Time (days)", title = "(A) Single virus", 
-       y = expression(paste("CYDV-RPV titer (", log[10], ")", sep = ""))) +
-  fig_theme 
-
-
-# combine
-tiff("output/invasion_simulation_figure.tiff", width = 4.5, height = 4.5, units = "in", res = 300)
-plot_grid(res_fig, inv_fig,
-          nrow = 2,
-          rel_heights = c(0.95, 1))
+  theme(axis.title.y = element_blank()) +
+  guides(color = guide_legend(order = 1), linetype = guide_legend(order = 1))
 dev.off()
 
 
-#### plant figure with PAV data ####
+#### plant figures with viruses ####
 
-# edit plant dat (change name, plant_dat used above)
-plant_dat <- comb_dat %>%
-  mutate(Qlim_n = Qmin_n / Q_n,
-         Qlim_p = Qmin_p / Q_p,
-         qlim_n = q_nb / Q_n, # used PAV q's, but they are equal to RPV's
-         qlim_p = q_pb / Q_p) %>%
-  rowwise() %>%
-  mutate(Qlim = max(Qlim_n, Qlim_p),
-         qlim = max(qlim_n, qlim_p)) %>%
-  ungroup() %>%
-  mutate(nutrient = fct_recode(nutrient, "+N" = "N",
-                               "+P" = "P",
-                               "+N+P" = "N+P") %>%
-           fct_relevel("low", "+N", "+P"),
-         lim_nut_H = case_when(Qlim == Qlim_n ~ "Q[N]",
-                               Qlim == Qlim_p ~ "Q[P]"),
-         lim_nut_V = case_when(qlim == qlim_n ~ "Q[N]",
-                               qlim == qlim_p ~ "Q[P]"))
-  
-pav_invader_dat <- plant_dat %>%
-  filter(invader == "PAV")
-
-rpv_invader_dat <- plant_dat %>%
-  filter(invader == "RPV")
-
-
-# plant figures
-# show one invader in main text and other in supplement because they look about the same
-pav_Rn_fig <- ggplot(pav_invader_dat, aes(time, R_n, linetype = nutrient, color = nutrient)) +
-  geom_line(aes(size = lim_nut_V)) +
-  scale_color_viridis_d(end = 0.7) +
-  scale_size_manual(values = c(1.2, 0.6)) +
-  labs(x = "Time (days)", y = "Environment N (g)", title = "(C)") +
-  fig_theme +
-  theme(legend.position = "none")
-
-pav_Rp_fig <- ggplot(pav_invader_dat, aes(time, R_p, linetype = nutrient, color = nutrient)) +
-  geom_line(aes(size = lim_nut_V)) +
-  scale_color_viridis_d(end = 0.7) +
-  scale_size_manual(values = c(1.2, 0.6)) +
-  labs(x = "Time (days)", y = "Environment P (g)", title = "(D)") +
-  fig_theme +
-  theme(legend.position = "none")
-
-pav_H_fig <- ggplot(pav_invader_dat, aes(time, H, linetype = nutrient, color = nutrient)) +
-  geom_line(aes(size = lim_nut_V)) +
-  scale_color_viridis_d(end = 0.7, name = "Nutrient") +
-  scale_linetype(name = "Nutrient") +
-  scale_size_manual(values = c(1.2, 0.6), guide = "none") +
-  labs(x = "Time (days)", y = "Plant biomass (g)", title = "(B)") +
-  fig_theme +
-  theme(legend.position = c(0.23, 0.68)) +
-  guides(color = guide_legend(override.aes = list(size = 1.2)))
-
-pav_Qn_fig <- ggplot(pav_invader_dat, aes(time, Q_n)) +
-  geom_hline(yintercept = Qmin_n, color = "black") +
-  geom_text(data = Qn_lab, aes(label = label), parse = T, color = "black", fontface = "italic",
-            size = 3, hjust = 0, vjust = 0, nudge_y = 1e-4) +
-  geom_line(aes(linetype = nutrient, color = nutrient, size = lim_nut_V)) +
-  scale_color_viridis_d(end = 0.7) +
-  scale_size_manual(values = c(1.2, 0.6)) +
-  labs(x = "Time (days)", y = "Plant N concentration", title = "(E)") +
-  fig_theme +
-  theme(legend.position = "none")
-
-pav_Qp_fig <- ggplot(pav_invader_dat, aes(time, Q_p)) +
-  geom_hline(yintercept = Qmin_p, color = "black") +
-  geom_text(data = Qp_lab, aes(label = label), parse = T, color = "black", fontface = "italic", 
-            size = 3, hjust = 0, vjust = 0, nudge_y = 4e-5) +
-  geom_line(aes(linetype = nutrient, color = nutrient, size = lim_nut_V)) +
-  scale_color_viridis_d(end = 0.7) +
-  scale_size_manual(values = c(1.2, 0.6)) +
-  labs(x = "Time (days)", y = "Plant P concentration", title = "(F)") +
-  fig_theme +
-  theme(legend.position = "none")
-
-pav_lim_fig <- ggplot(pav_invader_dat, aes(time, qlim, linetype = nutrient, color = nutrient)) +
-  geom_line(aes(size = lim_nut_V)) +
-  scale_color_viridis_d(end = 0.7, guide = "none") +
-  scale_linetype(guide = "none") +
-  scale_size_manual(values = c(1.2, 0.6), name = "Limiting nutrient",
-                    labels = c("N", "P")) +
-  labs(x = "Time (days)", title = "(A)", 
-       y = expression(paste("Limiting nutrient ratio (", Q[min], "/Q)", sep = ""))) +
-  fig_theme +
-  theme(legend.position = c(0.3, 0.8))
-
-ggplot(pav_invader_dat, aes(time, Qlim, linetype = nutrient, color = nutrient)) +
-  geom_line(aes(size = lim_nut_H)) +
-  scale_color_viridis_d(end = 0.7) +
-  scale_size_manual(values = c(1.2, 0.6)) +
-  labs(x = "Time (days)", title = "(F)", 
-       y = expression(paste("Limiting nutrient ratio (", Q[min], "/Q)", sep = ""))) +
-  fig_theme +
-  theme(legend.position = "none")
-# same as the virus one because the qmin values were set equal to Qmin
-
-# combine figures
-pav_top_fig <- plot_grid(pav_lim_fig, pav_H_fig, pav_Rn_fig,  
-                         nrow = 1)
-pav_bot_fig <- plot_grid(pav_Rp_fig, pav_Qn_fig, pav_Qp_fig, 
-                         nrow = 1)
-
-tiff("output/pav_invasion_plant_simulation_figure.tiff", width = 6.5, height = 4.5, units = "in", res = 300)
-plot_grid(pav_top_fig, pav_bot_fig,
-          nrow = 2)
+pdf("output/short_term_pav_only_plant_simulation_figure.pdf", width = 6.5, height = 4.5)
+plant_fig_fun(low_pav_first_sim, n_pav_first_sim, 
+              p_pav_first_sim, np_pav_first_sim, -2e-3, -5e-4)
 dev.off()
 
+pdf("output/short_term_rpv_only_plant_simulation_figure.pdf", width = 6.5, height = 4.5)
+plant_fig_fun(low_rpv_first_sim, n_rpv_first_sim, 
+              p_rpv_first_sim, np_rpv_first_sim, -2e-3, -5e-4)
+dev.off()
 
-#### plant figure with RPV data ####
+pdf("output/short_term_pav_inv_plant_simulation_figure.pdf", width = 6.5, height = 4.5)
+plant_fig_fun(low_pav_inv_sim, n_pav_inv_sim, 
+              p_pav_inv_sim, np_pav_inv_sim, -2e-3, -5e-4)
+dev.off()
 
-# recreate figures
-rpv_Rn_fig <- pav_Rn_fig %+% rpv_invader_dat
-rpv_Rp_fig <- pav_Rp_fig %+% rpv_invader_dat
-rpv_H_fig <- pav_H_fig %+% rpv_invader_dat
-rpv_Qn_fig <- pav_Qn_fig %+% rpv_invader_dat
-rpv_Qp_fig <- pav_Qp_fig %+% rpv_invader_dat
-rpv_lim_fig <- pav_lim_fig %+% rpv_invader_dat
-
-# combine figures
-rpv_top_fig <- plot_grid(rpv_lim_fig, rpv_H_fig, rpv_Rn_fig,  
-                         nrow = 1)
-rpv_bot_fig <- plot_grid(rpv_Rp_fig, rpv_Qn_fig, rpv_Qp_fig, 
-                         nrow = 1)
-
-tiff("output/rpv_invasion_plant_simulation_figure.tiff", width = 6.5, height = 4.5, units = "in", res = 300)
-plot_grid(rpv_top_fig, rpv_bot_fig,
-          nrow = 2)
+pdf("output/short_term_rpv_inv_plant_simulation_figure.pdf", width = 6.5, height = 4.5)
+plant_fig_fun(low_rpv_inv_sim, n_rpv_inv_sim, 
+              p_rpv_inv_sim, np_rpv_inv_sim, -2e-3, -5e-4)
 dev.off()
