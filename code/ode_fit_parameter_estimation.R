@@ -26,27 +26,8 @@ library(lemon)
 # import data
 sdat <- read_csv("./edi.411.2/data/sample_exp_molc_data.csv")
 
-# figure settings
-fig_theme <- theme_bw() +
-  theme(panel.background = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        panel.border = element_blank(),
-        panel.spacing.x = unit(0,"line"),
-        axis.text.y = element_text(size = 7, color = "black"),
-        axis.text.x = element_text(size = 7, color = "black"),
-        axis.title.x = element_text(size = 8),
-        axis.title.y = element_blank(),
-        axis.line = element_line(color = "black"),
-        legend.text = element_text(size = 7),
-        legend.title = element_blank(),
-        legend.background = element_blank(),
-        legend.position = "none",
-        legend.key.size = unit(5, "mm"),
-        strip.background = element_blank(),
-        strip.text = element_text(size = 8),
-        strip.placement = "outside",
-        plot.title = element_text(size = 8, vjust = 0))
+# load model parameters and figure settings
+source("code/model_settings.R")
 
 
 #### edit data ####
@@ -151,37 +132,9 @@ dat5[duplicated(dat5$sample) == T, ]
 
 #### parameters ####
 
-# supply rates
-a_n_lo <- 1.1e-6
-a_n_hi <- 5.6e-5
-a_p_lo <- 1.6e-7
-a_p_hi <- 8.2e-6
-
-# other parameters
-u_n <- 2.9e-3
-u_p <- 1.4e-3
-k_n <- 4.9e-5
-k_p <- 3.0e-5
-Qmin_n <- 1.1e-3
-Qmin_p <- 7.4e-5
-q_n <- 1.1e-3 # same for both viruses
-q_p <- 7.4e-5 # same for both viruses
-z_nb <- 1.6e-18
-z_pb <- 2.6e-19
-z_nc <- 1.7e-18
-z_pc <- 2.6e-19
- 
-# initial values
-H0 <- 1e-2 # changed this 11/24/21 from 1e-3
-Q0_const <- 10
-Q0_n <- Qmin_n * Q0_const
-Q0_p <- Qmin_p * Q0_const
-R0_const <- 10 # used to be 3, which was based on nutrients supplied before biomass was measured, but nutrients are also in the seed
-R0_n_lo <- a_n_hi * R0_const
-R0_n_hi <- a_n_hi * R0_const
-R0_p_lo <- a_p_hi * R0_const
-R0_p_hi <- a_p_hi * R0_const
-V0_init <- 100000
+# remove the parameters to be estimated
+# added to model_settings file
+rm(list = c("m", "g", "c_b", "c_c", "r_b", "r_c"))
 
 # time
 plant_days <- 11
@@ -605,7 +558,7 @@ times <- seq(0, max(dat5$dpi), length.out = 100)
 # PAV
 z_n <- z_nb
 z_p <- z_pb
-V0 <- V0_init * 5
+V0 <- V0_init
 manipulate(virus_wrapper(c, r, species = "PAV", plant_time = plant_days), c = slider(0, 0.1), r = slider(0, 1))
 # r ~ 0.092
 # c ~ 0.0056
@@ -613,7 +566,7 @@ manipulate(virus_wrapper(c, r, species = "PAV", plant_time = plant_days), c = sl
 # RPV
 z_n <- z_nc
 z_p <- z_pc
-V0 <- V0_init * 5
+V0 <- V0_init
 manipulate(virus_wrapper(c, r, species = "RPV", plant_time = plant_days), c = slider(0, 0.5), r = slider(0, 1))
 # r ~ 0.27
 # c ~ 0.005
@@ -713,9 +666,6 @@ rpv_pred_dat <- virus_wrapper(c, r, species = "RPV", plant_time = (plant_days + 
 
 #### output ####
 
-#### start here ####
-# reorder groups
-
 fig_pred_dat <- plant_pred_dat %>%
   mutate(fitType = "Plant~biomass~(g)") %>%
   full_join(pav_pred_dat %>%
@@ -742,15 +692,16 @@ fig_raw_dat <- mock_fit %>%
          fitType = fct_relevel(fitType, "Plant~biomass~(g)"))
 
 pdf("output/growth_rate_fit_figure.pdf", width = 6.5, height = 5)
-ggplot(fig_pred_dat, aes(x = time, y = value, linetype = nutrient, color = nutrient)) +
-  geom_line() +
+ggplot(fig_pred_dat, aes(x = time, y = value, color = nutrient)) +
+  geom_line(size = 1.2) +
   geom_point(data = fig_raw_dat, alpha = 0.5) +
   facet_rep_grid(fitType ~ nutrient, labeller = label_parsed,
                  scales = "free_y", switch = "y") +
   scale_color_viridis_d(end = 0.7, name = "Nutrient supply") +
-  scale_linetype(name = "Nutrient supply") +
   labs(x = "Time (days)") +
-  fig_theme
+  fig_theme +
+  theme(axis.title.y = element_blank(),
+        legend.position = "none")
 dev.off()
 
 # parameters
