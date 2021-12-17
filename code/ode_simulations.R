@@ -242,19 +242,6 @@ n_rpv_inv_sim <- sim_fun("high", "low", "N", "PAV", plant_days, res_days, inv_da
 p_rpv_inv_sim <- sim_fun("low", "high", "P", "PAV", plant_days, res_days, inv_days)
 np_rpv_inv_sim <- sim_fun("high", "high", "N+P", "PAV", plant_days, res_days, inv_days)
 
-# long-term simulations
-inv_days <- 1000-plant_days-res_days
-
-low_pav_long_inv_sim <- sim_fun("low", "low", "low", "RPV", plant_days, res_days, inv_days)
-n_pav_long_inv_sim <- sim_fun("high", "low", "N", "RPV", plant_days, res_days, inv_days)
-p_pav_long_inv_sim <- sim_fun("low", "high", "P", "RPV", plant_days, res_days, inv_days)
-np_pav_long_inv_sim <- sim_fun("high", "high", "N+P", "RPV", plant_days, res_days, inv_days)
-
-low_rpv_long_inv_sim <- sim_fun("low", "low", "low", "PAV", plant_days, res_days, inv_days)
-n_rpv_long_inv_sim <- sim_fun("high", "low", "N", "PAV", plant_days, res_days, inv_days)
-p_rpv_long_inv_sim <- sim_fun("low", "high", "P", "PAV", plant_days, res_days, inv_days)
-np_rpv_long_inv_sim <- sim_fun("high", "high", "N+P", "PAV", plant_days, res_days, inv_days)
-
 
 #### edit simulation data ####
 
@@ -354,22 +341,22 @@ dev.off()
 
 #### plant figures with viruses ####
 
-pdf("output/short_term_pav_only_plant_simulation_figure.pdf", width = 6.5, height = 3.75)
+pdf("output/pav_only_plant_simulation_figure.pdf", width = 6.5, height = 3.75)
 plant_fig_fun(low_pav_first_sim, n_pav_first_sim, 
               p_pav_first_sim, np_pav_first_sim, -2e-3, -5e-4)
 dev.off()
 
-pdf("output/short_term_rpv_only_plant_simulation_figure.pdf", width = 6.5, height = 3.75)
+pdf("output/rpv_only_plant_simulation_figure.pdf", width = 6.5, height = 3.75)
 plant_fig_fun(low_rpv_first_sim, n_rpv_first_sim, 
               p_rpv_first_sim, np_rpv_first_sim, -2e-3, -5e-4)
 dev.off()
 
-pdf("output/short_term_pav_inv_plant_simulation_figure.pdf", width = 6.5, height = 3.75)
+pdf("output/pav_inv_plant_simulation_figure.pdf", width = 6.5, height = 3.75)
 plant_fig_fun(low_pav_inv_sim, n_pav_inv_sim, 
               p_pav_inv_sim, np_pav_inv_sim, -2e-3, -5e-4)
 dev.off()
 
-pdf("output/short_term_rpv_inv_plant_simulation_figure.pdf", width = 6.5, height = 3.75)
+pdf("output/rpv_inv_plant_simulation_figure.pdf", width = 6.5, height = 3.75)
 plant_fig_fun(low_rpv_inv_sim, n_rpv_inv_sim, 
               p_rpv_inv_sim, np_rpv_inv_sim, -2e-3, -5e-4)
 dev.off()
