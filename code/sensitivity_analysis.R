@@ -18,22 +18,126 @@ source("code/model_settings.R")
 
 #### model function ####
 
-# simulation data formatting
-# revised from ode_simulations
-sim_dat_fun <- function(low_sim, n_sim, p_sim, np_sim){
+# run model for all 4 nutrients
+sim_param_fun <- function(params, first_virus, plant_time, res_time, inv_time){
   
-  dat_out <- low_sim %>%
-    full_join(n_sim) %>%
-    full_join(p_sim) %>%
-    full_join(np_sim) %>%
-    filter(time == max_days) %>%
-    mutate(PAV_log10 = log10(V_b + 1),
-           RPV_log10 = log10(V_c + 1)) %>%
-    arrange(nutrient)
+  # simulate plant growth
+  plant_init <- ode(c(R_n_low = R0_n_lo, R_p_low = R0_p_lo, Q_n_low = Q0_n, Q_p_low = Q0_p, H_low = H0, 
+                      V_b_low = 0, V_c_low = 0,
+                      R_n_n = R0_n_hi, R_p_n = R0_p_lo, Q_n_n = Q0_n, Q_p_n = Q0_p, H_n = H0, 
+                      V_b_n = 0, V_c_n = 0,
+                      R_n_p = R0_n_lo, R_p_p = R0_p_hi, Q_n_p = Q0_n, Q_p_p = Q0_p, H_p = H0, 
+                      V_b_p = 0, V_c_p = 0,
+                      R_n_np = R0_n_hi, R_p_np = R0_p_hi, Q_n_np = Q0_n, Q_p_np = Q0_p, H_np = H0, 
+                      V_b_np = 0, V_c_np = 0),
+                    times = seq(0, plant_time, length.out = 100), plant_virus_param_model, params) %>%
+    as_tibble() %>%
+    mutate(across(everything(), as.double)) %>%
+    filter(time == plant_time)
   
-  return(dat_out)
+  y0_first_virus <- c(R_n_low = pull(plant_init, R_n_low), 
+                      R_p_low = pull(plant_init, R_p_low), 
+                      Q_n_low = pull(plant_init, Q_n_low), 
+                      Q_p_low = pull(plant_init, Q_p_low), 
+                      H_low = pull(plant_init, H_low), 
+                      V_b_low = if_else(first_virus == "PAV", V0_b, 0),
+                      V_c_low = if_else(first_virus == "RPV", V0_c, 0), 
+                      R_n_n = pull(plant_init, R_n_n), 
+                      R_p_n = pull(plant_init, R_p_n), 
+                      Q_n_n = pull(plant_init, Q_n_n), 
+                      Q_p_n = pull(plant_init, Q_p_n), 
+                      H_n = pull(plant_init, H_n), 
+                      V_b_n = if_else(first_virus == "PAV", V0_b, 0),
+                      V_c_n = if_else(first_virus == "RPV", V0_c, 0), 
+                      R_n_p = pull(plant_init, R_n_p), 
+                      R_p_p = pull(plant_init, R_p_p), 
+                      Q_n_p = pull(plant_init, Q_n_p), 
+                      Q_p_p = pull(plant_init, Q_p_p), 
+                      H_p = pull(plant_init, H_p), 
+                      V_b_p = if_else(first_virus == "PAV", V0_b, 0),
+                      V_c_p = if_else(first_virus == "RPV", V0_c, 0), 
+                      R_n_np = pull(plant_init, R_n_np), 
+                      R_p_np = pull(plant_init, R_p_np), 
+                      Q_n_np = pull(plant_init, Q_n_np), 
+                      Q_p_np = pull(plant_init, Q_p_np), 
+                      H_np = pull(plant_init, H_np), 
+                      V_b_np = if_else(first_virus == "PAV", V0_b, 0),
+                      V_c_np = if_else(first_virus == "RPV", V0_c, 0))
+
+  
+  # first virus model
+  first_virus_init <- ode(y0_first_virus, seq(0, res_time, length.out = 100),
+                         plant_virus_param_model, params) %>%
+    as_tibble() %>%
+    mutate(across(everything(), as.double)) %>%
+    filter(time == res_time)
+  
+  # virus initial conditions
+  y0_second_virus <- c(R_n_low = pull(plant_init, R_n_low), 
+                      R_p_low = pull(plant_init, R_p_low), 
+                      Q_n_low = pull(plant_init, Q_n_low), 
+                      Q_p_low = pull(plant_init, Q_p_low), 
+                      H_low = pull(plant_init, H_low), 
+                      V_b_low = if_else(first_virus == "PAV", pull(first_virus_init, V_b_low), V0_b),
+                      V_c_low = if_else(first_virus == "RPV", pull(first_virus_init, V_c_low), V0_c), 
+                      R_n_n = pull(plant_init, R_n_n), 
+                      R_p_n = pull(plant_init, R_p_n), 
+                      Q_n_n = pull(plant_init, Q_n_n), 
+                      Q_p_n = pull(plant_init, Q_p_n), 
+                      H_n = pull(plant_init, H_n), 
+                      V_b_n = if_else(first_virus == "PAV", pull(first_virus_init, V_b_n), V0_b),
+                      V_c_n = if_else(first_virus == "RPV", pull(first_virus_init, V_c_n), V0_c),
+                      R_n_p = pull(plant_init, R_n_p), 
+                      R_p_p = pull(plant_init, R_p_p), 
+                      Q_n_p = pull(plant_init, Q_n_p), 
+                      Q_p_p = pull(plant_init, Q_p_p), 
+                      H_p = pull(plant_init, H_p), 
+                      V_b_p = if_else(first_virus == "PAV", pull(first_virus_init, V_b_p), V0_b),
+                      V_c_p = if_else(first_virus == "RPV", pull(first_virus_init, V_c_p), V0_c),
+                      R_n_np = pull(plant_init, R_n_np), 
+                      R_p_np = pull(plant_init, R_p_np), 
+                      Q_n_np = pull(plant_init, Q_n_np), 
+                      Q_p_np = pull(plant_init, Q_p_np), 
+                      H_np = pull(plant_init, H_np), 
+                      V_b_np = if_else(first_virus == "PAV", pull(first_virus_init, V_b_np), V0_b),
+                      V_c_np = if_else(first_virus == "RPV", pull(first_virus_init, V_c_np), V0_c))
+  
+  # first virus model
+  second_virus_mod <- ode(y0_second_virus, seq(0, inv_time, length.out = 100),
+                          plant_virus_param_model, params) %>%
+    as_tibble() %>%
+    mutate(across(everything(), as.double)) %>%
+    filter(time == inv_time) %>%
+    pivot_longer(cols = everything(),
+                 names_to = "variable",
+                 values_to = "value") %>%
+    mutate(nutrient = case_when(str_ends(variable, "low") == T ~ "low",
+                                str_ends(variable, "np") == T ~ "+N+P",
+                                str_ends(variable, "n") == T ~ "+N",
+                                str_ends(variable, "p") == T ~ "+P") %>%
+             fct_relevel("low", "+N", "+P"),
+           variable = case_when(str_starts(V_b) == T ~ "V_b",
+                                str_starts(V_c) == T ~ "V_c",
+                                TRUE ~ variable),
+           virus_conc = log10(value + 1))
+  
+  # output: invading virus titer
+  if(first_virus == "PAV"){
+    output <- second_virus_mod %>%
+      filter(variable == "V_c") %>%
+      select(nutrient, virus_conc)
+  }else{
+    output <- second_virus_mod %>%
+      filter(variable == "V_b") %>%
+      select(nutrient, virus_conc)
+  }
+  
+  return(output)
   
 }
+
+#### start here ####
+# writing function so that parameters are input and global parameter values aren't reset
 
 param_fun <- function(params, param_foc, param_val, first_virus){
   
@@ -190,18 +294,20 @@ max_days <- 100
 
 n <- 7
 
-param_df_pav <- tibble(param_foc = rep(c("q_nc", "q_pc"), each = n), 
-                   param_val = c(1.1e-9, 1.1e-8, 1.1e-7, 1.1e-6, 1.1e-5, 1.1e-4, 1.1e-3,
-                                 7.4e-11, 7.4e-10, 7.4e-9, 7.4e-8, 7.4e-7, 7.4e-6, 7.4e-5))
+param_df_pav <- tibble(param_foc = rep(c("q_nc", "q_pc"), each = n),
+                       param_val = c(1.1e-9, 1.1e-8, 1.1e-7, 1.1e-6, 1.1e-5, 1.1e-4, 1.1e-3,
+                                     7.4e-17, 7.4e-15, 7.4e-13, 7.4e-11, 7.4e-9, 7.4e-7, 7.4e-5))
 
 param_df_rpv <- tibble(param_foc = rep(c("q_nb", "q_pb"), each = n), 
-                       param_val = c(1.1e-9, 1.1e-8, 1.1e-7, 1.1e-6, 1.1e-5, 1.1e-4, 1.1e-3,
-                                     7.4e-11, 7.4e-10, 7.4e-9, 7.4e-8, 7.4e-7, 7.4e-6, 7.4e-5))
+                       param_val = c(1.1e-15, 1.1e-13, 1.1e-11, 1.1e-9, 1.1e-7, 1.1e-5, 1.1e-3,
+                                     7.4e-17, 7.4e-15, 7.4e-13, 7.4e-11, 7.4e-9, 7.4e-7, 7.4e-5))
 
 
 #### PAV q simulations ####
 
 V0_b <- V0_c <- V0_init
+q_nb <- 1.1e-3
+q_nc <- 7.4e-5
 pav_q_params <- param_df_pav %>%
   mutate(first_virus = "RPV") %>%
   mutate(pav_conc = pmap(., function(param_foc, param_val, first_virus) param_fun(params_def, param_foc, param_val, first_virus))) %>%
@@ -214,6 +320,10 @@ ggplot(pav_q_params,
   facet_rep_wrap(~ param_foc, scales = "free_x") +
   scale_x_log10() +
   fig_theme
+
+# explore P simulation
+pav_q_p <- sim_fun("low", "high", "+P", first_virus = "RPV", 
+       plant_time = 12, res_time = 11, inv_time = max_days-11-12)
 
 
 #### RPV q simulations ####
@@ -232,5 +342,5 @@ ggplot(rpv_q_params,
   scale_x_log10() +
   fig_theme
 
-#### start here ####
-# why does only one q out of the four have an effect?
+
+
