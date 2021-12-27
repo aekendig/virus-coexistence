@@ -26,17 +26,13 @@ library(lemon)
 # import data
 sdat <- read_csv("./edi.411.2/data/sample_exp_molc_data.csv")
 
-# load model parameters and figure settings
-source("code/model_settings.R")
-
 
 #### edit data ####
 # code source: concentration_analysis.R in edi folder
 
 # days post inoculation
-dpi <- tibble(
-  time = 1:8,
-  dpi = c(5, 8, 12, 16, 19, 22, 26, 29))
+dpi <- tibble(time = 1:8,
+              dpi = c(5, 8, 12, 16, 19, 22, 26, 29))
 
 # remove samples:
 # poor standard curve efficiency
@@ -130,11 +126,10 @@ dat5[duplicated(dat5$sample) == T, ]
 # all were removed
 
 
-#### parameters ####
+#### parameters and model functions ####
 
-# remove the parameters to be estimated
-# added to model_settings file
-rm(list = c("m", "g", "c_b", "c_c", "r_b", "r_c"))
+# load model parameters and figure settings
+source("code/model_settings.R")
 
 # time
 plant_days <- 11
@@ -222,52 +217,38 @@ mock <- dat5 %>%
                                "+N+P" = "N+P") %>%
            fct_relevel("low", "+N", "+P"))
 
+mock_mean <- mock %>%
+  group_by(nutrient) %>%
+  summarize(value = mean(value)) %>%
+  ungroup()
+
 # wrapper function
 plant_wrapper <- function(m, g){
   
-  out <- ode(c(R_n_low = R0_n_lo, R_p_low = R0_p_lo, Q_n_low = Q0_n, Q_p_low = Q0_p, H_low = H0,
-               R_n_n = R0_n_hi, R_p_n = R0_p_lo, Q_n_n = Q0_n, Q_p_n = Q0_p, H_n = H0,
-               R_n_p = R0_n_lo, R_p_p = R0_p_hi, Q_n_p = Q0_n, Q_p_p = Q0_p, H_p = H0,
-               R_n_np = R0_n_hi, R_p_np = R0_p_hi, Q_n_np = Q0_n, Q_p_np = Q0_p, H_np = H0),
-             times, plant_model, c(m = m, g = g)) %>%
-    as_tibble() %>%
-    mutate(across(everything(), as.double)) %>%
-    pivot_longer(cols = -time,
-                 names_to = "variable",
-                 values_to = "value") %>%
-    mutate(nutrient = case_when(str_ends(variable, "low") == T ~ "low",
-                                str_ends(variable, "np") == T ~ "+N+P",
-                                str_ends(variable, "n") == T ~ "+N",
-                                str_ends(variable, "p") == T ~ "+P") %>%
-             fct_relevel("low", "+N", "+P"),
-           variable2 = case_when(str_starts(variable, "R_n") == T ~ "R_n",
-                                 str_starts(variable, "R_p") == T ~ "R_p",
-                                 str_starts(variable, "Q_n") == T ~ "Q_n",
-                                 str_starts(variable, "Q_p") == T ~ "Q_p",
-                                 str_starts(variable, "H") == T ~ "H"))
+  # set to default
+  params_in <- params_def1
   
-  # use to visualize all variables
+  # update parameter value
+  params_in["m"] <- m
+  params_in["g"] <- g
+  
+  # fit model
+  out <- ode(init_def1, times, plant_model, params_in) %>%
+    plant_model_format()
+
+  # # use to visualize all variables
   # ggplot(out, aes(x = time, y = value, color = nutrient)) +
   #   geom_line() +
   #   stat_summary(data = mock, geom = "errorbar", width = 0, fun.data = "mean_se") +
   #   stat_summary(data = mock, geom = "point", size = 2, fun = "mean") +
   #   facet_wrap(~ variable2, scales = "free")
   
-  # mock_mean <- mock %>%
-  #   group_by(nutrient) %>%
-  #   summarize(value = mean(value)) %>%
-  #   ungroup()
-  # 
-  # # visualize only H
-  # ggplot(filter(out, variable2 == "H"), aes(x = time, y = value)) +
-  #   geom_line() +
-  #   geom_hline(data = mock_mean, aes(yintercept = value), linetype = "dashed") +
-  #   geom_point(data = mock) +
-  #   facet_wrap(~ nutrient, scales = "free")
-
-  # data for supplement
-  dat_out <- filter(out, variable2 == "H")
-  return(dat_out)
+  # visualize only H
+  ggplot(filter(out, variable2 == "H"), aes(x = time, y = value)) +
+    geom_line() +
+    geom_hline(data = mock_mean, aes(yintercept = value), linetype = "dashed") +
+    geom_point(data = mock) +
+    facet_wrap(~ nutrient, scales = "free")
 }
 
 # initiate slider for ggplot
@@ -281,7 +262,7 @@ manipulate(plant_wrapper(m, g), m = slider(0, 0.1), g = slider(0, 1))
 # m ~ 0.004
 
 # set g so that we only estimate one parameter
-g <- 0.144
+params_def1["g"] <- 0.144
 
 
 #### compare plant model to observations ####
@@ -296,24 +277,26 @@ mock_fit <- mock %>%
 times <- seq(0, max(dat5$dpp), length.out = 100)
 
 # cost function
-plant_cost <- function(input_plant){ 
-  m = input_plant[1];
-  out = ode(y = c(R_n_low = R0_n_lo, R_p_low = R0_p_lo, Q_n_low = Q0_n, Q_p_low = Q0_p, H_low = H0,
-                  R_n_n = R0_n_hi, R_p_n = R0_p_lo, Q_n_n = Q0_n, Q_p_n = Q0_p, H_n = H0,
-                  R_n_p = R0_n_lo, R_p_p = R0_p_hi, Q_n_p = Q0_n, Q_p_p = Q0_p, H_p = H0,
-                  R_n_np = R0_n_hi, R_p_np = R0_p_hi, Q_n_np = Q0_n, Q_p_np = Q0_p, H_np = H0),
-            times = times, func = plant_model, parms = c(m = m))
+plant_cost <- function(m_init){ 
+  
+  # set to default
+  params_in <- params_def1
+  
+  # update parameter value
+  params_in["m"] <- m_init
+  
+  # fit model
+  out = ode(y = init_def1, times = times, func = plant_model, parms = params_in)
+  
+  # compare to data
   return(modCost(model = out[ , c("time", "H_low", "H_n", "H_p", "H_np")], obs = mock_fit, y = "value"))   
 }
 
 
 #### estimate plant parameters ####
 
-#initial guess
-input_plant <- c(0.004) 
-
 # fit model
-fit_plant <- modFit(plant_cost, input_plant, lower = c(0))
+fit_plant <- modFit(plant_cost, 0.004, lower = c(0))
 summary(fit_plant)
 deviance(fit_plant)
 fit_plant$ssr # sum of squared residuals
@@ -323,19 +306,25 @@ fit_plant$ms # mean squared residuals
 #### visualize plant model fit ####
 
 # save value
-m <- fit_plant$par[1]; # 0.007
+params_def1["m"] <- fit_plant$par[1]
 
 # time 
 times <- seq(0, max(dat5$dpp), length.out = 100)
 
-# figure
-plant_wrapper(m, g)
-
 # data for plant figure
-plant_pred_dat <- plant_wrapper(m, g)
+plant_pred_dat <- ode(init_def1, times, plant_model, params_def1) %>%
+  plant_model_format() %>%
+  filter(variable2 == "H")
+
+# figure
+plant_pred_dat %>%
+  ggplot(aes(x = time, y = value)) +
+  geom_line() +
+  geom_point(data = mock) +
+  facet_wrap(~ nutrient, scales = "free")
 
 
-#### fit virus parameters ####
+#### start here: fit virus parameters ####
 
 
 #### virus model ####
