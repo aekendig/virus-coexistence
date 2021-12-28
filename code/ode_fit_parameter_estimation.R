@@ -135,71 +135,6 @@ source("code/model_settings.R")
 plant_days <- 11
 
 
-#### plant model ####
-
-plant_model = function (t, yy, parms) { 
-  
-  # supply rates
-  m = parms[1];
-  g = ifelse(length(parms) == 2, parms[2], g);
-  
-  # set initial values
-  R_n_low = yy[1];
-  R_p_low = yy[2];
-  Q_n_low = yy[3];
-  Q_p_low = yy[4];
-  H_low = yy[5];
-  
-  R_n_n = yy[6];
-  R_p_n = yy[7];
-  Q_n_n = yy[8];
-  Q_p_n = yy[9];
-  H_n = yy[10];
-  
-  R_n_p = yy[11];
-  R_p_p = yy[12];
-  Q_n_p = yy[13];
-  Q_p_p = yy[14];
-  H_p = yy[15];
-  
-  R_n_np = yy[16];
-  R_p_np = yy[17];
-  Q_n_np = yy[18];
-  Q_p_np = yy[19];
-  H_np = yy[20];
-  
-  # model
-  dR_n_low = a_n_lo - (u_n * R_n_low * H_low) / (R_n_low + k_n);
-  dR_p_low = a_p_lo - (u_p * R_p_low * H_low) / (R_p_low + k_p);
-  dQ_n_low = (u_n * R_n_low) / (R_n_low + k_n) - min((1 - Qmin_n / Q_n_low), (1 - Qmin_p / Q_p_low)) * g * Q_n_low
-  dQ_p_low = (u_p * R_p_low) / (R_p_low + k_p) - min((1 - Qmin_n / Q_n_low), (1 - Qmin_p / Q_p_low)) * g * Q_p_low
-  dH_low = min((1 - Qmin_n / Q_n_low), (1 - Qmin_p / Q_p_low)) * g * H_low - m * H_low
-  
-  dR_n_n = a_n_hi - (u_n * R_n_n * H_n) / (R_n_n + k_n);
-  dR_p_n = a_p_lo - (u_p * R_p_n * H_n) / (R_p_n + k_p);
-  dQ_n_n = (u_n * R_n_n) / (R_n_n + k_n) - min((1 - Qmin_n / Q_n_n), (1 - Qmin_p / Q_p_n)) * g * Q_n_n
-  dQ_p_n = (u_p * R_p_n) / (R_p_n + k_p) - min((1 - Qmin_n / Q_n_n), (1 - Qmin_p / Q_p_n)) * g * Q_p_n
-  dH_n = min((1 - Qmin_n / Q_n_n), (1 - Qmin_p / Q_p_n)) * g * H_n - m * H_n
-  
-  dR_n_p = a_n_lo - (u_n * R_n_p * H_p) / (R_n_p + k_n);
-  dR_p_p = a_p_hi - (u_p * R_p_p * H_p) / (R_p_p + k_p);
-  dQ_n_p = (u_n * R_n_p) / (R_n_p + k_n) - min((1 - Qmin_n / Q_n_p), (1 - Qmin_p / Q_p_p)) * g * Q_n_p
-  dQ_p_p = (u_p * R_p_p) / (R_p_p + k_p) - min((1 - Qmin_n / Q_n_p), (1 - Qmin_p / Q_p_p)) * g * Q_p_p
-  dH_p = min((1 - Qmin_n / Q_n_p), (1 - Qmin_p / Q_p_p)) * g * H_p - m * H_p
-  
-  dR_n_np = a_n_hi - (u_n * R_n_np * H_np) / (R_n_np + k_n);
-  dR_p_np = a_p_hi - (u_p * R_p_np * H_np) / (R_p_np + k_p);
-  dQ_n_np = (u_n * R_n_np) / (R_n_np + k_n) - min((1 - Qmin_n / Q_n_np), (1 - Qmin_p / Q_p_np)) * g * Q_n_np
-  dQ_p_np = (u_p * R_p_np) / (R_p_np + k_p) - min((1 - Qmin_n / Q_n_np), (1 - Qmin_p / Q_p_np)) * g * Q_p_np
-  dH_np = min((1 - Qmin_n / Q_n_np), (1 - Qmin_p / Q_p_np)) * g * H_np - m * H_np
-  
-  return(list(c(dR_n_low, dR_p_low, dQ_n_low, dQ_p_low, dH_low,
-                dR_n_n, dR_p_n, dQ_n_n, dQ_p_n, dH_n,
-                dR_n_p, dR_p_p, dQ_n_p, dQ_p_p, dH_p,
-                dR_n_np, dR_p_np, dQ_n_np, dQ_p_np, dH_np)))
-}
-
-
 #### visualize plant parameters ####
 
 # data
@@ -324,82 +259,6 @@ plant_pred_dat %>%
   facet_wrap(~ nutrient, scales = "free")
 
 
-#### start here: fit virus parameters ####
-
-
-#### virus model ####
-
-virus_model = function (t, yy, parms) { 
-  
-  # unknown parameters and supply rates
-  c = parms[1];
-  r = ifelse(length(parms) == 2, parms[2], r);
-  
-  # set initial values
-  R_n_low = yy[1];
-  R_p_low = yy[2];
-  Q_n_low = yy[3];
-  Q_p_low = yy[4];
-  H_low = yy[5];
-  V_low = yy[6];
-  
-  R_n_n = yy[7];
-  R_p_n = yy[8];
-  Q_n_n = yy[9];
-  Q_p_n = yy[10];
-  H_n = yy[11];
-  V_n = yy[12];
-  
-  R_n_p = yy[13];
-  R_p_p = yy[14];
-  Q_n_p = yy[15];
-  Q_p_p = yy[16];
-  H_p = yy[17]
-  V_p = yy[18];
-  
-  R_n_np = yy[19];
-  R_p_np = yy[20];
-  Q_n_np = yy[21];
-  Q_p_np = yy[22];
-  H_np = yy[23];
-  V_np = yy[24];
-  
-  # model
-  dR_n_low = a_n_lo - (u_n * R_n_low * H_low) / (R_n_low + k_n);
-  dR_p_low = a_p_lo - (u_p * R_p_low * H_low) / (R_p_low + k_p);
-  dQ_n_low = (u_n * R_n_low) / (R_n_low + k_n) - min((1 - Qmin_n / Q_n_low), (1 - Qmin_p / Q_p_low)) * g * Q_n_low - min((1 - q_n / Q_n_low), (1 - q_p / Q_p_low)) * z_n * r * V_low
-  dQ_p_low = (u_p * R_p_low) / (R_p_low + k_p) - min((1 - Qmin_n / Q_n_low), (1 - Qmin_p / Q_p_low)) * g * Q_p_low - min((1 - q_n / Q_n_low), (1 - q_p / Q_p_low)) * z_p * r * V_low
-  dH_low = min((1 - Qmin_n / Q_n_low), (1 - Qmin_p / Q_p_low)) * g * H_low - m * H_low
-  dV_low = min((1 - q_n / Q_n_low), (1 - q_p / Q_p_low)) * r * V_low - c * V_low
-  
-  dR_n_n = a_n_hi - (u_n * R_n_n * H_n) / (R_n_n + k_n);
-  dR_p_n = a_p_lo - (u_p * R_p_n * H_n) / (R_p_n + k_p);
-  dQ_n_n = (u_n * R_n_n) / (R_n_n + k_n) - min((1 - Qmin_n / Q_n_n), (1 - Qmin_p / Q_p_n)) * g * Q_n_n - min((1 - q_n / Q_n_n), (1 - q_p / Q_p_n)) * z_n * r * V_n
-  dQ_p_n = (u_p * R_p_n) / (R_p_n + k_p) - min((1 - Qmin_n / Q_n_n), (1 - Qmin_p / Q_p_n)) * g * Q_p_n - min((1 - q_n / Q_n_n), (1 - q_p / Q_p_n)) * z_p * r * V_n
-  dH_n = min((1 - Qmin_n / Q_n_n), (1 - Qmin_p / Q_p_n)) * g * H_n - m * H_n
-  dV_n = min((1 - q_n / Q_n_n), (1 - q_p / Q_p_n)) * r * V_n - c * V_n
-  
-  dR_n_p = a_n_lo - (u_n * R_n_p * H_p) / (R_n_p + k_n);
-  dR_p_p = a_p_hi - (u_p * R_p_p * H_p) / (R_p_p + k_p);
-  dQ_n_p = (u_n * R_n_p) / (R_n_p + k_n) - min((1 - Qmin_n / Q_n_p), (1 - Qmin_p / Q_p_p)) * g * Q_n_p - min((1 - q_n / Q_n_p), (1 - q_p / Q_p_p)) * z_n * r * V_p
-  dQ_p_p = (u_p * R_p_p) / (R_p_p + k_p) - min((1 - Qmin_n / Q_n_p), (1 - Qmin_p / Q_p_p)) * g * Q_p_p - min((1 - q_n / Q_n_p), (1 - q_p / Q_p_p)) * z_p * r * V_p
-  dH_p = min((1 - Qmin_n / Q_n_p), (1 - Qmin_p / Q_p_p)) * g * H_p - m * H_p
-  dV_p = min((1 - q_n / Q_n_p), (1 - q_p / Q_p_p)) * r * V_p - c * V_p
-  
-  dR_n_np = a_n_hi - (u_n * R_n_np * H_np) / (R_n_np + k_n);
-  dR_p_np = a_p_hi - (u_p * R_p_np * H_np) / (R_p_np + k_p);
-  dQ_n_np = (u_n * R_n_np) / (R_n_np + k_n) - min((1 - Qmin_n / Q_n_np), (1 - Qmin_p / Q_p_np)) * g * Q_n_np - min((1 - q_n / Q_n_np), (1 - q_p / Q_p_np)) * z_n * r * V_np
-  dQ_p_np = (u_p * R_p_np) / (R_p_np + k_p) - min((1 - Qmin_n / Q_n_np), (1 - Qmin_p / Q_p_np)) * g * Q_p_np - min((1 - q_n / Q_n_np), (1 - q_p / Q_p_np)) * z_p * r * V_np
-  dH_np = min((1 - Qmin_n / Q_n_np), (1 - Qmin_p / Q_p_np)) * g * H_np - m * H_np
-  dV_np = min((1 - q_n / Q_n_np), (1 - q_p / Q_p_np)) * r * V_np - c * V_np
-  
-  return(list(c(dR_n_low, dR_p_low, dQ_n_low, dQ_p_low, dH_low, dV_low,
-                dR_n_n, dR_p_n, dQ_n_n, dQ_p_n, dH_n, dV_n,
-                dR_n_p, dR_p_p, dQ_n_p, dQ_p_p, dH_p, dV_p,
-                dR_n_np, dR_p_np, dQ_n_np, dQ_p_np, dH_np, dV_np)))
-}
-
-
 #### visualize virus parameters ####
 
 # data
@@ -431,75 +290,11 @@ rpv <- dat5 %>%
                                "+N+P" = "N+P") %>%
            fct_relevel("low", "+N", "+P"))
 
-# min dpp
-min(pav$dpp)
-
-# min virions
-min(pav$conc_PAV)
-min(rpv$conc_RPV)
-
-# initial plant values
-virus_init_fun <- function(plant_time){
-  
-  # simulate plant growth
-  plant_init <- ode(c(R_n_low = R0_n_lo, R_p_low = R0_p_lo, Q_n_low = Q0_n, Q_p_low = Q0_p, H_low = H0,
-                      R_n_n = R0_n_hi, R_p_n = R0_p_lo, Q_n_n = Q0_n, Q_p_n = Q0_p, H_n = H0,
-                      R_n_p = R0_n_lo, R_p_p = R0_p_hi, Q_n_p = Q0_n, Q_p_p = Q0_p, H_p = H0,
-                      R_n_np = R0_n_hi, R_p_np = R0_p_hi, Q_n_np = Q0_n, Q_p_np = Q0_p, H_np = H0),
-                    times = seq(0, plant_time, length.out = 100), plant_model, c(m, g)) %>%
-    as_tibble() %>%
-    mutate(across(everything(), as.double)) %>%
-    filter(time == plant_time)
-  
-  y0_virus <- c(R_n_low = pull(plant_init, R_n_low), 
-                R_p_low = pull(plant_init, R_p_low), 
-                Q_n_low = pull(plant_init, Q_n_low), 
-                Q_p_low = pull(plant_init, Q_p_low), 
-                H_low = pull(plant_init, H_low), 
-                V_low = V0,
-                R_n_n = pull(plant_init, R_n_n), 
-                R_p_n = pull(plant_init, R_p_n), 
-                Q_n_n = pull(plant_init, Q_n_n), 
-                Q_p_n = pull(plant_init, Q_p_n), 
-                H_n = pull(plant_init, H_n), 
-                V_n = V0,
-                R_n_p = pull(plant_init, R_n_p), 
-                R_p_p = pull(plant_init, R_p_p), 
-                Q_n_p = pull(plant_init, Q_n_p), 
-                Q_p_p = pull(plant_init, Q_p_p), 
-                H_p = pull(plant_init, H_p), 
-                V_p = V0,
-                R_n_np = pull(plant_init, R_n_np), 
-                R_p_np = pull(plant_init, R_p_np), 
-                Q_n_np = pull(plant_init, Q_n_np), 
-                Q_p_np = pull(plant_init, Q_p_np), 
-                H_np = pull(plant_init, H_np), 
-                V_np = V0)
-  
-  return(y0_virus)
-}
+# initial values
+init_virus1 <- virus1_model_init()
 
 # wrapper function
-virus_wrapper <- function(c, r, species, plant_time){
-  
-  out <- ode(virus_init_fun(plant_time),
-             times, virus_model, c(c = c, r = r)) %>%
-    as_tibble() %>%
-    mutate(across(everything(), as.double)) %>%
-    pivot_longer(cols = -time,
-                 names_to = "variable",
-                 values_to = "value") %>%
-    mutate(nutrient = case_when(str_ends(variable, "low") == T ~ "low",
-                                str_ends(variable, "np") == T ~ "+N+P",
-                                str_ends(variable, "n") == T ~ "+N",
-                                str_ends(variable, "p") == T ~ "+P") %>%
-             fct_relevel("low", "+N", "+P"),
-           variable2 = case_when(str_starts(variable, "R_n") == T ~ "R_n",
-                                 str_starts(variable, "R_p") == T ~ "R_p",
-                                 str_starts(variable, "Q_n") == T ~ "Q_n",
-                                 str_starts(variable, "Q_p") == T ~ "Q_p",
-                                 str_starts(variable, "H") == T ~ "H",
-                                 str_starts(variable, "V") == T ~ "V"))
+virus_wrapper <- function(c, r, species){
   
   if(species == "PAV"){
     virus <- pav
@@ -507,35 +302,36 @@ virus_wrapper <- function(c, r, species, plant_time){
     virus <- rpv
   }
   
-  # use to visualize all variables
+  # set to default
+  params_in <- params_def1
+  
+  # update parameter value
+  params_in["c"] <- c
+  params_in["r"] <- r
+  
+  # fit model
+  out <- ode(init_virus1, times, virus1_model, params_in) %>%
+    virus1_model_format()
+  
+  # # visualize all variables
   # ggplot(out, aes(x = time, y = value, color = nutrient)) +
   #   geom_line() +
   #   stat_summary(data = virus, geom = "errorbar", width = 0, fun.data = "mean_se") +
   #   stat_summary(data = virus, geom = "point", size = 2, fun = "mean") +
   #   facet_wrap(~ variable2, scales = "free")
   
-  # virus_mean <- virus %>%
-  #   group_by(nutrient) %>%
-  #   summarize(value = mean(value)) %>%
-  #   ungroup()
-  # 
-  # # average raw data
-  # ggplot(filter(out, variable2 == "V"), aes(x = time, y = value)) +
-  #   geom_line() +
-  #   geom_hline(data = virus_mean, aes(yintercept = value), linetype = "dashed") +
-  #   stat_summary(data = virus, geom = "errorbar", width = 0, fun.data = "mean_se") +
-  #   stat_summary(data = virus, geom = "point", size = 2, fun = "mean") +
-  #   facet_wrap(~ nutrient, scales = "free")
-  
-  # raw data points
-  # ggplot(filter(out, variable2 == "V"), aes(x = time, y = value)) +
-  #   geom_line() +
-  #   # geom_point(data = virus) +
-  #   facet_wrap(~ nutrient, scales = "free")
-  
-  # figure for supplement
-  dat_out <- filter(out, variable2 == "V")
-  return(dat_out)
+  # average raw data
+  virus_mean <- virus %>%
+    group_by(nutrient) %>%
+    summarize(value = mean(value)) %>%
+    ungroup()
+
+  ggplot(filter(out, variable2 == "V"), aes(x = time, y = value)) +
+    geom_line() +
+    geom_hline(data = virus_mean, aes(yintercept = value), linetype = "dashed") +
+    stat_summary(data = virus, geom = "errorbar", width = 0, fun.data = "mean_se") +
+    stat_summary(data = virus, geom = "point", size = 2, fun = "mean") +
+    facet_wrap(~ nutrient, scales = "free")
 }
 
 # initiate slider for ggplot
@@ -545,24 +341,21 @@ manipulate(plot(1:5, cex=size), size = slider(0.5,10,step=0.5))
 times <- seq(0, max(dat5$dpi), length.out = 100)
 
 # PAV
-z_n <- z_nb
-z_p <- z_pb
-V0 <- V0_init
-manipulate(virus_wrapper(c, r, species = "PAV", plant_time = plant_days), c = slider(0, 0.1), r = slider(0, 1))
+manipulate(virus_wrapper(c, r, species = "PAV"), c = slider(0, 0.1), r = slider(0, 1))
 # r ~ 0.092
 # c ~ 0.0056
 
 # RPV
-z_n <- z_nc
-z_p <- z_pc
-V0 <- V0_init
-manipulate(virus_wrapper(c, r, species = "RPV", plant_time = plant_days), c = slider(0, 0.5), r = slider(0, 1))
+manipulate(virus_wrapper(c, r, species = "RPV"), c = slider(0, 0.5), r = slider(0, 1))
 # r ~ 0.27
 # c ~ 0.005
 
-# set c so that we only estimate one parameter
-r_b <- 0.09
-r_c <- r_b * 3
+# set r so that we only estimate one parameter
+params_pav <- params_def1
+params_rpv <- params_def1
+
+params_pav["r"] <- 0.09
+params_rpv["r"] <- 0.27
 
 
 #### compare virus model to observations ####
@@ -579,17 +372,33 @@ rpv_fit <- rpv %>%
   data.frame()
 
 # cost functions
-pav_cost <- function(input_virus){ 
-  c = input_virus[1];
-  out = ode(y = virus_init_fun(plant_days), 
-            times = times_pav, func = virus_model, parms = c(c = c))
+pav_cost <- function(c_init){ 
+  
+  # set to default
+  params_in <- params_pav
+  
+  # update parameter value
+  params_in["c"] <- c_init
+  
+  # fit model
+  out = ode(y = init_virus1, times = times_pav, func = virus1_model, parms = params_in)
+  
+  # compare to data
   return(modCost(model = out[ , c("time", "V_low", "V_n", "V_p", "V_np")], obs = pav_fit, y = "value"))   
 }
 
-rpv_cost <- function(input_virus){ 
-  c = input_virus[1];
-  out = ode(y = virus_init_fun(plant_days), 
-            times = times_rpv, func = virus_model, parms = c(c = c))
+rpv_cost <- function(c_init){ 
+  
+  # set to default
+  params_in <- params_rpv
+  
+  # update parameter value
+  params_in["c"] <- c_init
+  
+  # fit model
+  out = ode(y = init_virus1, times = times_rpv, func = virus1_model, parms = params_in)
+  
+  # compare to data
   return(modCost(model = out[ , c("time", "V_low", "V_n", "V_p", "V_np")], obs = rpv_fit, y = "value"))   
 }
 
@@ -600,25 +409,15 @@ rpv_cost <- function(input_virus){
 times_pav <- seq(0, max(pav_fit$time), length.out = 100)
 times_rpv <- seq(0, max(rpv_fit$time), length.out = 100)
 
-#initial guess
-input_pav <- c(0.0055)
-input_rpv <- c(0.005)
-
 # fit PAV model
-z_n <- z_nb
-z_p <- z_pb
-r <- r_b
-fit_pav <- modFit(pav_cost, input_pav, lower = c(0))
+fit_pav <- modFit(pav_cost, 0.0055, lower = c(0))
 summary(fit_pav)
 deviance(fit_pav)
 fit_pav$ssr # sum of squared residuals
 fit_pav$ms # mean squared residuals
 
 # fit RPV model
-z_n <- z_nc
-z_p <- z_pc
-r <- r_c
-fit_rpv <- modFit(rpv_cost, input_rpv, lower = c(0))
+fit_rpv <- modFit(rpv_cost, 0.005, lower = c(0))
 summary(fit_rpv)
 deviance(fit_rpv)
 fit_rpv$ssr # sum of squared residuals
@@ -627,30 +426,34 @@ fit_rpv$ms # mean squared residuals
 
 #### visualize virus model fit ####
 
-# fit PAV model
-c <- c_b <- fit_pav$par[1]
-r <- r_b
-z_n <- z_nb
-z_p <- z_pb
+# virus times
 times <- seq(0, max(dat5$dpi), length.out = 100)
 
-# quick figure
-virus_wrapper(c, r, species = "PAV", plant_time = (plant_days + 12))
+# add new values
+params_pav["c"] <- fit_pav$par[1]
+params_rpv["c"] <- fit_rpv$par[1]
 
-# data for supp. figure
-pav_pred_dat <- virus_wrapper(c, r, species = "PAV", plant_time = (plant_days + 12))
+# data for figure
+pav_pred_dat <- ode(init_virus1, times, virus1_model, params_pav) %>%
+  virus1_model_format() %>%
+  filter(variable2 == "V")
 
-# fit RPV model
-c <- c_c <- fit_rpv$par[1]
-r <- r_c
-z_n <- z_nc
-z_p <- z_pc
+rpv_pred_dat <- ode(init_virus1, times, virus1_model, params_rpv) %>%
+  virus1_model_format() %>%
+  filter(variable2 == "V")
 
-# quick figure
-virus_wrapper(c, r, species = "RPV", plant_time = (plant_days + 12))
+# figure
+pav_pred_dat %>%
+  ggplot(aes(x = time, y = value)) +
+  geom_line() +
+  geom_point(data = pav) +
+  facet_wrap(~ nutrient, scales = "free")
 
-# data for supp. figure
-rpv_pred_dat <- virus_wrapper(c, r, species = "RPV", plant_time = (plant_days + 12))
+rpv_pred_dat %>%
+  ggplot(aes(x = time, y = value)) +
+  geom_line() +
+  geom_point(data = pav) +
+  facet_wrap(~ nutrient, scales = "free")
 
 
 #### output ####
@@ -695,6 +498,11 @@ dev.off()
 
 # parameters
 write_csv(tibble(parameter = c("g", "m", "r_b", "c_b", "r_c", "c_c"),
-                 value = c(g, m, r_b, c_b, r_c, c_c)),
+                 value = c(as.numeric(params_def1["g"]),
+                           as.numeric(params_def1["m"]),
+                           as.numeric(params_pav["r"]),
+                           as.numeric(params_pav["c"]),
+                           as.numeric(params_rpv["r"]),
+                           as.numeric(params_rpv["c"]))),
           "output/estimated_growth_mortality_rates.csv")
 

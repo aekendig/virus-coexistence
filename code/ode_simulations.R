@@ -22,6 +22,8 @@ Qp_lab <- tibble(time = 0, Q_p = Qmin_p, label = "Q['min,P']")
 
 #### figure functions ####
 
+#### start here: formatting function below in model_settings ####
+
 # simulation data formatting
 sim_dat_fun <- function(low_sim, n_sim, p_sim, np_sim){
   

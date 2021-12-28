@@ -37,8 +37,8 @@ params_def2 <- c(a_n_lo = 1.1e-6,
                  z_pc = 2.6e-19,
                  m = 0.006,
                  g = 0.144,
-                 c_b = 0.002,
-                 c_c = 0.005,
+                 c_b = 0.001,
+                 c_c = 0.036,
                  r_b = 0.09,
                  r_c = 0.27)
 
@@ -53,7 +53,7 @@ R0_n_lo <- as.numeric(params_def1["a_n_hi"]) * 7 + as.numeric(params_def1["a_n_l
 R0_n_hi <- as.numeric(params_def1["a_n_hi"]) * 10
 R0_p_lo <- as.numeric(params_def1["a_p_hi"]) * 7 + as.numeric(params_def1["a_p_lo"]) * 3
 R0_p_hi <- as.numeric(params_def1["a_p_hi"]) * 10
-V0_init <- 5e5
+V0 <- 5e5
 
 # plant-only and single virus
 init_def1 <- c(R_n_low = R0_n_lo,
@@ -118,7 +118,7 @@ plant_model = function (t, yy, parms) {
 
 plant_model_format <- function(mod_in){
   
-  mod_out <- mod_in  %>%
+  mod_out <- mod_in %>%
     as_tibble() %>%
     mutate(across(everything(), as.double)) %>%
     pivot_longer(cols = -time,
@@ -140,36 +140,190 @@ plant_model_format <- function(mod_in){
 }
 
 
-#### start here: plant and single virus model ####
+#### single virus model ####
 
-
-#### model ####
-
-plant_virus_model = function (t, yy, parms) { 
+virus1_model = function (t, yy, parms) { 
   
-  # supply rates
-  a_n = parms[1];
-  a_p = parms[2];
-  
-  # set initial values
-  R_n = yy[1];
-  R_p = yy[2];
-  Q_n = yy[3];
-  Q_p = yy[4];
-  H = yy[5];
-  V_b = yy[6];
-  V_c = yy[7];
+  with(as.list(c(yy, parms)), {
   
   # model
-  dR_n = a_n - (u_n * R_n * H) / (R_n + k_n);
-  dR_p = a_p - (u_p * R_p * H) / (R_p + k_p);
-  dQ_n = (u_n * R_n) / (R_n + k_n) - min((1 - Qmin_n / Q_n), (1 - Qmin_p / Q_p)) * g * Q_n - min((1 - q_nb / Q_n), (1 - q_pb / Q_p)) * z_nb * r_b * V_b - min((1 - q_nc / Q_n), (1 - q_pc / Q_p)) * z_nc * r_c * V_c
-  dQ_p = (u_p * R_p) / (R_p + k_p) - min((1 - Qmin_n / Q_n), (1 - Qmin_p / Q_p)) * g * Q_p - min((1 - q_nb / Q_n), (1 - q_pb / Q_p)) * z_pb * r_b * V_b - min((1 - q_nc / Q_n), (1 - q_pc / Q_p)) * z_pc * r_c * V_c
-  dH = min((1 - Qmin_n / Q_n), (1 - Qmin_p / Q_p)) * g * H - m * H
-  dV_b = min((1 - q_nb / Q_n), (1 - q_pb / Q_p)) * r_b * V_b - c_b * V_b
-  dV_c = min((1 - q_nc / Q_n), (1 - q_pc / Q_p)) * r_c * V_c - c_c * V_c
+  dR_n_low <- a_n_lo - (u_n * R_n_low * H_low) / (R_n_low + k_n);
+  dR_p_low <- a_p_lo - (u_p * R_p_low * H_low) / (R_p_low + k_p);
+  dQ_n_low <- (u_n * R_n_low) / (R_n_low + k_n) - min((1 - Qmin_n / Q_n_low), (1 - Qmin_p / Q_p_low)) * g * Q_n_low - min((1 - q_n / Q_n_low), (1 - q_p / Q_p_low)) * z_n * r * V_low
+  dQ_p_low <- (u_p * R_p_low) / (R_p_low + k_p) - min((1 - Qmin_n / Q_n_low), (1 - Qmin_p / Q_p_low)) * g * Q_p_low - min((1 - q_n / Q_n_low), (1 - q_p / Q_p_low)) * z_p * r * V_low
+  dH_low <- min((1 - Qmin_n / Q_n_low), (1 - Qmin_p / Q_p_low)) * g * H_low - m * H_low
+  dV_low <- min((1 - q_n / Q_n_low), (1 - q_p / Q_p_low)) * r * V_low - c * V_low
   
-  return(list(c(dR_n, dR_p, dQ_n, dQ_p, dH, dV_b, dV_c)))
+  dR_n_n <- a_n_hi - (u_n * R_n_n * H_n) / (R_n_n + k_n);
+  dR_p_n <- a_p_lo - (u_p * R_p_n * H_n) / (R_p_n + k_p);
+  dQ_n_n <- (u_n * R_n_n) / (R_n_n + k_n) - min((1 - Qmin_n / Q_n_n), (1 - Qmin_p / Q_p_n)) * g * Q_n_n - min((1 - q_n / Q_n_n), (1 - q_p / Q_p_n)) * z_n * r * V_n
+  dQ_p_n <- (u_p * R_p_n) / (R_p_n + k_p) - min((1 - Qmin_n / Q_n_n), (1 - Qmin_p / Q_p_n)) * g * Q_p_n - min((1 - q_n / Q_n_n), (1 - q_p / Q_p_n)) * z_p * r * V_n
+  dH_n <- min((1 - Qmin_n / Q_n_n), (1 - Qmin_p / Q_p_n)) * g * H_n - m * H_n
+  dV_n <- min((1 - q_n / Q_n_n), (1 - q_p / Q_p_n)) * r * V_n - c * V_n
+  
+  dR_n_p <- a_n_lo - (u_n * R_n_p * H_p) / (R_n_p + k_n);
+  dR_p_p <- a_p_hi - (u_p * R_p_p * H_p) / (R_p_p + k_p);
+  dQ_n_p <- (u_n * R_n_p) / (R_n_p + k_n) - min((1 - Qmin_n / Q_n_p), (1 - Qmin_p / Q_p_p)) * g * Q_n_p - min((1 - q_n / Q_n_p), (1 - q_p / Q_p_p)) * z_n * r * V_p
+  dQ_p_p <- (u_p * R_p_p) / (R_p_p + k_p) - min((1 - Qmin_n / Q_n_p), (1 - Qmin_p / Q_p_p)) * g * Q_p_p - min((1 - q_n / Q_n_p), (1 - q_p / Q_p_p)) * z_p * r * V_p
+  dH_p <- min((1 - Qmin_n / Q_n_p), (1 - Qmin_p / Q_p_p)) * g * H_p - m * H_p
+  dV_p <- min((1 - q_n / Q_n_p), (1 - q_p / Q_p_p)) * r * V_p - c * V_p
+  
+  dR_n_np <- a_n_hi - (u_n * R_n_np * H_np) / (R_n_np + k_n);
+  dR_p_np <- a_p_hi - (u_p * R_p_np * H_np) / (R_p_np + k_p);
+  dQ_n_np <- (u_n * R_n_np) / (R_n_np + k_n) - min((1 - Qmin_n / Q_n_np), (1 - Qmin_p / Q_p_np)) * g * Q_n_np - min((1 - q_n / Q_n_np), (1 - q_p / Q_p_np)) * z_n * r * V_np
+  dQ_p_np <- (u_p * R_p_np) / (R_p_np + k_p) - min((1 - Qmin_n / Q_n_np), (1 - Qmin_p / Q_p_np)) * g * Q_p_np - min((1 - q_n / Q_n_np), (1 - q_p / Q_p_np)) * z_p * r * V_np
+  dH_np <- min((1 - Qmin_n / Q_n_np), (1 - Qmin_p / Q_p_np)) * g * H_np - m * H_np
+  dV_np <- min((1 - q_n / Q_n_np), (1 - q_p / Q_p_np)) * r * V_np - c * V_np
+  
+  return(list(c(dR_n_low, dR_p_low, dQ_n_low, dQ_p_low, dH_low, dV_low,
+                dR_n_n, dR_p_n, dQ_n_n, dQ_p_n, dH_n, dV_n,
+                dR_n_p, dR_p_p, dQ_n_p, dQ_p_p, dH_p, dV_p,
+                dR_n_np, dR_p_np, dQ_n_np, dQ_p_np, dH_np, dV_np)))
+  })
+}
+
+virus1_model_init <- function(){
+  
+  # simulate plant growth
+  plant_init <- ode(init_def1, times = seq(0, plant_days, length.out = 100), 
+                        plant_model, params_def1) %>%
+    as_tibble() %>%
+    mutate(across(everything(), as.double)) %>%
+    filter(time == max(time))
+  
+  # extract values
+  y0 <- c(R_n_low = pull(plant_init, R_n_low), 
+          R_p_low = pull(plant_init, R_p_low), 
+          Q_n_low = pull(plant_init, Q_n_low), 
+          Q_p_low = pull(plant_init, Q_p_low), 
+          H_low = pull(plant_init, H_low), 
+          V_low = V0,
+          R_n_n = pull(plant_init, R_n_n), 
+          R_p_n = pull(plant_init, R_p_n), 
+          Q_n_n = pull(plant_init, Q_n_n), 
+          Q_p_n = pull(plant_init, Q_p_n), 
+          H_n = pull(plant_init, H_n), 
+          V_n = V0,
+          R_n_p = pull(plant_init, R_n_p), 
+          R_p_p = pull(plant_init, R_p_p), 
+          Q_n_p = pull(plant_init, Q_n_p), 
+          Q_p_p = pull(plant_init, Q_p_p), 
+          H_p = pull(plant_init, H_p), 
+          V_p = V0,
+          R_n_np = pull(plant_init, R_n_np), 
+          R_p_np = pull(plant_init, R_p_np), 
+          Q_n_np = pull(plant_init, Q_n_np), 
+          Q_p_np = pull(plant_init, Q_p_np), 
+          H_np = pull(plant_init, H_np), 
+          V_np = V0)
+  
+  return(y0)
+}
+
+virus1_model_format <- function(mod_in){
+  
+  mod_out <- mod_in  %>%
+    as_tibble() %>%
+    mutate(across(everything(), as.double)) %>%
+    pivot_longer(cols = -time,
+                 names_to = "variable",
+                 values_to = "value") %>%
+    mutate(nutrient = case_when(str_ends(variable, "low") == T ~ "low",
+                                str_ends(variable, "np") == T ~ "+N+P",
+                                str_ends(variable, "n") == T ~ "+N",
+                                str_ends(variable, "p") == T ~ "+P") %>%
+             fct_relevel("low", "+N", "+P"),
+           variable2 = case_when(str_starts(variable, "R_n") == T ~ "R_n",
+                                 str_starts(variable, "R_p") == T ~ "R_p",
+                                 str_starts(variable, "Q_n") == T ~ "Q_n",
+                                 str_starts(variable, "Q_p") == T ~ "Q_p",
+                                 str_starts(variable, "H") == T ~ "H",
+                                 str_starts(variable, "V") == T ~ "V"))
+  
+  return(mod_out)
+  
+}
+
+
+#### two virus model ####
+
+virus2_model = function (t, yy, parms) {
+  with(as.list(c(yy, parms)), {
+    
+    dR_n_low <- a_n_lo - (u_n * R_n_low * H_low) / (R_n_low + k_n);
+    dR_p_low <- a_p_lo - (u_p * R_p_low * H_low) / (R_p_low + k_p);
+    dQ_n_low <- (u_n * R_n_low) / (R_n_low + k_n) - min((1 - Qmin_n / Q_n_low), (1 - Qmin_p / Q_p_low)) * g * Q_n_low - min((1 - q_nb / Q_n_low), (1 - q_pb / Q_p_low)) * z_nb * r_b * V_b_low - min((1 - q_nc / Q_n_low), (1 - q_pc / Q_p_low)) * z_nc * r_c * V_c_low
+    dQ_p_low <- (u_p * R_p_low) / (R_p_low + k_p) - min((1 - Qmin_n / Q_n_low), (1 - Qmin_p / Q_p_low)) * g * Q_p_low - min((1 - q_nb / Q_n_low), (1 - q_pb / Q_p_low)) * z_pb * r_b * V_b_low - min((1 - q_nc / Q_n_low), (1 - q_pc / Q_p_low)) * z_pc * r_c * V_c_low
+    dH_low <- min((1 - Qmin_n / Q_n_low), (1 - Qmin_p / Q_p_low)) * g * H_low - m * H_low
+    dV_b_low <- min((1 - q_nb / Q_n_low), (1 - q_pb / Q_p_low)) * r_b * V_b_low - c_b * V_b_low
+    dV_c_low <- min((1 - q_nc / Q_n_low), (1 - q_pc / Q_p_low)) * r_c * V_c_low - c_c * V_c_low
+    
+    dR_n_n <- a_n_hi - (u_n * R_n_n * H_n) / (R_n_n + k_n);
+    dR_p_n <- a_p_lo - (u_p * R_p_n * H_n) / (R_p_n + k_p);
+    dQ_n_n <- (u_n * R_n_n) / (R_n_n + k_n) - min((1 - Qmin_n / Q_n_n), (1 - Qmin_p / Q_p_n)) * g * Q_n_n - min((1 - q_nb / Q_n_n), (1 - q_pb / Q_p_n)) * z_nb * r_b * V_b_n - min((1 - q_nc / Q_n_n), (1 - q_pc / Q_p_n)) * z_nc * r_c * V_c_n
+    dQ_p_n <- (u_p * R_p_n) / (R_p_n + k_p) - min((1 - Qmin_n / Q_n_n), (1 - Qmin_p / Q_p_n)) * g * Q_p_n - min((1 - q_nb / Q_n_n), (1 - q_pb / Q_p_n)) * z_pb * r_b * V_b_n - min((1 - q_nc / Q_n_n), (1 - q_pc / Q_p_n)) * z_pc * r_c * V_c_n
+    dH_n <- min((1 - Qmin_n / Q_n_n), (1 - Qmin_p / Q_p_n)) * g * H_n - m * H_n
+    dV_b_n <- min((1 - q_nb / Q_n_n), (1 - q_pb / Q_p_n)) * r_b * V_b_n - c_b * V_b_n
+    dV_c_n <- min((1 - q_nc / Q_n_n), (1 - q_pc / Q_p_n)) * r_c * V_c_n - c_c * V_c_n
+    
+    dR_n_p <- a_n_lo - (u_n * R_n_p * H_p) / (R_n_p + k_n);
+    dR_p_p <- a_p_hi - (u_p * R_p_p * H_p) / (R_p_p + k_p);
+    dQ_n_p <- (u_n * R_n_p) / (R_n_p + k_n) - min((1 - Qmin_n / Q_n_p), (1 - Qmin_p / Q_p_p)) * g * Q_n_p - min((1 - q_nb / Q_n_p), (1 - q_pb / Q_p_p)) * z_nb * r_b * V_b_p - min((1 - q_nc / Q_n_p), (1 - q_pc / Q_p_p)) * z_nc * r_c * V_c_p
+    dQ_p_p <- (u_p * R_p_p) / (R_p_p + k_p) - min((1 - Qmin_n / Q_n_p), (1 - Qmin_p / Q_p_p)) * g * Q_p_p - min((1 - q_nb / Q_n_p), (1 - q_pb / Q_p_p)) * z_pb * r_b * V_b_p - min((1 - q_nc / Q_n_p), (1 - q_pc / Q_p_p)) * z_pc * r_c * V_c_p
+    dH_p <- min((1 - Qmin_n / Q_n_p), (1 - Qmin_p / Q_p_p)) * g * H_p - m * H_p
+    dV_b_p <- min((1 - q_nb / Q_n_p), (1 - q_pb / Q_p_p)) * r_b * V_b_p - c_b * V_b_p
+    dV_c_p <- min((1 - q_nc / Q_n_p), (1 - q_pc / Q_p_p)) * r_c * V_c_p - c_c * V_c_p
+    
+    dR_n_np <- a_n_hi - (u_n * R_n_np * H_np) / (R_n_np + k_n);
+    dR_p_np <- a_p_hi - (u_p * R_p_np * H_np) / (R_p_np + k_p);
+    dQ_n_np <- (u_n * R_n_np) / (R_n_np + k_n) - min((1 - Qmin_n / Q_n_np), (1 - Qmin_p / Q_p_np)) * g * Q_n_np - min((1 - q_nb / Q_n_np), (1 - q_pb / Q_p_np)) * z_nb * r_b * V_b_np - min((1 - q_nc / Q_n_np), (1 - q_pc / Q_p_np)) * z_nc * r_c * V_c_np
+    dQ_p_np <- (u_p * R_p_np) / (R_p_np + k_p) - min((1 - Qmin_n / Q_n_np), (1 - Qmin_p / Q_p_np)) * g * Q_p_np - min((1 - q_nb / Q_n_np), (1 - q_pb / Q_p_np)) * z_pb * r_b * V_b_np - min((1 - q_nc / Q_n_np), (1 - q_pc / Q_p_np)) * z_pc * r_c * V_c_np
+    dH_np <- min((1 - Qmin_n / Q_n_np), (1 - Qmin_p / Q_p_np)) * g * H_np - m * H_np
+    dV_b_np <- min((1 - q_nb / Q_n_np), (1 - q_pb / Q_p_np)) * r_b * V_b_np - c_b * V_b_np
+    dV_c_np <- min((1 - q_nc / Q_n_np), (1 - q_pc / Q_p_np)) * r_c * V_c_np - c_c * V_c_np
+    
+    return(list(c(dR_n_low, dR_p_low, dQ_n_low, dQ_p_low, dH_low, dV_b_low, dV_c_low,
+                  dR_n_n, dR_p_n, dQ_n_n, dQ_p_n, dH_n, dV_b_n, dV_c_n,
+                  dR_n_p, dR_p_p, dQ_n_p, dQ_p_p, dH_p, dV_b_p, dV_c_p,
+                  dR_n_np, dR_p_np, dQ_n_np, dQ_p_np, dH_np, dV_b_np, dV_c_np)))
+    
+  })
+}
+
+#### start here ####
+virus2_model_format <- function(mod_in){
+  
+  mod_out <- mod_in  %>%
+    as_tibble() %>%
+    mutate(across(everything(), as.double)) %>%
+    mutate(Qlim_n_low = Qmin_n / Q_n_low,
+           Qlim_p_low = Qmin_p / Q_p_low,
+           Qlim_n_n = Qmin_n / Q_n_n,
+           Qlim_p_n = Qmin_p / Q_p_n,
+           Qlim_n_p = Qmin_n / Q_n_p,
+           Qlim_p_p = Qmin_p / Q_p_p,
+           Qlim_n_np = Qmin_n / Q_n_np,
+           Qlim_p_np = Qmin_p / Q_p_np) %>%
+    pivot_longer(cols = -time,
+                 names_to = "variable",
+                 values_to = "value") %>%
+    mutate(nutrient = case_when(str_ends(variable, "low") == T ~ "low",
+                                str_ends(variable, "np") == T ~ "+N+P",
+                                str_ends(variable, "n") == T ~ "+N",
+                                str_ends(variable, "p") == T ~ "+P") %>%
+             fct_relevel("low", "+N", "+P"),
+           variable2 = case_when(str_starts(variable, "R_n") == T ~ "R_n",
+                                 str_starts(variable, "R_p") == T ~ "R_p",
+                                 str_starts(variable, "Q_n") == T ~ "Q_n",
+                                 str_starts(variable, "Q_p") == T ~ "Q_p",
+                                 str_starts(variable, "H") == T ~ "H",
+                                 str_starts(variable, "V_b") == T ~ "V_b",
+                                 str_starts(variable, "V_c") == T ~ "V_c",
+                                 str_starts(variable, "Qlim_n") == T ~ "Qlim_n",
+                                 str_starts(variable, "Qlim_p") == T ~ "Qlim_p"))
+  
+  return(mod_out)
+  
 }
 
 
@@ -255,51 +409,11 @@ sim_fun <- function(N_level, P_level, nut_trt, first_virus, plant_time, res_time
 
 #### model with more flexible parameters ####
 
-plant_virus_param_model = function (t, yy, parms) {
-  with(as.list(c(yy, parms)), {
-    
-    dR_n_low <- a_n_lo - (u_n * R_n_low * H_low) / (R_n_low + k_n);
-    dR_p_low <- a_p_lo - (u_p * R_p_low * H_low) / (R_p_low + k_p);
-    dQ_n_low <- (u_n * R_n_low) / (R_n_low + k_n) - min((1 - Qmin_n / Q_n_low), (1 - Qmin_p / Q_p_low)) * g * Q_n_low - min((1 - q_nb / Q_n_low), (1 - q_pb / Q_p_low)) * z_nb * r_b * V_b_low - min((1 - q_nc / Q_n_low), (1 - q_pc / Q_p_low)) * z_nc * r_c * V_c_low
-    dQ_p_low <- (u_p * R_p_low) / (R_p_low + k_p) - min((1 - Qmin_n / Q_n_low), (1 - Qmin_p / Q_p_low)) * g * Q_p_low - min((1 - q_nb / Q_n_low), (1 - q_pb / Q_p_low)) * z_pb * r_b * V_b_low - min((1 - q_nc / Q_n_low), (1 - q_pc / Q_p_low)) * z_pc * r_c * V_c_low
-    dH_low <- min((1 - Qmin_n / Q_n_low), (1 - Qmin_p / Q_p_low)) * g * H_low - m * H_low
-    dV_b_low <- min((1 - q_nb / Q_n_low), (1 - q_pb / Q_p_low)) * r_b * V_b_low - c_b * V_b_low
-    dV_c_low <- min((1 - q_nc / Q_n_low), (1 - q_pc / Q_p_low)) * r_c * V_c_low - c_c * V_c_low
-    
-    dR_n_n <- a_n_hi - (u_n * R_n_n * H_n) / (R_n_n + k_n);
-    dR_p_n <- a_p_lo - (u_p * R_p_n * H_n) / (R_p_n + k_p);
-    dQ_n_n <- (u_n * R_n_n) / (R_n_n + k_n) - min((1 - Qmin_n / Q_n_n), (1 - Qmin_p / Q_p_n)) * g * Q_n_n - min((1 - q_nb / Q_n_n), (1 - q_pb / Q_p_n)) * z_nb * r_b * V_b_n - min((1 - q_nc / Q_n_n), (1 - q_pc / Q_p_n)) * z_nc * r_c * V_c_n
-    dQ_p_n <- (u_p * R_p_n) / (R_p_n + k_p) - min((1 - Qmin_n / Q_n_n), (1 - Qmin_p / Q_p_n)) * g * Q_p_n - min((1 - q_nb / Q_n_n), (1 - q_pb / Q_p_n)) * z_pb * r_b * V_b_n - min((1 - q_nc / Q_n_n), (1 - q_pc / Q_p_n)) * z_pc * r_c * V_c_n
-    dH_n <- min((1 - Qmin_n / Q_n_n), (1 - Qmin_p / Q_p_n)) * g * H_n - m * H_n
-    dV_b_n <- min((1 - q_nb / Q_n_n), (1 - q_pb / Q_p_n)) * r_b * V_b_n - c_b * V_b_n
-    dV_c_n <- min((1 - q_nc / Q_n_n), (1 - q_pc / Q_p_n)) * r_c * V_c_n - c_c * V_c_n
-    
-    dR_n_p <- a_n_lo - (u_n * R_n_p * H_p) / (R_n_p + k_n);
-    dR_p_p <- a_p_hi - (u_p * R_p_p * H_p) / (R_p_p + k_p);
-    dQ_n_p <- (u_n * R_n_p) / (R_n_p + k_n) - min((1 - Qmin_n / Q_n_p), (1 - Qmin_p / Q_p_p)) * g * Q_n_p - min((1 - q_nb / Q_n_p), (1 - q_pb / Q_p_p)) * z_nb * r_b * V_b_p - min((1 - q_nc / Q_n_p), (1 - q_pc / Q_p_p)) * z_nc * r_c * V_c_p
-    dQ_p_p <- (u_p * R_p_p) / (R_p_p + k_p) - min((1 - Qmin_n / Q_n_p), (1 - Qmin_p / Q_p_p)) * g * Q_p_p - min((1 - q_nb / Q_n_p), (1 - q_pb / Q_p_p)) * z_pb * r_b * V_b_p - min((1 - q_nc / Q_n_p), (1 - q_pc / Q_p_p)) * z_pc * r_c * V_c_p
-    dH_p <- min((1 - Qmin_n / Q_n_p), (1 - Qmin_p / Q_p_p)) * g * H_p - m * H_p
-    dV_b_p <- min((1 - q_nb / Q_n_p), (1 - q_pb / Q_p_p)) * r_b * V_b_p - c_b * V_b_p
-    dV_c_p <- min((1 - q_nc / Q_n_p), (1 - q_pc / Q_p_p)) * r_c * V_c_p - c_c * V_c_p
-    
-    dR_n_np <- a_n_hi - (u_n * R_n_np * H_np) / (R_n_np + k_n);
-    dR_p_np <- a_p_hi - (u_p * R_p_np * H_np) / (R_p_np + k_p);
-    dQ_n_np <- (u_n * R_n_np) / (R_n_np + k_n) - min((1 - Qmin_n / Q_n_np), (1 - Qmin_p / Q_p_np)) * g * Q_n_np - min((1 - q_nb / Q_n_np), (1 - q_pb / Q_p_np)) * z_nb * r_b * V_b_np - min((1 - q_nc / Q_n_np), (1 - q_pc / Q_p_np)) * z_nc * r_c * V_c_np
-    dQ_p_np <- (u_p * R_p_np) / (R_p_np + k_p) - min((1 - Qmin_n / Q_n_np), (1 - Qmin_p / Q_p_np)) * g * Q_p_np - min((1 - q_nb / Q_n_np), (1 - q_pb / Q_p_np)) * z_pb * r_b * V_b_np - min((1 - q_nc / Q_n_np), (1 - q_pc / Q_p_np)) * z_pc * r_c * V_c_np
-    dH_np <- min((1 - Qmin_n / Q_n_np), (1 - Qmin_p / Q_p_np)) * g * H_np - m * H_np
-    dV_b_np <- min((1 - q_nb / Q_n_np), (1 - q_pb / Q_p_np)) * r_b * V_b_np - c_b * V_b_np
-    dV_c_np <- min((1 - q_nc / Q_n_np), (1 - q_pc / Q_p_np)) * r_c * V_c_np - c_c * V_c_np
-    
-    return(list(c(dR_n_low, dR_p_low, dQ_n_low, dQ_p_low, dH_low, dV_b_low, dV_c_low,
-                  dR_n_n, dR_p_n, dQ_n_n, dQ_p_n, dH_n, dV_b_n, dV_c_n,
-                  dR_n_p, dR_p_p, dQ_n_p, dQ_p_p, dH_p, dV_b_p, dV_c_p,
-                  dR_n_np, dR_p_np, dQ_n_np, dQ_p_np, dH_np, dV_b_np, dV_c_np)))
-    
-  })
-}
+
 
 
 #### figure settings ####
+
 fig_theme <- theme_bw() +
   theme(panel.background = element_blank(),
         panel.grid.major = element_blank(),
