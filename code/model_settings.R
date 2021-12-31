@@ -77,6 +77,35 @@ init_def1 <- c(R_n_low = R0_n_lo,
                Q_p_np = Q0_p,
                H_np = H0)
 
+init_def2 <- c(R_n_low = R0_n_lo,
+               R_p_low = R0_p_lo,
+               Q_n_low = Q0_n,
+               Q_p_low = Q0_p,
+               H_low = H0,
+               V_b_low = 0, 
+               V_c_low = 0,
+               R_n_n = R0_n_hi,
+               R_p_n = R0_p_lo,
+               Q_n_n = Q0_n,
+               Q_p_n = Q0_p,
+               H_n = H0,
+               V_b_n = 0, 
+               V_c_n = 0,
+               R_n_p = R0_n_lo,
+               R_p_p = R0_p_hi,
+               Q_n_p = Q0_n,
+               Q_p_p = Q0_p,
+               H_p = H0,
+               V_b_p = 0, 
+               V_c_p = 0,
+               R_n_np = R0_n_hi,
+               R_p_np = R0_p_hi,
+               Q_n_np = Q0_n,
+               Q_p_np = Q0_p,
+               H_np = H0,
+               V_b_np = 0, 
+               V_c_np = 0)
+
 
 #### plant only model ####
 
@@ -142,7 +171,7 @@ plant_model_format <- function(mod_in){
 
 #### single virus model ####
 
-virus1_model = function (t, yy, parms) { 
+virus1_model <- function (t, yy, parms) { 
   
   with(as.list(c(yy, parms)), {
   
@@ -290,9 +319,119 @@ virus2_model = function (t, yy, parms) {
   })
 }
 
-#### start here ####
-virus2_model_format <- function(mod_in){
+virus2_model_sim <- function(params, first_virus, plant_time, res_time, inv_time){
   
+  # simulate plant growth
+  plant_mod <- ode(init_def2, times = seq(0, plant_time, length.out = 100),
+                   virus2_model, params) %>%
+    as_tibble() %>%
+    mutate(across(everything(), as.double)) 
+  
+  plant_init <- plant_mod %>%
+    filter(time == plant_time)
+  
+  y0_first_virus <- c(R_n_low = pull(plant_init, R_n_low), 
+                      R_p_low = pull(plant_init, R_p_low), 
+                      Q_n_low = pull(plant_init, Q_n_low), 
+                      Q_p_low = pull(plant_init, Q_p_low), 
+                      H_low = pull(plant_init, H_low), 
+                      V_b_low = if_else(first_virus == "PAV", V0_b, 0),
+                      V_c_low = if_else(first_virus == "RPV", V0_c, 0), 
+                      R_n_n = pull(plant_init, R_n_n), 
+                      R_p_n = pull(plant_init, R_p_n), 
+                      Q_n_n = pull(plant_init, Q_n_n), 
+                      Q_p_n = pull(plant_init, Q_p_n), 
+                      H_n = pull(plant_init, H_n), 
+                      V_b_n = if_else(first_virus == "PAV", V0_b, 0),
+                      V_c_n = if_else(first_virus == "RPV", V0_c, 0), 
+                      R_n_p = pull(plant_init, R_n_p), 
+                      R_p_p = pull(plant_init, R_p_p), 
+                      Q_n_p = pull(plant_init, Q_n_p), 
+                      Q_p_p = pull(plant_init, Q_p_p), 
+                      H_p = pull(plant_init, H_p), 
+                      V_b_p = if_else(first_virus == "PAV", V0_b, 0),
+                      V_c_p = if_else(first_virus == "RPV", V0_c, 0), 
+                      R_n_np = pull(plant_init, R_n_np), 
+                      R_p_np = pull(plant_init, R_p_np), 
+                      Q_n_np = pull(plant_init, Q_n_np), 
+                      Q_p_np = pull(plant_init, Q_p_np), 
+                      H_np = pull(plant_init, H_np), 
+                      V_b_np = if_else(first_virus == "PAV", V0_b, 0),
+                      V_c_np = if_else(first_virus == "RPV", V0_c, 0))
+  
+  # first virus model
+  first_virus_mod <- ode(y0_first_virus, seq(0, res_time, length.out = 100),
+                         virus2_model, params) %>%
+    as_tibble() %>%
+    mutate(across(everything(), as.double)) 
+  
+  first_virus_init <- first_virus_mod %>%
+    filter(time == res_time)
+  
+  # virus initial conditions
+  y0_second_virus <- c(R_n_low = pull(first_virus_init, R_n_low), 
+                       R_p_low = pull(first_virus_init, R_p_low), 
+                       Q_n_low = pull(first_virus_init, Q_n_low), 
+                       Q_p_low = pull(first_virus_init, Q_p_low), 
+                       H_low = pull(first_virus_init, H_low), 
+                       V_b_low = if_else(first_virus == "PAV", 
+                                         pull(first_virus_init, V_b_low), V0_b),
+                       V_c_low = if_else(first_virus == "RPV", 
+                                         pull(first_virus_init, V_c_low), V0_c), 
+                       R_n_n = pull(first_virus_init, R_n_n), 
+                       R_p_n = pull(first_virus_init, R_p_n), 
+                       Q_n_n = pull(first_virus_init, Q_n_n), 
+                       Q_p_n = pull(first_virus_init, Q_p_n), 
+                       H_n = pull(first_virus_init, H_n), 
+                       V_b_n = if_else(first_virus == "PAV", 
+                                       pull(first_virus_init, V_b_n), V0_b),
+                       V_c_n = if_else(first_virus == "RPV", 
+                                       pull(first_virus_init, V_c_n), V0_c),
+                       R_n_p = pull(first_virus_init, R_n_p), 
+                       R_p_p = pull(first_virus_init, R_p_p), 
+                       Q_n_p = pull(first_virus_init, Q_n_p), 
+                       Q_p_p = pull(first_virus_init, Q_p_p), 
+                       H_p = pull(first_virus_init, H_p), 
+                       V_b_p = if_else(first_virus == "PAV", 
+                                       pull(first_virus_init, V_b_p), V0_b),
+                       V_c_p = if_else(first_virus == "RPV", 
+                                       pull(first_virus_init, V_c_p), V0_c),
+                       R_n_np = pull(first_virus_init, R_n_np), 
+                       R_p_np = pull(first_virus_init, R_p_np), 
+                       Q_n_np = pull(first_virus_init, Q_n_np), 
+                       Q_p_np = pull(first_virus_init, Q_p_np), 
+                       H_np = pull(first_virus_init, H_np), 
+                       V_b_np = if_else(first_virus == "PAV", 
+                                        pull(first_virus_init, V_b_np), V0_b),
+                       V_c_np = if_else(first_virus == "RPV", 
+                                        pull(first_virus_init, V_c_np), V0_c))
+  
+  # first virus model
+  second_virus_mod <- ode(y0_second_virus, seq(0, inv_time, length.out = 100),
+                          virus2_model, params) %>%
+    as_tibble() %>%
+    mutate(across(everything(), as.double))
+  
+  # combine simulations
+  comb_mod <- plant_mod %>%
+    filter(time != max(time)) %>%
+    full_join(first_virus_mod %>%
+                filter(time != max(time)) %>%
+                mutate(time = time + plant_time)) %>%
+    full_join(second_virus_mod %>%
+                mutate(time = time + plant_time + res_time))
+  
+  return(comb_mod)
+  
+}
+
+virus2_model_format <- function(mod_in, params){
+  
+  # min nutrient conc.
+  Qmin_n <- as.numeric(params["Qmin_n"])
+  Qmin_p <- as.numeric(params["Qmin_p"])
+  
+  # format
   mod_out <- mod_in  %>%
     as_tibble() %>%
     mutate(across(everything(), as.double)) %>%
@@ -304,6 +443,20 @@ virus2_model_format <- function(mod_in){
            Qlim_p_p = Qmin_p / Q_p_p,
            Qlim_n_np = Qmin_n / Q_n_np,
            Qlim_p_np = Qmin_p / Q_p_np) %>%
+    rowwise() %>%
+    mutate(LimQ_low = max(Qlim_n_low, Qlim_p_low),
+           LimQ_n = max(Qlim_n_n, Qlim_p_n),
+           LimQ_p = max(Qlim_n_p, Qlim_p_p),
+           LimQ_np = max(Qlim_n_np, Qlim_p_np)) %>%
+    ungroup() %>%
+    mutate(lim_N_H_low = case_when(LimQ_low == Qlim_n_low ~ 1,
+                                   TRUE ~ 0),
+           lim_N_H_n = case_when(LimQ_n == Qlim_n_n ~ 1,
+                                 TRUE ~ 0),
+           lim_N_H_p = case_when(LimQ_p == Qlim_n_p ~ 1,
+                                 TRUE ~ 0),
+           lim_N_H_np = case_when(LimQ_np == Qlim_n_np ~ 1,
+                                  TRUE ~ 0)) %>%
     pivot_longer(cols = -time,
                  names_to = "variable",
                  values_to = "value") %>%
@@ -317,99 +470,127 @@ virus2_model_format <- function(mod_in){
                                  str_starts(variable, "Q_n") == T ~ "Q_n",
                                  str_starts(variable, "Q_p") == T ~ "Q_p",
                                  str_starts(variable, "H") == T ~ "H",
-                                 str_starts(variable, "V_b") == T ~ "V_b",
-                                 str_starts(variable, "V_c") == T ~ "V_c",
+                                 str_starts(variable, "V_b") == T ~ "PAV",
+                                 str_starts(variable, "V_c") == T ~ "RPV",
                                  str_starts(variable, "Qlim_n") == T ~ "Qlim_n",
-                                 str_starts(variable, "Qlim_p") == T ~ "Qlim_p"))
+                                 str_starts(variable, "Qlim_p") == T ~ "Qlim_p",
+                                 str_starts(variable, "LimQ") == T ~ "Qlim",
+                                 str_starts(variable, "lim_N") == T ~ "lim_N"))
   
-  return(mod_out)
+  # add limiting nutrient to all rows
+  mod_out2 <- mod_out %>%
+    filter(!(variable2 %in% c("Qlim_n", "Qlim_p", "LimQ", "lim_N"))) %>%
+    full_join(mod_out %>%
+                filter(variable2 == "lim_N") %>%
+                mutate(value = fct_recode(as.character(value), 
+                                          "Q[N]" = "1", "Q[P]" = "0")) %>%
+                rename("lim_nut_H" = "value") %>%
+                select(nutrient, time, lim_nut_H))
   
-}
-
-
-#### simulation wrapper ####
-
-sim_fun <- function(N_level, P_level, nut_trt, first_virus, plant_time, res_time, inv_time){
-  
-  # initial resource values
-  if(N_level == "low"){
-    R0_n <- R0_n_lo
-    a_n <- a_n_lo
-  }else{
-    R0_n <- R0_n_hi
-    a_n <- a_n_hi
-  }
-  
-  if(P_level == "low"){
-    R0_p <- R0_p_lo
-    a_p <- a_p_lo
-  }else{
-    R0_p <- R0_p_hi
-    a_p <- a_p_hi
-  }
-  
-  # plant model
-  plant_mod <- ode(c(R_n = R0_n, R_p = R0_p, Q_n = Q0_n, Q_p = Q0_p, H = H0, V_b = 0, V_c = 0),
-                   seq(0, plant_time, length.out = 100), plant_virus_model, c(a_n = a_n, a_p = a_p)) %>%
-    as_tibble() %>%
-    mutate(across(everything(), as.double))
-  
-  # final time
-  plant_init <- plant_mod %>%
-    filter(time == plant_time)
-  
-  # virus initial conditions
-  y0_first_virus <- c(R_n = pull(plant_init, R_n), 
-                      R_p = pull(plant_init, R_p), 
-                      Q_n = pull(plant_init, Q_n), 
-                      Q_p = pull(plant_init, Q_p), 
-                      H = pull(plant_init, H), 
-                      V_b = if_else(first_virus == "PAV", V0_b, 0),
-                      V_c = if_else(first_virus == "RPV", V0_c, 0))
-  
-  # first virus model
-  first_virus_mod <- ode(y0_first_virus, seq(0, res_time, length.out = 100),
-                         plant_virus_model, c(a_n = a_n, a_p = a_p)) %>%
-    as_tibble() %>%
-    mutate(across(everything(), as.double))
-  
-  # final time
-  first_virus_init <- first_virus_mod %>%
-    filter(time == res_time)
-  
-  # virus initial conditions
-  y0_second_virus <- c(R_n = pull(first_virus_init, R_n),
-                       R_p = pull(first_virus_init, R_p),
-                       Q_n = pull(first_virus_init, Q_n),
-                       Q_p = pull(first_virus_init, Q_p),
-                       H = pull(first_virus_init, H),
-                       V_b = if_else(first_virus == "PAV", pull(first_virus_init, V_b), V0_b),
-                       V_c = if_else(first_virus == "RPV", pull(first_virus_init, V_c), V0_c))
-  
-  # first virus model
-  second_virus_mod <- ode(y0_second_virus, seq(0, inv_time, length.out = 100),
-                          plant_virus_model, c(a_n = a_n, a_p = a_p)) %>%
-    as_tibble() %>%
-    mutate(across(everything(), as.double))
-  
-  # combine models
-  mod_out <- plant_mod %>%
-    filter(time != max(time)) %>%
-    full_join(first_virus_mod %>%
-                filter(time != max(time)) %>%
-                mutate(time = time + plant_time)) %>%
-    full_join(second_virus_mod %>%
-                mutate(time = time + plant_time + res_time)) %>%
-    mutate(nutrient = nut_trt,
-           resident = first_virus,
-           invader = if_else(resident == "PAV", "RPV", "PAV"))
+  return(mod_out2)
   
 }
 
-
-#### model with more flexible parameters ####
-
-
+plant_fig_fun <- function(mod, params, q_adj_n, q_adj_p){
+  
+  # min nutrient conc.
+  Qmin_n <- as.numeric(params["Qmin_n"])
+  Qmin_p <- as.numeric(params["Qmin_p"])
+  
+  # combine
+  plant_dat <- virus2_model_format(mod)
+  
+  # panels
+  plant_H_fig <- filter(plant_dat, variable2 == "H") %>%
+    ggplot(aes(time, value, linetype = nutrient, color = nutrient)) +
+    geom_line(aes(size = lim_nut_H)) +
+    scale_color_viridis_d(end = 0.7, name = "Nutrient\nsupply") +
+    scale_linetype(name = "Nutrient\nsupply") +
+    scale_size_manual(values = c(1.2, 0.6), guide= "none") +
+    labs(x = "Time (days)", y = "Plant biomass (g)", title = "(A)") +
+    fig_theme +
+    theme(axis.title.x = element_blank(),
+          axis.text.x = element_blank()) +
+    guides(color = guide_legend(override.aes = list(size = 1.2)))
+  
+  plant_lim_fig <- filter(plant_dat, variable2 == "Qlim") %>%
+    ggplot(aes(time, value, linetype = nutrient, color = nutrient)) +
+    geom_line(aes(size = lim_nut_H)) +
+    scale_color_viridis_d(end = 0.7, guide = "none") +
+    scale_linetype(guide = "none") +
+    scale_size_manual(values = c(1.2, 0.6), name = "Limiting\nnutrient",
+                      labels = c("N", "P")) +
+    labs(x = "Time (days)", title = "(B)", 
+         y = expression(paste("Limiting nutrient ratio (", Q[min], "/Q)", sep = ""))) +
+    fig_theme +
+    theme(axis.title.x = element_blank(),
+          axis.text.x = element_blank())
+  
+  plant_Rn_fig <- filter(plant_dat, variable2 == "R_n") %>%
+    ggplot(aes(time, value, linetype = nutrient, color = nutrient)) +
+    geom_line(aes(size = lim_nut_H)) +
+    scale_color_viridis_d(end = 0.7) +
+    scale_size_manual(values = c(1.2, 0.6)) +
+    labs(x = "Time (days)", y = "Environment N (g)", title = "(C)") +
+    fig_theme +
+    theme(legend.position = "none",
+          axis.title.x = element_blank(),
+          axis.text.x = element_blank())
+  
+  plant_Rp_fig <- filter(plant_dat, variable2 == "R_p") %>%
+    ggplot(aes(time, value, linetype = nutrient, color = nutrient)) +
+    geom_line(aes(size = lim_nut_H)) +
+    scale_color_viridis_d(end = 0.7) +
+    scale_size_manual(values = c(1.2, 0.6)) +
+    labs(x = "", y = "Environment P (g)", title = "(D)") +
+    fig_theme +
+    theme(legend.position = "none")
+  
+  plant_Qn_fig <- filter(plant_dat, variable2 == "Q_n") %>%
+    ggplot(aes(time, value)) +
+    geom_hline(yintercept = Qmin_n, color = "black") +
+    geom_text(data = Qn_lab, aes(label = label), parse = T, color = "black", fontface = "italic",
+              size = 3, hjust = 0, vjust = 0, nudge_y = q_adj_n) +
+    geom_line(aes(linetype = nutrient, color = nutrient, size = lim_nut_H)) +
+    scale_color_viridis_d(end = 0.7) +
+    scale_size_manual(values = c(1.2, 0.6)) +
+    labs(x = "Time (days)", y = "Plant N concentration", title = "(E)") +
+    fig_theme +
+    theme(legend.position = "none")
+  
+  plant_Qp_fig <- filter(plant_dat, variable2 == "Q_p") %>%
+    ggplot(aes(time, value)) +
+    geom_hline(yintercept = Qmin_p, color = "black") +
+    geom_text(data = Qp_lab, aes(label = label), parse = T, color = "black", fontface = "italic", 
+              size = 3, hjust = 0, vjust = 0, nudge_y = q_adj_p) +
+    geom_line(aes(linetype = nutrient, color = nutrient, size = lim_nut_H)) +
+    scale_color_viridis_d(end = 0.7) +
+    scale_size_manual(values = c(1.2, 0.6)) +
+    labs(x = "", y = "Plant P concentration", title = "(F)") +
+    fig_theme +
+    theme(legend.position = "none")
+  
+  # extract legends
+  nut_leg <- get_legend(plant_H_fig)
+  lim_leg <- get_legend(plant_lim_fig)
+  
+  # combine figures
+  plant_top_fig <- plot_grid(plant_H_fig + theme(legend.position = "none"), 
+                             plant_lim_fig + theme(legend.position = "none"), 
+                             plant_Rn_fig,
+                             nut_leg,
+                             nrow = 1,
+                             rel_widths = c(1, 1, 1, 0.35))
+  plant_bot_fig <- plot_grid(plant_Rp_fig, plant_Qn_fig, plant_Qp_fig, 
+                             lim_leg,
+                             nrow = 1,
+                             rel_widths = c(1, 1, 1, 0.35))
+  
+  # output
+  return(plot_grid(plant_top_fig, plant_bot_fig,
+                   nrow = 2, rel_heights = c(0.85, 1)))
+  
+}
 
 
 #### figure settings ####
