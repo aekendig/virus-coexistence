@@ -319,7 +319,7 @@ virus2_model = function (t, yy, parms) {
   })
 }
 
-virus2_model_sim <- function(params, first_virus, plant_time, res_time, inv_time){
+virus2_model_sim <- function(params, first_virus, V0_b, V0_c, plant_time, res_time, inv_time){
   
   # simulate plant growth
   plant_mod <- ode(init_def2, times = seq(0, plant_time, length.out = 100),
@@ -483,7 +483,8 @@ virus2_model_format <- function(mod_in, params){
     full_join(mod_out %>%
                 filter(variable2 == "lim_N") %>%
                 mutate(value = fct_recode(as.character(value), 
-                                          "Q[N]" = "1", "Q[P]" = "0")) %>%
+                                          "Q[N]" = "1", "Q[P]" = "0") %>%
+                         fct_relevel("Q[N]")) %>%
                 rename("lim_nut_H" = "value") %>%
                 select(nutrient, time, lim_nut_H))
   
@@ -491,17 +492,22 @@ virus2_model_format <- function(mod_in, params){
   
 }
 
-plant_fig_fun <- function(mod, params, q_adj_n, q_adj_p){
+plant_fig_fun <- function(mod_dat, params, q_adj_n, q_adj_p){
   
   # min nutrient conc.
   Qmin_n <- as.numeric(params["Qmin_n"])
   Qmin_p <- as.numeric(params["Qmin_p"])
   
-  # combine
-  plant_dat <- virus2_model_format(mod)
+  # figure labels
+  Qn_lab <- tibble(time = 0, 
+                   value = Qmin_n, 
+                   label = "Q['min,N']")
+  Qp_lab <- tibble(time = 0, 
+                   value = Qmin_p, 
+                   label = "Q['min,P']")
   
   # panels
-  plant_H_fig <- filter(plant_dat, variable2 == "H") %>%
+  plant_H_fig <- filter(mod_dat, variable2 == "H") %>%
     ggplot(aes(time, value, linetype = nutrient, color = nutrient)) +
     geom_line(aes(size = lim_nut_H)) +
     scale_color_viridis_d(end = 0.7, name = "Nutrient\nsupply") +
@@ -513,20 +519,20 @@ plant_fig_fun <- function(mod, params, q_adj_n, q_adj_p){
           axis.text.x = element_blank()) +
     guides(color = guide_legend(override.aes = list(size = 1.2)))
   
-  plant_lim_fig <- filter(plant_dat, variable2 == "Qlim") %>%
+  plant_lim_fig <- filter(mod_dat, variable2 == "Qlim") %>%
     ggplot(aes(time, value, linetype = nutrient, color = nutrient)) +
     geom_line(aes(size = lim_nut_H)) +
     scale_color_viridis_d(end = 0.7, guide = "none") +
     scale_linetype(guide = "none") +
     scale_size_manual(values = c(1.2, 0.6), name = "Limiting\nnutrient",
                       labels = c("N", "P")) +
-    labs(x = "Time (days)", title = "(B)", 
+    labs(x = "Time (days)", title = "(B)",
          y = expression(paste("Limiting nutrient ratio (", Q[min], "/Q)", sep = ""))) +
     fig_theme +
     theme(axis.title.x = element_blank(),
           axis.text.x = element_blank())
   
-  plant_Rn_fig <- filter(plant_dat, variable2 == "R_n") %>%
+  plant_Rn_fig <- filter(mod_dat, variable2 == "R_n") %>%
     ggplot(aes(time, value, linetype = nutrient, color = nutrient)) +
     geom_line(aes(size = lim_nut_H)) +
     scale_color_viridis_d(end = 0.7) +
@@ -537,7 +543,7 @@ plant_fig_fun <- function(mod, params, q_adj_n, q_adj_p){
           axis.title.x = element_blank(),
           axis.text.x = element_blank())
   
-  plant_Rp_fig <- filter(plant_dat, variable2 == "R_p") %>%
+  plant_Rp_fig <- filter(mod_dat, variable2 == "R_p") %>%
     ggplot(aes(time, value, linetype = nutrient, color = nutrient)) +
     geom_line(aes(size = lim_nut_H)) +
     scale_color_viridis_d(end = 0.7) +
@@ -546,7 +552,7 @@ plant_fig_fun <- function(mod, params, q_adj_n, q_adj_p){
     fig_theme +
     theme(legend.position = "none")
   
-  plant_Qn_fig <- filter(plant_dat, variable2 == "Q_n") %>%
+  plant_Qn_fig <- filter(mod_dat, variable2 == "Q_n") %>%
     ggplot(aes(time, value)) +
     geom_hline(yintercept = Qmin_n, color = "black") +
     geom_text(data = Qn_lab, aes(label = label), parse = T, color = "black", fontface = "italic",
@@ -558,10 +564,10 @@ plant_fig_fun <- function(mod, params, q_adj_n, q_adj_p){
     fig_theme +
     theme(legend.position = "none")
   
-  plant_Qp_fig <- filter(plant_dat, variable2 == "Q_p") %>%
+  plant_Qp_fig <- filter(mod_dat, variable2 == "Q_p") %>%
     ggplot(aes(time, value)) +
     geom_hline(yintercept = Qmin_p, color = "black") +
-    geom_text(data = Qp_lab, aes(label = label), parse = T, color = "black", fontface = "italic", 
+    geom_text(data = Qp_lab, aes(label = label), parse = T, color = "black", fontface = "italic",
               size = 3, hjust = 0, vjust = 0, nudge_y = q_adj_p) +
     geom_line(aes(linetype = nutrient, color = nutrient, size = lim_nut_H)) +
     scale_color_viridis_d(end = 0.7) +
@@ -575,13 +581,13 @@ plant_fig_fun <- function(mod, params, q_adj_n, q_adj_p){
   lim_leg <- get_legend(plant_lim_fig)
   
   # combine figures
-  plant_top_fig <- plot_grid(plant_H_fig + theme(legend.position = "none"), 
-                             plant_lim_fig + theme(legend.position = "none"), 
+  plant_top_fig <- plot_grid(plant_H_fig + theme(legend.position = "none"),
+                             plant_lim_fig + theme(legend.position = "none"),
                              plant_Rn_fig,
                              nut_leg,
                              nrow = 1,
                              rel_widths = c(1, 1, 1, 0.35))
-  plant_bot_fig <- plot_grid(plant_Rp_fig, plant_Qn_fig, plant_Qp_fig, 
+  plant_bot_fig <- plot_grid(plant_Rp_fig, plant_Qn_fig, plant_Qp_fig,
                              lim_leg,
                              nrow = 1,
                              rel_widths = c(1, 1, 1, 0.35))
@@ -589,7 +595,6 @@ plant_fig_fun <- function(mod, params, q_adj_n, q_adj_p){
   # output
   return(plot_grid(plant_top_fig, plant_bot_fig,
                    nrow = 2, rel_heights = c(0.85, 1)))
-  
 }
 
 

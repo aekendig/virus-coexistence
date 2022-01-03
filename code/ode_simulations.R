@@ -15,180 +15,127 @@ library(lemon)
 # load model and settings
 source("code/model_settings.R")
 
-# figure labels
-Qn_lab <- tibble(time = 0, 
-                 Q_n = as.numeric(params_def2["Qmin_n"]), 
-                 label = "Q['min,N']")
-Qp_lab <- tibble(time = 0, 
-                 Q_p = as.numeric(params_def2["Qmin_p"]), 
-                 label = "Q['min,P']")
-
 
 #### long-term plant ####
 
-# viruses
-V0_b <- V0_c <- 0
-
 # simulation
-long_term_plant <- virus2_model_sim(params_def2, "PAV", 
+long_term_plant <- virus2_model_sim(params_def2, "PAV", V0_b = 0, V0_c = 0,
                                     plant_time = 250, res_time = 12, 
                                     inv_time = 1000-250-12) %>%
   virus2_model_format(params_def2)
 
-#### start here: check that above works as expected by making figure ###
-
 # figure
 pdf("output/long_term_plant_simulation_figure.pdf", width = 6.5, height = 3.75)
-plant_fig_fun(low_plant_long_sim, n_plant_long_sim, p_plant_long_sim, np_plant_long_sim, -3e-3, -1e-3)
+plant_fig_fun(long_term_plant, params_def2, -3e-3, -1e-3)
 dev.off()
 
 
 #### short-term plant ####
 
-# time intervals
+# settings for short-term simulations
 plant_days <- 11
 res_days <- 12
-inv_days <- 100-plant_days-res_days
+inv_days <- 1000-plant_days-res_days
 
-# viruses
-V0_b <- V0_c <- 0
-
-# simulations
-low_plant_short_sim <- sim_fun("low", "low", "low", "PAV", plant_days, res_days, inv_days)
-n_plant_short_sim <- sim_fun("high", "low", "N", "PAV", plant_days, res_days, inv_days)
-p_plant_short_sim <- sim_fun("low", "high", "P", "PAV", plant_days, res_days, inv_days)
-np_plant_short_sim <- sim_fun("high", "high", "N+P", "PAV", plant_days, res_days, inv_days)
+# simulation
+short_term_plant <- virus2_model_sim(params_def2, "PAV", V0_b = 0, V0_c = 0, 
+                                     plant_time = plant_days, res_time = res_days, 
+                                     inv_time = inv_days) %>%
+  virus2_model_format(params_def2)
 
 # figure
 pdf("output/short_term_plant_simulation_figure.pdf", width = 6.5, height = 3.75)
-plant_fig_fun(low_plant_short_sim, n_plant_short_sim, p_plant_short_sim, np_plant_short_sim, -2e-3, -5e-4)
+plant_fig_fun(short_term_plant, params_def2, -2e-3, -5e-4)
 dev.off()
 
 
 #### single virus simulations ####
 
-# time intervals
-plant_days <- 11
-res_days <- 12
-inv_days <- 100-plant_days-res_days
-
 # PAV with plant
-V0_b <- V0_init
-V0_c <- 0
+pav_first_sim <- virus2_model_sim(params_def2, "PAV", V0_b = V0, V0_c = 0,
+                                  plant_time = plant_days, res_time = res_days, 
+                                  inv_time = inv_days) %>%
+  virus2_model_format(params_def2)
 
-low_pav_first_sim <- sim_fun("low", "low", "low", "PAV", plant_days, res_days, inv_days)
-n_pav_first_sim <- sim_fun("high", "low", "N", "PAV", plant_days, res_days, inv_days)
-p_pav_first_sim <- sim_fun("low", "high", "P", "PAV", plant_days, res_days, inv_days)
-np_pav_first_sim <- sim_fun("high", "high", "N+P", "PAV", plant_days, res_days, inv_days)
-
-low_pav_second_sim <- sim_fun("low", "low", "low", "RPV", plant_days, res_days, inv_days)
-n_pav_second_sim <- sim_fun("high", "low", "N", "RPV", plant_days, res_days, inv_days)
-p_pav_second_sim <- sim_fun("low", "high", "P", "RPV", plant_days, res_days, inv_days)
-np_pav_second_sim <- sim_fun("high", "high", "N+P", "RPV", plant_days, res_days, inv_days)
+pav_second_sim <- virus2_model_sim(params_def2, "RPV", V0_b = V0, V0_c = 0,
+                                   plant_time = plant_days, res_time = res_days, 
+                                   inv_time = inv_days) %>%
+  virus2_model_format(params_def2)
 
 # RPV with plant
-V0_b <- 0
-V0_c <- V0_init
+rpv_first_sim <- virus2_model_sim(params_def2, "RPV", V0_b = 0, V0_c = V0,
+                                  plant_time = plant_days, res_time = res_days, 
+                                  inv_time = inv_days) %>%
+  virus2_model_format(params_def2)
 
-low_rpv_first_sim <- sim_fun("low", "low", "low", "RPV", plant_days, res_days, inv_days)
-n_rpv_first_sim <- sim_fun("high", "low", "N", "RPV", plant_days, res_days, inv_days)
-p_rpv_first_sim <- sim_fun("low", "high", "P", "RPV", plant_days, res_days, inv_days)
-np_rpv_first_sim <- sim_fun("high", "high", "N+P", "RPV", plant_days, res_days, inv_days)
-
-low_rpv_second_sim <- sim_fun("low", "low", "low", "PAV", plant_days, res_days, inv_days)
-n_rpv_second_sim <- sim_fun("high", "low", "N", "PAV", plant_days, res_days, inv_days)
-p_rpv_second_sim <- sim_fun("low", "high", "P", "PAV", plant_days, res_days, inv_days)
-np_rpv_second_sim <- sim_fun("high", "high", "N+P", "PAV", plant_days, res_days, inv_days)
+rpv_second_sim <- virus2_model_sim(params_def2, "PAV", V0_b = 0, V0_c = V0,
+                                   plant_time = plant_days, res_time = res_days, 
+                                   inv_time = inv_days) %>%
+  virus2_model_format(params_def2)
 
 
 #### virus invasion simulations ####
 
-# time intervals
-plant_days <- 11
-res_days <- 12
-inv_days <- 100-plant_days-res_days
+# PAV invades
+pav_inv_sim <- virus2_model_sim(params_def2, "RPV", V0_b = V0, V0_c = V0,
+                                plant_time = plant_days, res_time = res_days, 
+                                inv_time = inv_days) %>%
+  virus2_model_format(params_def2)
 
-# viruses
-V0_b <- V0_c <- V0_init
-
-# simulations
-low_pav_inv_sim <- sim_fun("low", "low", "low", "RPV", plant_days, res_days, inv_days)
-n_pav_inv_sim <- sim_fun("high", "low", "N", "RPV", plant_days, res_days, inv_days)
-p_pav_inv_sim <- sim_fun("low", "high", "P", "RPV", plant_days, res_days, inv_days)
-np_pav_inv_sim <- sim_fun("high", "high", "N+P", "RPV", plant_days, res_days, inv_days)
-
-low_rpv_inv_sim <- sim_fun("low", "low", "low", "PAV", plant_days, res_days, inv_days)
-n_rpv_inv_sim <- sim_fun("high", "low", "N", "PAV", plant_days, res_days, inv_days)
-p_rpv_inv_sim <- sim_fun("low", "high", "P", "PAV", plant_days, res_days, inv_days)
-np_rpv_inv_sim <- sim_fun("high", "high", "N+P", "PAV", plant_days, res_days, inv_days)
+# RPV invades
+rpv_inv_sim <- virus2_model_sim(params_def2, "PAV", V0_b = V0, V0_c = V0,
+                                plant_time = plant_days, res_time = res_days, 
+                                inv_time = inv_days) %>%
+  virus2_model_format(params_def2)
 
 
 #### edit simulation data ####
 
-pav_first_sim <- sim_dat_fun(low_pav_first_sim, n_pav_first_sim, 
-                             p_pav_first_sim, np_pav_first_sim) %>%
-  filter(time > plant_days) %>%
-  mutate(virus_conc = PAV_log10,
-         virus = resident,
-         scenario = "(D) Resident alone")
+# edit simulations
+pav_inv_sim2 <- pav_inv_sim %>%
+  filter(time > (plant_days + res_days) & variable2 == "PAV") %>%
+  mutate(scenario = "(A) Invader")
 
-pav_second_sim <- sim_dat_fun(low_pav_second_sim, n_pav_second_sim, 
-                              p_pav_second_sim, np_pav_second_sim) %>%
-  filter(time > (plant_days + res_days)) %>%
-  mutate(virus_conc = PAV_log10,
-         virus = invader,
-         scenario = "(B) Invader alone")
+rpv_inv_sim2 <- rpv_inv_sim %>%
+  filter(time > (plant_days + res_days) & variable2 == "RPV") %>%
+  mutate(scenario = "(A) Invader")
 
-rpv_first_sim <- sim_dat_fun(low_rpv_first_sim, n_rpv_first_sim, 
-                             p_rpv_first_sim, np_rpv_first_sim) %>%
-  filter(time > plant_days) %>%
-  mutate(virus_conc = RPV_log10,
-         virus = resident,
-         scenario = "(D) Resident alone")
+pav_second_sim2 <- pav_second_sim %>%
+  filter(time > (plant_days + res_days) & variable2 == "PAV") %>%
+  mutate(scenario = "(B) Invader alone")
 
-rpv_second_sim <- sim_dat_fun(low_rpv_second_sim, n_rpv_second_sim, 
-                              p_rpv_second_sim, np_rpv_second_sim) %>%
-  filter(time > (plant_days + res_days)) %>%
-  mutate(virus_conc = RPV_log10,
-         virus = invader,
-         scenario = "(B) Invader alone")
+rpv_second_sim2 <- rpv_second_sim %>%
+  filter(time > (plant_days + res_days) & variable2 == "RPV") %>%
+  mutate(scenario = "(B) Invader alone")
 
-pav_res_sim <- sim_dat_fun(low_rpv_inv_sim, n_rpv_inv_sim, 
-                           p_rpv_inv_sim, np_rpv_inv_sim) %>%
-  filter(time > plant_days) %>%
-  mutate(virus_conc = PAV_log10,
-         virus = resident,
-         scenario = "(C) Resident")
+pav_res_sim2 <- rpv_inv_sim %>%
+  filter(time > plant_days & variable2 == "PAV") %>%
+  mutate(scenario = "(C) Resident")
 
-rpv_inv_sim <- pav_res_sim %>%
-  filter(time > (plant_days + res_days)) %>%
-  mutate(virus_conc = RPV_log10,
-         virus = invader,
-         scenario = "(A) Invader")
+rpv_res_sim2 <- pav_inv_sim %>%
+  filter(time > plant_days & variable2 == "RPV") %>%
+  mutate(scenario = "(C) Resident")
 
-rpv_res_sim <- sim_dat_fun(low_pav_inv_sim, n_pav_inv_sim, 
-                           p_pav_inv_sim, np_pav_inv_sim) %>%
-  filter(time > plant_days) %>%
-  mutate(virus_conc = RPV_log10,
-         virus = resident,
-         scenario = "(C) Resident")
+pav_first_sim2 <- pav_first_sim %>%
+  filter(time > plant_days & variable2 == "PAV") %>%
+  mutate(scenario = "(D) Resident alone")
 
-pav_inv_sim <- rpv_res_sim %>%
-  filter(time > (plant_days + res_days)) %>%
-  mutate(virus_conc = PAV_log10,
-         virus = invader,
-         scenario = "(A) Invader")
+rpv_first_sim2 <- rpv_first_sim %>%
+  filter(time > plant_days & variable2 == "RPV") %>%
+  mutate(scenario = "(D) Resident alone")
 
 # combine
-virus_sim <- pav_inv_sim %>%
-  full_join(rpv_inv_sim) %>%
-  full_join(pav_second_sim) %>%
-  full_join(rpv_second_sim) %>%
-  full_join(pav_res_sim) %>%
-  full_join(rpv_res_sim) %>%
-  full_join(pav_first_sim) %>%
-  full_join(rpv_first_sim) %>%
-  mutate(fac_lab_y = case_when(virus == "PAV" ~ "BYDV-PAV~titer~(log[10])",
+virus_sim <- pav_inv_sim2 %>%
+  full_join(rpv_inv_sim2) %>%
+  full_join(pav_second_sim2) %>%
+  full_join(rpv_second_sim2) %>%
+  full_join(pav_res_sim2) %>%
+  full_join(rpv_res_sim2) %>%
+  full_join(pav_first_sim2) %>%
+  full_join(rpv_first_sim2) %>%
+  mutate(virus_conc = log10(value + 1),
+         virus = variable2,
+         fac_lab_y = case_when(virus == "PAV" ~ "BYDV-PAV~titer~(log[10])",
                                virus == "RPV" ~ "CYDV-RPV~titer~(log[10])"),
          fac_lab_x = str_replace_all(scenario, " ", "~"),
          fac_lab_x = paste0("bold(", fac_lab_x, ")"))
@@ -222,21 +169,17 @@ dev.off()
 #### plant figures with viruses ####
 
 pdf("output/pav_only_plant_simulation_figure.pdf", width = 6.5, height = 3.75)
-plant_fig_fun(low_pav_first_sim, n_pav_first_sim, 
-              p_pav_first_sim, np_pav_first_sim, -2e-3, -5e-4)
+plant_fig_fun(pav_first_sim, params_def2, -2e-3, -5e-4)
 dev.off()
 
 pdf("output/rpv_only_plant_simulation_figure.pdf", width = 6.5, height = 3.75)
-plant_fig_fun(low_rpv_first_sim, n_rpv_first_sim, 
-              p_rpv_first_sim, np_rpv_first_sim, -2e-3, -5e-4)
+plant_fig_fun(rpv_first_sim, params_def2, -2e-3, -5e-4)
 dev.off()
 
 pdf("output/pav_inv_plant_simulation_figure.pdf", width = 6.5, height = 3.75)
-plant_fig_fun(low_pav_inv_sim, n_pav_inv_sim, 
-              p_pav_inv_sim, np_pav_inv_sim, -2e-3, -5e-4)
+plant_fig_fun(pav_inv_sim, params_def2, -2e-3, -5e-4)
 dev.off()
 
 pdf("output/rpv_inv_plant_simulation_figure.pdf", width = 6.5, height = 3.75)
-plant_fig_fun(low_rpv_inv_sim, n_rpv_inv_sim, 
-              p_rpv_inv_sim, np_rpv_inv_sim, -2e-3, -5e-4)
+plant_fig_fun(rpv_inv_sim, params_def2, -2e-3, -5e-4)
 dev.off()

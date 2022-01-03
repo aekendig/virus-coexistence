@@ -1,5 +1,9 @@
 ## Goal: estimate plant and virus growth rates
 
+#### start here ####
+# ode_simulations and model_settings are all updated
+# current virus parameters make PAV grow linearly without limit and RPV crashes by ~ 600 days
+
 
 #### set up ####
 
