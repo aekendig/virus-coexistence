@@ -21,7 +21,7 @@ source("code/model_settings.R")
 # simulation
 long_term_plant <- virus2_model_sim(params_def2, "PAV", V0_b = 0, V0_c = 0,
                                     plant_time = 250, res_time = 12, 
-                                    inv_time = 1000-250-12) %>%
+                                    inv_time = 10000-250-12) %>%
   virus2_model_format(params_def2)
 
 # figure
@@ -35,7 +35,7 @@ dev.off()
 # settings for short-term simulations
 plant_days <- 11
 res_days <- 12
-inv_days <- 1000-plant_days-res_days
+inv_days <- 100-plant_days-res_days
 
 # simulation
 short_term_plant <- virus2_model_sim(params_def2, "PAV", V0_b = 0, V0_c = 0, 

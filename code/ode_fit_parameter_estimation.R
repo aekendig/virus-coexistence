@@ -1,9 +1,5 @@
 ## Goal: estimate plant and virus growth rates
 
-#### start here ####
-# ode_simulations and model_settings are all updated
-# current virus parameters make PAV grow linearly without limit and RPV crashes by ~ 600 days
-
 
 #### set up ####
 
@@ -200,9 +196,6 @@ manipulate(plant_wrapper(m, g), m = slider(0, 0.1), g = slider(0, 1))
 # g ~ 0.144
 # m ~ 0.004
 
-# set g so that we only estimate one parameter
-params_def1["g"] <- 0.144
-
 
 #### compare plant model to observations ####
 
@@ -216,26 +209,28 @@ mock_fit <- mock %>%
 times <- seq(0, max(dat5$dpp), length.out = 100)
 
 # cost function
-plant_cost <- function(m_init){ 
+plant_cost <- function(P){ 
   
   # set to default
   params_in <- params_def1
   
   # update parameter value
-  params_in["m"] <- m_init
+  params_in["g"] <- P[1]
+  params_in["m"] <- P[2]
   
   # fit model
   out = ode(y = init_def1, times = times, func = plant_model, parms = params_in)
   
   # compare to data
-  return(modCost(model = out[ , c("time", "H_low", "H_n", "H_p", "H_np")], obs = mock_fit, y = "value"))   
+  return(modCost(model = out[ , c("time", "H_low", "H_n", "H_p", "H_np")], 
+                 obs = mock_fit, x = "time", y = "value"))   
 }
 
 
 #### estimate plant parameters ####
 
 # fit model
-fit_plant <- modFit(plant_cost, 0.004, lower = c(0))
+fit_plant <- modFit(plant_cost, c(0.144, 0.004), lower = c(0))
 summary(fit_plant)
 deviance(fit_plant)
 fit_plant$ssr # sum of squared residuals
@@ -245,10 +240,12 @@ fit_plant$ms # mean squared residuals
 #### visualize plant model fit ####
 
 # save value
-params_def1["m"] <- fit_plant$par[1]
+params_def1["g"] <- fit_plant$par[1]
+params_def1["m"] <- fit_plant$par[2]
 
 # time 
 times <- seq(0, max(dat5$dpp), length.out = 100)
+# times <- seq(0, 800, length.out = 100)
 
 # data for plant figure
 plant_pred_dat <- ode(init_def1, times, plant_model, params_def1) %>%
@@ -343,23 +340,17 @@ manipulate(plot(1:5, cex=size), size = slider(0.5,10,step=0.5))
 
 # time 
 times <- seq(0, max(dat5$dpi), length.out = 100)
+times <- seq(0, 800, length.out = 100)
 
 # PAV
 manipulate(virus_wrapper(c, r, species = "PAV"), c = slider(0, 0.1), r = slider(0, 1))
 # r ~ 0.092
-# c ~ 0.0056
+# c ~ 0.0036
 
 # RPV
-manipulate(virus_wrapper(c, r, species = "RPV"), c = slider(0, 0.5), r = slider(0, 1))
-# r ~ 0.27
-# c ~ 0.005
-
-# set r so that we only estimate one parameter
-params_pav <- params_def1
-params_rpv <- params_def1
-
-params_pav["r"] <- 0.09
-params_rpv["r"] <- 0.27
+manipulate(virus_wrapper(c, r, species = "RPV"), c = slider(0, 0.1), r = slider(0, 1))
+# r ~ 0.272
+# c ~ 0.0116
 
 
 #### compare virus model to observations ####
@@ -376,34 +367,38 @@ rpv_fit <- rpv %>%
   data.frame()
 
 # cost functions
-pav_cost <- function(c_init){ 
+pav_cost <- function(P){ 
   
   # set to default
-  params_in <- params_pav
+  params_in <- params_def1
   
   # update parameter value
-  params_in["c"] <- c_init
+  params_in["r"] <- P[1]
+  params_in["c"] <- P[2]
   
   # fit model
   out = ode(y = init_virus1, times = times_pav, func = virus1_model, parms = params_in)
   
   # compare to data
-  return(modCost(model = out[ , c("time", "V_low", "V_n", "V_p", "V_np")], obs = pav_fit, y = "value"))   
+  return(modCost(model = out[ , c("time", "V_low", "V_n", "V_p", "V_np")], 
+                 obs = pav_fit, x = "time", y = "value"))   
 }
 
-rpv_cost <- function(c_init){ 
+rpv_cost <- function(P){ 
   
   # set to default
-  params_in <- params_rpv
+  params_in <- params_def1
   
   # update parameter value
-  params_in["c"] <- c_init
+  params_in["r"] <- P[1]
+  params_in["c"] <- P[2]
   
   # fit model
   out = ode(y = init_virus1, times = times_rpv, func = virus1_model, parms = params_in)
   
   # compare to data
-  return(modCost(model = out[ , c("time", "V_low", "V_n", "V_p", "V_np")], obs = rpv_fit, y = "value"))   
+  return(modCost(model = out[ , c("time", "V_low", "V_n", "V_p", "V_np")], 
+                 obs = rpv_fit, x = "time", y = "value"))   
 }
 
 
@@ -414,14 +409,14 @@ times_pav <- seq(0, max(pav_fit$time), length.out = 100)
 times_rpv <- seq(0, max(rpv_fit$time), length.out = 100)
 
 # fit PAV model
-fit_pav <- modFit(pav_cost, 0.0055, lower = c(0))
+fit_pav <- modFit(pav_cost, c(0.092, 0.0036), lower = c(0))
 summary(fit_pav)
 deviance(fit_pav)
 fit_pav$ssr # sum of squared residuals
 fit_pav$ms # mean squared residuals
 
 # fit RPV model
-fit_rpv <- modFit(rpv_cost, 0.005, lower = c(0))
+fit_rpv <- modFit(rpv_cost, c(0.272, 0.0116), lower = c(0))
 summary(fit_rpv)
 deviance(fit_rpv)
 fit_rpv$ssr # sum of squared residuals
@@ -430,12 +425,18 @@ fit_rpv$ms # mean squared residuals
 
 #### visualize virus model fit ####
 
+# add new values
+params_pav <- params_def1
+params_pav["r"] <- fit_pav$par[1]
+params_pav["c"] <- fit_pav$par[2]
+
+params_rpv <- params_def1
+params_rpv["r"] <- fit_rpv$par[1]
+params_rpv["c"] <- fit_rpv$par[2]
+
 # virus times
 times <- seq(0, max(dat5$dpi), length.out = 100)
-
-# add new values
-params_pav["c"] <- fit_pav$par[1]
-params_rpv["c"] <- fit_rpv$par[1]
+# times <- seq(0, 100, length.out = 100)
 
 # data for figure
 pav_pred_dat <- ode(init_virus1, times, virus1_model, params_pav) %>%
@@ -509,4 +510,3 @@ write_csv(tibble(parameter = c("g", "m", "r_b", "c_b", "r_c", "c_c"),
                            as.numeric(params_rpv["r"]),
                            as.numeric(params_rpv["c"]))),
           "output/estimated_growth_mortality_rates.csv")
-
