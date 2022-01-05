@@ -319,10 +319,10 @@ virus2_model = function (t, yy, parms) {
   })
 }
 
-virus2_model_sim <- function(params, first_virus, V0_b, V0_c, plant_time, res_time, inv_time){
+virus2_model_sim <- function(params, first_virus, V0_b, V0_c, plant_time, res_time, inv_time, inits = init_def2){
   
   # simulate plant growth
-  plant_mod <- ode(init_def2, times = seq(0, plant_time, length.out = 100),
+  plant_mod <- ode(inits, times = seq(0, plant_time, length.out = 100),
                    virus2_model, params) %>%
     as_tibble() %>%
     mutate(across(everything(), as.double)) 

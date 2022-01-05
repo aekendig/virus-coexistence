@@ -1,7 +1,5 @@
 ## Goal: sensitivity analysis of virus parameters
 
-#### start here ####
-
 
 #### set up ####
 
@@ -20,18 +18,30 @@ source("code/model_settings.R")
 
 #### model functions ####
 
-# run models for all 4 nutrients
-
-
 # change parameter value
-param_fun <- function(params_in, param_foc, param_val, first_virus, max_days){
+param_fun <- function(params_in, param_foc1, param_val1, param_foc2, param_val2, 
+                      first_virus, V0_b = V0, V0_c = V0, inits_in = init_def2,
+                      plant_time = 11, res_time = 12, inv_time = 100-11-12){
   
   # update parameter value
-  params_in[param_foc] <- param_val
+  params_in[param_foc1] <- param_val1
+  params_in[param_foc2] <- param_val2
+  
+  # update resource supply
+  if(param_foc1 == "a_n_lo"){
+    inits_in["R_n_low"] <- 5.6e-5 * 7 + param_val1 * 3
+    inits_in["R_n_p"] <- 5.6e-5 * 7 + param_val1 * 3
+  }
+  if(param_foc2 == "a_p_lo"){
+    inits_in["R_p_low"] <- 8.2e-6 * 7 + param_val2 * 3
+    inits_in["R_p_n"] <- 8.2e-6 * 7 + param_val2 * 3
+  }
   
   # run model
-  mod_out <- sim_param_fun(params = params_in, first_virus = first_virus, 
-                           plant_time = 11, res_time = 12, inv_time = max_days-11-12)
+  mod_out <- virus2_model_sim(params = params_in, first_virus = first_virus, 
+                              V0_b = V0_b, V0_c = V0_c,
+                              plant_time = plant_time, res_time = res_time, inv_time = inv_time, 
+                              inits = inits_in)
   
   # edit output
   mod_out2 <- mod_out %>%
@@ -65,67 +75,73 @@ param_fun <- function(params_in, param_foc, param_val, first_virus, max_days){
 
 }
 
-# format output data from simulation
-sim_dat_form <- function(dat_in){
-  
-  dat_out <- dat_in %>%
-    pivot_longer(cols = -c(time),
-                 names_to = "variable",
-                 values_to = "value") %>%
-    mutate(nutrient = case_when(str_ends(variable, "low") == T ~ "low",
-                                str_ends(variable, "np") == T ~ "+N+P",
-                                str_ends(variable, "n") == T ~ "+N",
-                                str_ends(variable, "p") == T ~ "+P") %>%
-             fct_relevel("low", "+N", "+P"),
-           variable = case_when(str_starts(variable, "V_b") == T ~ "V_b",
-                                str_starts(variable, "V_c") == T ~ "V_c",
-                                str_starts(variable, "R_n") == T ~ "R_n",
-                                str_starts(variable, "R_p") == T ~ "R_p",
-                                str_starts(variable, "Q_n") == T ~ "Q_n",
-                                str_starts(variable, "Q_p") == T ~ "Q_p",
-                                str_starts(variable, "H") == T ~ "H"))
-  
-  return(dat_out)
-  
-}
-
-# default parameters
-params_def <- c(a_n_lo = a_n_lo,
-                a_n_hi = a_n_hi,
-                a_p_lo = a_p_lo,
-                a_p_hi = a_p_hi,
-                u_n = u_n,
-                u_p = u_p,
-                k_n = k_n,
-                k_p = k_p,
-                Qmin_n = Qmin_n,
-                Qmin_p = Qmin_p,
-                q_nb = q_nb,
-                q_nc = q_nc,
-                q_pb = q_pb,
-                q_pc = q_pc,
-                z_nb = z_nb,
-                z_pb = z_pb,
-                z_nc = z_nc,
-                z_pc = z_pc,
-                m = m,
-                g = g,
-                c_b = c_b,
-                c_c = c_c,
-                r_b = r_b,
-                r_c = r_c)
-
 # test function
-V0_b <- V0_c <- V0_init
-param_fun(params_def, "r_b", 0, "RPV", 1000)
-param_fun(params_def, "r_c", 0.08, "PAV", 100)
-sim_param_fun(params_def, "RPV", 11, 12, 100-11-12) %>%
-  filter(time %in% c(11, (11+12)))
+virus2_model_sim(params_def2, "RPV", V0_b = V0, V0_c = V0,
+                 plant_time = 11, res_time = 12, 
+                 inv_time = 100-11-12) %>%
+  virus2_model_format(params_def2) %>%
+  filter(time == max(time) & variable2 == "PAV") %>%
+  mutate(virus_conc = log10(value + 1))
+param_fun(params_def2, "r_b", 0.0961, "r_c", 0.221, "RPV")
+param_fun(params_def2, "a_n_lo", 1.1e-10, "r_c", 0.221, "RPV")
 
+
+#### resource supply rates ####
+
+# values for low 
+a_n_vals <- 1.1*10^(-15:-6)
+a_p_vals <- 1.6*10^(-16:-7)
+
+# data frame
+a_in <- tibble(param_foc1 = "a_n_lo",
+               param_val1 = a_n_vals) %>%
+  expand_grid(tibble(param_foc2 = "a_p_lo",
+                     param_val2 = a_p_vals))
+
+# PAV invades RPV
+pav_inv_a <- a_in %>%
+  mutate(first_virus = "RPV") %>%
+  mutate(pav_conc = pmap(., function(param_foc1, param_val1, param_foc2, param_val2, first_virus) param_fun(params_def2, param_foc1, param_val1, param_foc2, param_val2, first_virus))) %>%
+  unnest(cols = c(pav_conc)) %>%
+  mutate(nutrient = fct_relevel(nutrient, "low", "+N", "+P"))
+
+# figure
+pav_inv_a %>%
+  filter(nutrient == "low") %>%
+  ggplot(aes(x = param_val1, y = param_val2, color = virus_conc)) +
+  geom_point(size = 10) +
+  scale_x_log10() +
+  scale_y_log10()
+
+# RPV invades PAV
+rpv_inv_a <- a_in %>%
+  mutate(first_virus = "PAV") %>%
+  mutate(rpv_conc = pmap(., function(param_foc1, param_val1, param_foc2, param_val2, first_virus) param_fun(params_def2, param_foc1, param_val1, param_foc2, param_val2, first_virus))) %>%
+  unnest(cols = c(rpv_conc)) %>%
+  mutate(nutrient = fct_relevel(nutrient, "low", "+N", "+P"))
+
+# figure
+rpv_inv_a %>%
+  filter(nutrient == "low") %>%
+  ggplot(aes(x = param_val1, y = param_val2, color = virus_conc)) +
+  geom_point(size = 10) +
+  scale_x_log10() +
+  scale_y_log10()
+
+# minimum titer
+min(pav_inv_a$virus_conc)
+min(rpv_inv_a$virus_conc)
+
+#### start here ####
+# both viruses plateau at a minimum titer as resources are reduced
+# the plant could be dead in a lot of these cases
+# total titer is probably more relevant than concentration
+# this was one of Eric's comments
+
+
+#### older code ####
 
 #### initial simulation settings ####
-
-max_days <- 100
 
 n <- 10
 
