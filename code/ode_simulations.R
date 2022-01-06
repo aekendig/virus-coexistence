@@ -93,35 +93,35 @@ rpv_inv_sim <- virus2_model_sim(params_def2, "PAV", V0_b = V0, V0_c = V0,
 
 # edit simulations
 pav_inv_sim2 <- pav_inv_sim %>%
-  filter(time > (plant_days + res_days) & variable2 == "PAV") %>%
+  filter(time > (plant_days + res_days) & str_starts(variable2, "PAV") == T) %>%
   mutate(scenario = "(A) Invader")
 
 rpv_inv_sim2 <- rpv_inv_sim %>%
-  filter(time > (plant_days + res_days) & variable2 == "RPV") %>%
+  filter(time > (plant_days + res_days) & str_starts(variable2, "RPV") == T) %>%
   mutate(scenario = "(A) Invader")
 
 pav_second_sim2 <- pav_second_sim %>%
-  filter(time > (plant_days + res_days) & variable2 == "PAV") %>%
+  filter(time > (plant_days + res_days) & str_starts(variable2, "PAV") == T) %>%
   mutate(scenario = "(B) Invader alone")
 
 rpv_second_sim2 <- rpv_second_sim %>%
-  filter(time > (plant_days + res_days) & variable2 == "RPV") %>%
+  filter(time > (plant_days + res_days) & str_starts(variable2, "RPV") == T) %>%
   mutate(scenario = "(B) Invader alone")
 
 pav_res_sim2 <- rpv_inv_sim %>%
-  filter(time > plant_days & variable2 == "PAV") %>%
+  filter(time > plant_days & str_starts(variable2, "PAV") == T) %>%
   mutate(scenario = "(C) Resident")
 
 rpv_res_sim2 <- pav_inv_sim %>%
-  filter(time > plant_days & variable2 == "RPV") %>%
+  filter(time > plant_days & str_starts(variable2, "RPV") == T) %>%
   mutate(scenario = "(C) Resident")
 
 pav_first_sim2 <- pav_first_sim %>%
-  filter(time > plant_days & variable2 == "PAV") %>%
+  filter(time > plant_days & str_starts(variable2, "PAV") == T) %>%
   mutate(scenario = "(D) Resident alone")
 
 rpv_first_sim2 <- rpv_first_sim %>%
-  filter(time > plant_days & variable2 == "RPV") %>%
+  filter(time > plant_days & str_starts(variable2, "RPV") == T) %>%
   mutate(scenario = "(D) Resident alone")
 
 # combine
@@ -133,10 +133,13 @@ virus_sim <- pav_inv_sim2 %>%
   full_join(rpv_res_sim2) %>%
   full_join(pav_first_sim2) %>%
   full_join(rpv_first_sim2) %>%
-  mutate(virus_conc = log10(value + 1),
-         virus = variable2,
-         fac_lab_y = case_when(virus == "PAV" ~ "BYDV-PAV~titer~(log[10])",
-                               virus == "RPV" ~ "CYDV-RPV~titer~(log[10])"),
+  mutate(virus_abund = log10(value + 1),
+         virus = str_sub(variable2, 1, 3),
+         abund_type = str_sub(variable2, 5, 7),
+         fac_lab_y = case_when(virus == "PAV" & abund_type == "con" ~ "Log[10]~BYDV-PAV~(g^-1)",
+                               virus == "RPV" & abund_type == "con" ~ "Log[10]~CYDV-RPV~(g^-1)",
+                               virus == "PAV" & abund_type == "pop" ~ "Log[10]~BYDV-PAV~(plant^-1)",
+                               virus == "RPV" & abund_type == "pop" ~ "Log[10]~CYDV-RPV~(plant^-1)"),
          fac_lab_x = str_replace_all(scenario, " ", "~"),
          fac_lab_x = paste0("bold(", fac_lab_x, ")"))
 
@@ -146,9 +149,28 @@ virus_sim <- pav_inv_sim2 %>%
 # tried to align strip x labels left, 
 # but resident alone only shows full text with hjust = 0.5
 
-pdf("output/invasion_simulation_figure.pdf", width = 6.5, height = 3.75)
-ggplot(virus_sim, 
-       aes(x = time, y = virus_conc, color = nutrient, linetype = nutrient)) +
+pdf("output/invasion_simulation_concentration_figure.pdf", width = 6.5, height = 3.75)
+ggplot(filter(virus_sim, abund_type == "con"), 
+       aes(x = time, y = virus_abund, color = nutrient, linetype = nutrient)) +
+  geom_line(aes(size = lim_nut_H)) +
+  facet_rep_grid(rows = vars(fac_lab_y),
+                 cols = vars(fac_lab_x),
+                 labeller = label_parsed,
+                 switch = "y",
+                 scales = "free_y") +
+  scale_color_viridis_d(end = 0.7, name = "Nutrient\nsupply") +
+  scale_linetype(name = "Nutrient\nsupply") +
+  scale_size_manual(values = c(1.2, 0.6), name = "Limiting\nnutrient",
+                    labels = c("N", "P")) +
+  labs(x = "Time (days)") +
+  fig_theme +
+  theme(axis.title.y = element_blank()) +
+  guides(color = guide_legend(order = 1, override.aes = list(size = 1.2)), linetype = guide_legend(order = 1))
+dev.off()
+
+pdf("output/invasion_simulation_ population_figure.pdf", width = 6.5, height = 3.75)
+ggplot(filter(virus_sim, abund_type == "pop"), 
+       aes(x = time, y = virus_abund, color = nutrient, linetype = nutrient)) +
   geom_line(aes(size = lim_nut_H)) +
   facet_rep_grid(rows = vars(fac_lab_y),
                  cols = vars(fac_lab_x),

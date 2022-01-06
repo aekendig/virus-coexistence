@@ -29,12 +29,16 @@ param_fun <- function(params_in, param_foc1, param_val1, param_foc2, param_val2,
   
   # update resource supply
   if(param_foc1 == "a_n_lo"){
-    inits_in["R_n_low"] <- 5.6e-5 * 7 + param_val1 * 3
-    inits_in["R_n_p"] <- 5.6e-5 * 7 + param_val1 * 3
+    # inits_in["R_n_low"] <- 5.6e-5 * 7 + param_val1 * 3
+    # inits_in["R_n_p"] <- 5.6e-5 * 7 + param_val1 * 3
+    inits_in["R_n_low"] <- param_val1 * 10
+    inits_in["R_n_p"] <- param_val1 * 10
   }
   if(param_foc2 == "a_p_lo"){
-    inits_in["R_p_low"] <- 8.2e-6 * 7 + param_val2 * 3
-    inits_in["R_p_n"] <- 8.2e-6 * 7 + param_val2 * 3
+    # inits_in["R_p_low"] <- 8.2e-6 * 7 + param_val2 * 3
+    # inits_in["R_p_n"] <- 8.2e-6 * 7 + param_val2 * 3
+    inits_in["R_p_low"] <- param_val2 * 10
+    inits_in["R_p_n"] <- param_val2 * 10
   }
   
   # run model
@@ -46,6 +50,14 @@ param_fun <- function(params_in, param_foc1, param_val1, param_foc2, param_val2,
   # edit output
   mod_out2 <- mod_out %>%
     filter(time == max(time)) %>%
+    mutate(VbH_low = V_b_low * H_low,
+           VbH_n = V_b_n * H_n,
+           VbH_p = V_b_p * H_p,
+           VbH_np = V_b_np * H_np,
+           VcH_low = V_c_low * H_low,
+           VcH_n = V_c_n * H_n,
+           VcH_p = V_c_p * H_p,
+           VcH_np = V_c_np * H_np) %>%
     pivot_longer(cols = everything(),
                  names_to = "variable",
                  values_to = "value") %>%
@@ -54,24 +66,22 @@ param_fun <- function(params_in, param_foc1, param_val1, param_foc2, param_val2,
                                 str_ends(variable, "n") == T ~ "+N",
                                 str_ends(variable, "p") == T ~ "+P") %>%
              fct_relevel("low", "+N", "+P"),
-           variable = case_when(str_starts(variable, "V_b") == T ~ "V_b",
-                                str_starts(variable, "V_c") == T ~ "V_c",
-                                TRUE ~ variable),
-           virus_conc = log10(value + 1))
-  
-  # output: invading virus titer
-  if(first_virus == "PAV"){
-    output <- mod_out2 %>%
-      filter(variable == "V_c") %>%
-      select(nutrient, virus_conc)
-  }else{
-    output <- mod_out2 %>%
-      filter(variable == "V_b") %>%
-      select(nutrient, virus_conc)
-  }
+           variable2 = case_when(str_starts(variable, "R_n") == T ~ "R_n",
+                                 str_starts(variable, "R_p") == T ~ "R_p",
+                                 str_starts(variable, "Q_n") == T ~ "Q_n",
+                                 str_starts(variable, "Q_p") == T ~ "Q_p",
+                                 str_starts(variable, "H") == T ~ "H",
+                                 str_starts(variable, "V_b") == T ~ "PAV_conc",
+                                 str_starts(variable, "V_c") == T ~ "RPV_conc",
+                                 str_starts(variable, "VbH") == T ~ "PAV_pop",
+                                 str_starts(variable, "VcH") == T ~ "RPV_pop"),
+           virus_abund = if_else(str_starts(variable, "V") == T, 
+                                 log10(value + 1), NA_real_),
+           abund_type = if_else(str_starts(variable, "V") == T, 
+                                str_sub(variable2, 5, 7), NA_character_))
   
   # return output
-  return(output)
+  return(mod_out2)
 
 }
 
@@ -80,10 +90,12 @@ virus2_model_sim(params_def2, "RPV", V0_b = V0, V0_c = V0,
                  plant_time = 11, res_time = 12, 
                  inv_time = 100-11-12) %>%
   virus2_model_format(params_def2) %>%
-  filter(time == max(time) & variable2 == "PAV") %>%
+  filter(time == max(time) & variable2 %in% c("PAV_conc", "PAV_pop")) %>%
   mutate(virus_conc = log10(value + 1))
-param_fun(params_def2, "r_b", 0.0961, "r_c", 0.221, "RPV")
-param_fun(params_def2, "a_n_lo", 1.1e-10, "r_c", 0.221, "RPV")
+param_fun(params_def2, "r_b", 0.0961, "r_c", 0.221, "RPV") %>%
+  filter(variable2 %in% c("PAV_conc", "PAV_pop"))
+param_fun(params_def2, "a_n_lo", 1.1e-10, "r_c", 0.221, "RPV") %>%
+  filter(variable2 %in% c("PAV_conc", "PAV_pop"))
 
 
 #### resource supply rates ####
@@ -101,42 +113,67 @@ a_in <- tibble(param_foc1 = "a_n_lo",
 # PAV invades RPV
 pav_inv_a <- a_in %>%
   mutate(first_virus = "RPV") %>%
-  mutate(pav_conc = pmap(., function(param_foc1, param_val1, param_foc2, param_val2, first_virus) param_fun(params_def2, param_foc1, param_val1, param_foc2, param_val2, first_virus))) %>%
-  unnest(cols = c(pav_conc)) %>%
-  mutate(nutrient = fct_relevel(nutrient, "low", "+N", "+P"))
+  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2, first_virus) param_fun(params_def2, param_foc1, param_val1, param_foc2, param_val2, first_virus))) %>%
+  unnest(cols = c(sim_out))
 
 # figure
 pav_inv_a %>%
-  filter(nutrient == "low") %>%
-  ggplot(aes(x = param_val1, y = param_val2, color = virus_conc)) +
+  filter(nutrient == "low" & variable2 == "PAV_conc") %>%
+  ggplot(aes(x = param_val1, y = param_val2, color = virus_abund)) +
   geom_point(size = 10) +
   scale_x_log10() +
   scale_y_log10()
+
+pav_inv_a %>%
+  filter(nutrient == "low" & variable2 == "PAV_pop") %>%
+  ggplot(aes(x = param_val1, y = param_val2, color = virus_abund)) +
+  geom_point(size = 10) +
+  scale_x_log10() +
+  scale_y_log10()
+
+pav_inv_a %>%
+  filter(nutrient == "low" & variable2 == "H") %>%
+  ggplot(aes(x = param_val1, y = param_val2, color = value)) +
+  geom_point(size = 10) +
+  scale_x_log10() +
+  scale_y_log10()
+
+# plant dynamics with very low nutrients
+n <- 10
+
+params_a_low <- params_def2
+params_a_low["a_n_low"] <- a_n_vals[n]
+params_a_low["a_p_low"] <- a_p_vals[n]
+
+inits_a_low <- init_def2
+inits_a_low["R_n_low"] <- a_n_vals[n] * 10
+inits_a_low["R_n_p"] <- a_n_vals[n] * 10
+inits_a_low["R_p_low"] <- a_p_vals[n] * 10
+inits_a_low["R_p_n"] <- a_p_vals[n] * 10
+
+plant_a_low <- virus2_model_sim(params_a_low, "RPV", V0_b = V0, V0_c = V0, 
+                                plant_time = 11, res_time = 12, 
+                                inv_time = 100-11-12,
+                                inits = inits_a_low) %>%
+  virus2_model_format(params_a_low)
+
+plant_fig_fun(plant_a_low, params_a_low, -2e-3, -5e-4)
+
+
+#### start here ####
+# 7 x high nutrient for R0 has a large effect on final plant biomass
+# viruses are not very sensitive to variation in a whether or not above is included
+# may be because Q starts the same for all conditions and viruses infect plant before Q is drawn down
+# try changing Q with a or infecting plants later
+# changing Q with a -- refit parameters?
+
 
 # RPV invades PAV
 rpv_inv_a <- a_in %>%
   mutate(first_virus = "PAV") %>%
-  mutate(rpv_conc = pmap(., function(param_foc1, param_val1, param_foc2, param_val2, first_virus) param_fun(params_def2, param_foc1, param_val1, param_foc2, param_val2, first_virus))) %>%
-  unnest(cols = c(rpv_conc)) %>%
-  mutate(nutrient = fct_relevel(nutrient, "low", "+N", "+P"))
+  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2, first_virus) param_fun(params_def2, param_foc1, param_val1, param_foc2, param_val2, first_virus))) %>%
+  unnest(cols = c(sim_out))
 
-# figure
-rpv_inv_a %>%
-  filter(nutrient == "low") %>%
-  ggplot(aes(x = param_val1, y = param_val2, color = virus_conc)) +
-  geom_point(size = 10) +
-  scale_x_log10() +
-  scale_y_log10()
-
-# minimum titer
-min(pav_inv_a$virus_conc)
-min(rpv_inv_a$virus_conc)
-
-#### start here ####
-# both viruses plateau at a minimum titer as resources are reduced
-# the plant could be dead in a lot of these cases
-# total titer is probably more relevant than concentration
-# this was one of Eric's comments
 
 
 #### older code ####

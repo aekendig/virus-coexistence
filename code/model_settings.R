@@ -435,13 +435,21 @@ virus2_model_format <- function(mod_in, params){
   mod_out <- mod_in  %>%
     as_tibble() %>%
     mutate(across(everything(), as.double)) %>%
-    mutate(Qlim_n_low = Qmin_n / Q_n_low,
-           Qlim_p_low = Qmin_p / Q_p_low,
+    mutate(VbH_low = V_b_low * H_low,
+           VbH_n = V_b_n * H_n,
+           VbH_p = V_b_p * H_p,
+           VbH_np = V_b_np * H_np,
+           VcH_low = V_c_low * H_low,
+           VcH_n = V_c_n * H_n,
+           VcH_p = V_c_p * H_p,
+           VcH_np = V_c_np * H_np,
+           Qlim_n_low = Qmin_n / Q_n_low,
            Qlim_n_n = Qmin_n / Q_n_n,
-           Qlim_p_n = Qmin_p / Q_p_n,
            Qlim_n_p = Qmin_n / Q_n_p,
-           Qlim_p_p = Qmin_p / Q_p_p,
            Qlim_n_np = Qmin_n / Q_n_np,
+           Qlim_p_low = Qmin_p / Q_p_low,
+           Qlim_p_n = Qmin_p / Q_p_n,
+           Qlim_p_p = Qmin_p / Q_p_p,
            Qlim_p_np = Qmin_p / Q_p_np) %>%
     rowwise() %>%
     mutate(LimQ_low = max(Qlim_n_low, Qlim_p_low),
@@ -470,8 +478,10 @@ virus2_model_format <- function(mod_in, params){
                                  str_starts(variable, "Q_n") == T ~ "Q_n",
                                  str_starts(variable, "Q_p") == T ~ "Q_p",
                                  str_starts(variable, "H") == T ~ "H",
-                                 str_starts(variable, "V_b") == T ~ "PAV",
-                                 str_starts(variable, "V_c") == T ~ "RPV",
+                                 str_starts(variable, "V_b") == T ~ "PAV_conc",
+                                 str_starts(variable, "V_c") == T ~ "RPV_conc",
+                                 str_starts(variable, "VbH") == T ~ "PAV_pop",
+                                 str_starts(variable, "VcH") == T ~ "RPV_pop",
                                  str_starts(variable, "Qlim_n") == T ~ "Qlim_n",
                                  str_starts(variable, "Qlim_p") == T ~ "Qlim_p",
                                  str_starts(variable, "LimQ") == T ~ "Qlim",
