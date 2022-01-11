@@ -92,17 +92,19 @@ virus2_model_sim(params_def2, "RPV", V0_b = V0, V0_c = V0,
   virus2_model_format(params_def2) %>%
   filter(time == max(time) & variable2 %in% c("PAV_conc", "PAV_pop")) %>%
   mutate(virus_conc = log10(value + 1))
+
 param_fun(params_def2, "r_b", 0.0961, "r_c", 0.221, "RPV") %>%
   filter(variable2 %in% c("PAV_conc", "PAV_pop"))
+
 param_fun(params_def2, "a_n_lo", 1.1e-10, "r_c", 0.221, "RPV") %>%
   filter(variable2 %in% c("PAV_conc", "PAV_pop"))
 
 
 #### resource supply rates ####
 
-# values for low 
-a_n_vals <- 1.1*10^(-15:-6)
-a_p_vals <- 1.6*10^(-16:-7)
+# values for low nutrient supply
+a_n_vals <- 10^(-13:-4)
+a_p_vals <- 10^(-13:-4)
 
 # data frame
 a_in <- tibble(param_foc1 = "a_n_lo",
@@ -118,28 +120,37 @@ pav_inv_a <- a_in %>%
 
 # figure
 pav_inv_a %>%
-  filter(nutrient == "low" & variable2 == "PAV_conc") %>%
+  filter(variable2 == "PAV_conc") %>%
   ggplot(aes(x = param_val1, y = param_val2, color = virus_abund)) +
   geom_point(size = 10) +
+  facet_wrap(~ nutrient) +
+  scale_color_viridis_c() +
   scale_x_log10() +
-  scale_y_log10()
+  scale_y_log10() +
+  labs(x = "N supply", y = "P supply")
 
 pav_inv_a %>%
-  filter(nutrient == "low" & variable2 == "PAV_pop") %>%
+  filter(variable2 == "PAV_pop") %>%
   ggplot(aes(x = param_val1, y = param_val2, color = virus_abund)) +
   geom_point(size = 10) +
+  facet_wrap(~ nutrient) +
+  scale_color_viridis_c() +
   scale_x_log10() +
-  scale_y_log10()
+  scale_y_log10() +
+  labs(x = "N supply", y = "P supply")
 
 pav_inv_a %>%
-  filter(nutrient == "low" & variable2 == "H") %>%
+  filter(variable2 == "H") %>%
   ggplot(aes(x = param_val1, y = param_val2, color = value)) +
   geom_point(size = 10) +
+  facet_wrap(~ nutrient) +
+  scale_color_viridis_c() +
   scale_x_log10() +
-  scale_y_log10()
+  scale_y_log10() +
+  labs(x = "N supply", y = "P supply")
 
 # plant dynamics with very low nutrients
-n <- 10
+n <- 1
 
 params_a_low <- params_def2
 params_a_low["a_n_low"] <- a_n_vals[n]
@@ -156,23 +167,98 @@ plant_a_low <- virus2_model_sim(params_a_low, "RPV", V0_b = V0, V0_c = V0,
                                 inv_time = 100-11-12,
                                 inits = inits_a_low) %>%
   virus2_model_format(params_a_low)
+# can ignore warning message about unknown levels in 'f'
+# occurs if one of the nutrients is never limiting
+# function still works
 
 plant_fig_fun(plant_a_low, params_a_low, -2e-3, -5e-4)
+# Q is only drawn down so fast, giving viruses some nutrients
 
 
-#### start here ####
-# 7 x high nutrient for R0 has a large effect on final plant biomass
-# viruses are not very sensitive to variation in a whether or not above is included
-# may be because Q starts the same for all conditions and viruses infect plant before Q is drawn down
-# try changing Q with a or infecting plants later
-# changing Q with a -- refit parameters?
+#### later invasion ####
+
+# use default parameters
+param_fun(params_def2, "r_b", 0.0961, "r_c", 0.221, "RPV",
+          plant_time = 11, res_time = 100-11, inv_time = 100) %>%
+  filter(variable2 %in% c("PAV_conc", "PAV_pop"))
+# abundances are comparable to very low nutrients
+# viruses can always invade when Q is at Qmin?
 
 
-# RPV invades PAV
-rpv_inv_a <- a_in %>%
-  mutate(first_virus = "PAV") %>%
+#### minimum nutrient concentrations ####
+
+# values for low nutrient supply
+q_nb_vals <- 10^(-3:6)
+q_nc_vals <- 10^(-3:6)
+
+# data frame
+q_n_in <- tibble(param_foc1 = "q_nb",
+                 param_val1 = q_nb_vals) %>%
+  expand_grid(tibble(param_foc2 = "q_nc",
+                     param_val2 = q_nc_vals))
+
+# PAV invades RPV
+pav_inv_q_n <- q_n_in %>%
+  mutate(first_virus = "RPV") %>%
   mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2, first_virus) param_fun(params_def2, param_foc1, param_val1, param_foc2, param_val2, first_virus))) %>%
   unnest(cols = c(sim_out))
+
+# figure
+pav_inv_q_n %>%
+  filter(variable2 == "PAV_conc") %>%
+  ggplot(aes(x = param_val1, y = param_val2, color = virus_abund)) +
+  geom_point(size = 10) +
+  facet_wrap(~ nutrient) +
+  scale_color_viridis_c() +
+  scale_x_log10() +
+  scale_y_log10() +
+  labs(x = "PAV min N", y = "RPV min N")
+
+pav_inv_q_n %>%
+  filter(variable2 == "RPV_conc") %>%
+  ggplot(aes(x = param_val1, y = param_val2, color = virus_abund)) +
+  geom_point(size = 10) +
+  facet_wrap(~ nutrient) +
+  scale_color_viridis_c() +
+  scale_x_log10() +
+  scale_y_log10() +
+  labs(x = "PAV min N", y = "RPV min N")
+# when q_ values are too high, viruses can't invade
+# this is about the virus-plant interaction, not virus-virus
+
+
+#### minimum nutrient concentration/nutrient content of virus ####
+
+#### start here ####
+# below values make simulation crash and output data can't be processed
+# adjust values to be less extreme
+
+# values for low nutrient supply
+z_nc_vals <- 10^seq(-18, 0, length.out = 10)
+q_nc_vals2 <- 10^(-11:-2)
+
+# data frame
+qz_nc_in <- tibble(param_foc1 = "z_nc",
+                   param_val1 = z_nc_vals) %>%
+  expand_grid(tibble(param_foc2 = "q_nc",
+                     param_val2 = q_nc_vals2))
+
+# PAV invades RPV
+pav_inv_qz_nc <- qz_nc_in %>%
+  mutate(first_virus = "RPV") %>%
+  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2, first_virus) param_fun(params_def2, param_foc1, param_val1, param_foc2, param_val2, first_virus))) %>%
+  unnest(cols = c(sim_out))
+
+# figure
+pav_inv_qz_nc %>%
+  filter(variable2 == "PAV_conc") %>%
+  ggplot(aes(x = param_val1, y = param_val2, color = virus_abund)) +
+  geom_point(size = 10) +
+  facet_wrap(~ nutrient) +
+  scale_color_viridis_c() +
+  scale_x_log10() +
+  scale_y_log10() +
+  labs(x = "PAV min N", y = "RPV min N")
 
 
 
