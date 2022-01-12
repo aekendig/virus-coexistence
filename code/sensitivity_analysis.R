@@ -229,13 +229,9 @@ pav_inv_q_n %>%
 
 #### minimum nutrient concentration/nutrient content of virus ####
 
-#### start here ####
-# below values make simulation crash and output data can't be processed
-# adjust values to be less extreme
-
 # values for low nutrient supply
 z_nc_vals <- 10^seq(-18, 0, length.out = 10)
-q_nc_vals2 <- 10^(-11:-2)
+q_nc_vals2 <- 10^(-3:6)
 
 # data frame
 qz_nc_in <- tibble(param_foc1 = "z_nc",
@@ -251,15 +247,56 @@ pav_inv_qz_nc <- qz_nc_in %>%
 
 # figure
 pav_inv_qz_nc %>%
-  filter(variable2 == "PAV_conc") %>%
+  filter(variable2 == "RPV_pop") %>%
   ggplot(aes(x = param_val1, y = param_val2, color = virus_abund)) +
   geom_point(size = 10) +
   facet_wrap(~ nutrient) +
   scale_color_viridis_c() +
   scale_x_log10() +
   scale_y_log10() +
-  labs(x = "PAV min N", y = "RPV min N")
+  labs(x = "RPV N conc", y = "RPV min N")
+# for lowest min N, increasing N conc decreases RPV pop
+# for higher min N, increasing N conc allows RPV to invade
 
+pav_inv_qz_nc %>%
+  filter(variable2 == "PAV_pop") %>%
+  ggplot(aes(x = param_val1, y = param_val2, color = virus_abund)) +
+  geom_point(size = 10) +
+  facet_wrap(~ nutrient) +
+  scale_color_viridis_c() +
+  scale_x_log10() +
+  scale_y_log10() +
+  labs(x = "RPV N conc", y = "RPV min N")
+# similar patterns for PAV
+
+# time series to clarify why
+params_qz_nc <- params_def2
+params_qz_nc["z_nc"] <- z_nc_vals[7]
+params_qz_nc["q_nc"] <- q_nc_vals2[2]
+
+sim_qz_nc <- virus2_model_sim(params_qz_nc, "RPV", V0_b = V0, V0_c = V0, 
+                              plant_time = 11, res_time = 12, 
+                              inv_time = 100-11-12) %>%
+  virus2_model_format(params_qz_nc)
+
+sim_qz_nc %>%
+  filter(variable2 == "RPV_pop") %>%
+  ggplot(aes(time, log10(value + 1), 
+             color = nutrient, linetype = nutrient, size = lim_nut_H)) +
+  geom_line() +
+  scale_color_viridis_d() +
+  scale_size_manual(values = c(1.2, 0.6)) +
+  fig_theme
+
+plant_fig_fun(sim_qz_nc, params_qz_nc, -2e-3, -5e-4)
+# increasing z by itself: makes plant N crash > plant biomass declines >
+# RPV population size quickly plateaus at smaller size
+# increase q: RPV conc doesn't change, pop size is smaller than default >
+# plant N stops at virus's q > plant size is bigger than default
+# this is an interaction between q and z -- doesn't happen with increased q alone
+# only occurs once z is set to 1e-6, this is probably when virus drawdown of Q
+# starts to have a large impact. Why does it equilibrate at q_nc though?
+#### start here ####
 
 
 #### older code ####
