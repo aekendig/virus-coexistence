@@ -182,7 +182,7 @@ param_fun(params_def2, "r_b", 0.0961, "r_c", 0.221, "RPV",
 # viruses can always invade when Q is at Qmin because of their q values
 
 
-#### minimum nutrient concentrations ####
+#### minimum nutrient concentrations (q) ####
 
 # values for low nutrient supply
 q_nb_vals <- 10^(-3:6)
@@ -227,7 +227,7 @@ pav_inv_q_n %>%
   labs(x = "PAV min N", y = "RPV min N")
 
 
-#### minimum nutrient concentration/nutrient content of virus ####
+#### minimum nutrient concentration (q_n)/nutrient content of virus (z_n) ####
 
 # values for z and q
 z_nc_vals <- 10^seq(-18, 0, length.out = 10)
@@ -279,14 +279,79 @@ pav_inv_qz_nc %>%
   labs(x = "RPV min N (q)", y = "RPV N conc (z)")
 # PAV can always persist unless plant is killed
 
-#### start here ####
-# consider how RPV dynamics above could affect invasion (without killing the plant)
-# review below to keep/delete
+
+#### q_n/z_n -> plant N conc. ####
+
+# values for z and q
+z_nc_vals2 <- 10^c(-18, -12, -11, -10, -9, -8, -6, -2)
+q_nc_vals3 <- 1.1e-3 * seq(1, 10, length.out = 100)
+
+# data frame
+qz_nc_in2 <- tibble(param_foc1 = "q_nc",
+                   param_val1 = q_nc_vals3) %>%
+  expand_grid(tibble(param_foc2 = "z_nc",
+                     param_val2 = z_nc_vals2))
+
+# RPV alone
+# pdf("output/sensitivity_analysis_rpv_res_qz_nc.pdf")
+# rpv_res_qz_nc <- qz_nc_in2 %>%
+#   mutate(first_virus = "RPV") %>%
+#   mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2, first_virus) param_fun(params_def2, param_foc1, param_val1, param_foc2, param_val2, first_virus, V0_b = 0))) %>%
+#   unnest(cols = c(sim_out))
+# dev.off()
+
+# save simulation output (large)
+# write_csv(rpv_res_qz_nc, "output/sensitivity_analysis_rpv_res_qz_nc.csv")
+rpv_res_qz_nc <- read_csv("output/sensitivity_analysis_rpv_res_qz_nc.csv")
+
+# figure
+rpv_res_qz_nc %>%
+  filter(variable2 == "Q_n") %>%
+  ggplot(aes(x = param_val1, y = value, color = as.factor(param_val2))) +
+  geom_abline(slope = 1, intercept = 0, color = "black", linetype = "dashed") +
+  geom_line() +
+  facet_wrap(~ nutrient) +
+  scale_color_viridis_d(name = "RPV N conc (z)") +
+  labs(x = "RPV min N (q)", y = "Plant N concentration") +
+  fig_theme
+#### use N+P panel from this figure ####
 
 
-# plant Q will be pulled down to the lowest Q unless a higher Q has more weight
-# if the plant's Q is pulled below its own Q, it will die (slowly if not too much lower, more quickly otherwise)
-# viruses with higher Q's would be excluded
-# in cases where the established virus drives the invader extinct, it also drives itself exinct
+#### q_p/z_p -> plant P conc. ####
 
-# see parameter_scenarios for next steps
+# values for z and q
+z_pc_vals <- 10^c(-19, -13, -12, -11, -10, -9, -7, -3)
+q_pc_vals <- 7.4e-5 * seq(1, 10, length.out = 100)
+
+# data frame
+qz_pc_in <- tibble(param_foc1 = "q_pc",
+                    param_val1 = q_pc_vals) %>%
+  expand_grid(tibble(param_foc2 = "z_pc",
+                     param_val2 = z_pc_vals))
+
+# RPV alone
+pdf("output/sensitivity_analysis_rpv_res_qz_nc.pdf")
+rpv_res_qz_pc <- qz_pc_in %>%
+  mutate(first_virus = "RPV") %>%
+  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2, first_virus) param_fun(params_def2, param_foc1, param_val1, param_foc2, param_val2, first_virus, V0_b = 0))) %>%
+  unnest(cols = c(sim_out))
+dev.off()
+
+# save simulation output (large)
+write_csv(rpv_res_qz_pc, "output/sensitivity_analysis_rpv_res_qz_pc.csv")
+# rpv_res_qz_pc <- read_csv("output/sensitivity_analysis_rpv_res_qz_pc.csv")
+
+# Q_p values become negative in one simulation: remove
+rpv_res_qz_pc2 <- rpv_res_qz_pc %>%
+  filter(!(variable2 == "Q_p" & value < 0))
+
+# figure
+rpv_res_qz_pc2 %>%
+  filter(variable2 == "Q_p") %>%
+  ggplot(aes(x = param_val1, y = value, color = as.factor(param_val2))) +
+  geom_abline(slope = 1, intercept = 0, color = "black", linetype = "dashed") +
+  geom_line() +
+  facet_wrap(~ nutrient) +
+  scale_color_viridis_d(name = "RPV P conc (z)") +
+  labs(x = "RPV min P (q)", y = "Plant P concentration") +
+  fig_theme
