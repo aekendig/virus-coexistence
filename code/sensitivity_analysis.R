@@ -299,8 +299,8 @@ qz_nc_in2 <- tibble(param_foc1 = "q_nc",
 #   mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2, first_virus) param_fun(params_def2, param_foc1, param_val1, param_foc2, param_val2, first_virus, V0_b = 0))) %>%
 #   unnest(cols = c(sim_out))
 # dev.off()
-
-# save simulation output (large)
+# 
+# # save simulation output (large)
 # write_csv(rpv_res_qz_nc, "output/sensitivity_analysis_rpv_res_qz_nc.csv")
 rpv_res_qz_nc <- read_csv("output/sensitivity_analysis_rpv_res_qz_nc.csv")
 
@@ -330,16 +330,16 @@ qz_pc_in <- tibble(param_foc1 = "q_pc",
                      param_val2 = z_pc_vals))
 
 # RPV alone
-pdf("output/sensitivity_analysis_rpv_res_qz_nc.pdf")
-rpv_res_qz_pc <- qz_pc_in %>%
-  mutate(first_virus = "RPV") %>%
-  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2, first_virus) param_fun(params_def2, param_foc1, param_val1, param_foc2, param_val2, first_virus, V0_b = 0))) %>%
-  unnest(cols = c(sim_out))
-dev.off()
-
-# save simulation output (large)
-write_csv(rpv_res_qz_pc, "output/sensitivity_analysis_rpv_res_qz_pc.csv")
-# rpv_res_qz_pc <- read_csv("output/sensitivity_analysis_rpv_res_qz_pc.csv")
+# pdf("output/sensitivity_analysis_rpv_res_qz_pc.pdf")
+# rpv_res_qz_pc <- qz_pc_in %>%
+#   mutate(first_virus = "RPV") %>%
+#   mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2, first_virus) param_fun(params_def2, param_foc1, param_val1, param_foc2, param_val2, first_virus, V0_b = 0))) %>%
+#   unnest(cols = c(sim_out))
+# dev.off()
+# 
+# # save simulation output (large)
+# write_csv(rpv_res_qz_pc, "output/sensitivity_analysis_rpv_res_qz_pc.csv")
+rpv_res_qz_pc <- read_csv("output/sensitivity_analysis_rpv_res_qz_pc.csv")
 
 # Q_p values become negative in one simulation: remove
 rpv_res_qz_pc2 <- rpv_res_qz_pc %>%
@@ -355,3 +355,52 @@ rpv_res_qz_pc2 %>%
   scale_color_viridis_d(name = "RPV P conc (z)") +
   labs(x = "RPV min P (q)", y = "Plant P concentration") +
   fig_theme
+
+
+#### z_n -> invasion ####
+
+# values for z
+z_nc_vals3 <- 10^seq(-18, 0, length.out = 10)
+z_nb_vals <- 10^seq(-18, 0, length.out = 10)
+
+# data frame
+z_n_in <- tibble(param_foc1 = "z_nb",
+                 param_val1 = z_nb_vals) %>%
+  expand_grid(tibble(param_foc2 = "z_nc",
+                     param_val2 = z_nc_vals3))
+
+# set q values
+params_q_n <- params_def2
+params_q_n["q_nc"] <- 5.5e-3 # q_nc x 5
+params_q_n["q_nb"] <- 1.1e-2 # q_nb x 10
+
+# PAV invasion
+pdf("output/sensitivity_analysis_pav_inv_z_n.pdf")
+pav_inv_z_n <- z_n_in %>%
+  mutate(first_virus = "RPV") %>%
+  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2, first_virus) param_fun(params_q_n, param_foc1, param_val1, param_foc2, param_val2, first_virus))) %>%
+  unnest(cols = c(sim_out))
+dev.off()
+
+# scale virus values relative to initial
+pav_inv_z_n2 <- pav_inv_z_n %>%
+  mutate(value_scale = case_when(variable2 == "PAV_conc" ~ value / log10(V0 + 1),
+                                 variable2 == "RPV_conc" ~ value / log10(V0 + 1),
+                                 TRUE ~ NA_real_))
+
+# figure
+pav_inv_z_n2 %>%
+  filter(str_detect(variable2, "conc") == T &
+           param_val1 == 1e-4) %>% # set z_nb >= 1e-6
+  ggplot(aes(x = param_val2, y = value_scale, color = variable2)) +
+  geom_hline(yintercept = 1) +
+  geom_line() +
+  facet_wrap(~ nutrient) +
+  scale_color_viridis_d(name = "Virus") +
+  labs(x = "RPV P conc (z)", y = "Relative virus concentration") +
+  fig_theme
+#### start here ####
+# improve above simulation:
+# set z_nb to 1e-4
+# increase number of z_nc values between 1e-8 and 1e-4
+# let simulation run longer to show PAV go to zero
