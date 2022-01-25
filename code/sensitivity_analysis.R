@@ -360,8 +360,8 @@ rpv_res_qz_pc2 %>%
 #### z_n -> invasion ####
 
 # values for z
-z_nc_vals3 <- 10^seq(-18, 0, length.out = 10)
-z_nb_vals <- 10^seq(-18, 0, length.out = 10)
+z_nc_vals3 <- 10^seq(-18, 0, length.out = 100)
+z_nb_vals <- 10^-4
 
 # data frame
 z_n_in <- tibble(param_foc1 = "z_nb",
@@ -374,13 +374,17 @@ params_q_n <- params_def2
 params_q_n["q_nc"] <- 5.5e-3 # q_nc x 5
 params_q_n["q_nb"] <- 1.1e-2 # q_nb x 10
 
-# PAV invasion
-pdf("output/sensitivity_analysis_pav_inv_z_n.pdf")
-pav_inv_z_n <- z_n_in %>%
-  mutate(first_virus = "RPV") %>%
-  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2, first_virus) param_fun(params_q_n, param_foc1, param_val1, param_foc2, param_val2, first_virus))) %>%
-  unnest(cols = c(sim_out))
-dev.off()
+# # PAV invasion
+# pdf("output/sensitivity_analysis_pav_inv_z_n.pdf")
+# pav_inv_z_n <- z_n_in %>%
+#   mutate(first_virus = "RPV") %>%
+#   mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2, first_virus) param_fun(params_q_n, param_foc1, param_val1, param_foc2, param_val2, first_virus, inv_time = (500-11-12)))) %>%
+#   unnest(cols = c(sim_out))
+# dev.off()
+# 
+# # save simulation output (large)
+# write_csv(pav_inv_z_n, "output/sensitivity_analysis_pav_inv_z_n.csv")
+pav_inv_z_n <- read_csv("output/sensitivity_analysis_pav_inv_z_n.csv")
 
 # scale virus values relative to initial
 pav_inv_z_n2 <- pav_inv_z_n %>%
@@ -396,11 +400,45 @@ pav_inv_z_n2 %>%
   geom_hline(yintercept = 1) +
   geom_line() +
   facet_wrap(~ nutrient) +
+  scale_x_log10() +
   scale_color_viridis_d(name = "Virus") +
   labs(x = "RPV P conc (z)", y = "Relative virus concentration") +
   fig_theme
+
+
+#### z_n/z_p -> invasion ####
+
+# values for z
+z_nc_vals4 <- 10^seq(-18, 0, length.out = 19)
+z_pb_vals <- 10^seq(-18, 0, length.out = 19)
+
+# data frame
+z_np_in <- tibble(param_foc1 = "z_pb",
+                 param_val1 = z_pb_vals) %>%
+  expand_grid(tibble(param_foc2 = "z_nc",
+                     param_val2 = z_nc_vals4))
+
+# set q values
+params_qz_np <- params_def2
+params_qz_np["q_nc"] <- 5.5e-3 # q_nc x 5
+params_qz_np["q_nb"] <- 1.1e-2 # q_nb x 10
+params_qz_np["z_nb"] <- 10^-4
+params_qz_np["q_pc"] <- 7.4e-4 # q_pc x 10
+params_qz_np["q_pb"] <- 3.7e-4 # q_pb x 5
+params_qz_np["z_pc"] <- 10^-4
+
+
+# PAV invasion
+pdf("output/sensitivity_analysis_pav_inv_z_np.pdf")
+pav_inv_z_np <- z_np_in %>%
+  mutate(first_virus = "RPV") %>%
+  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2, first_virus) param_fun(params_qz_np, param_foc1, param_val1, param_foc2, param_val2, first_virus, inv_time = (500-11-12)))) %>%
+  unnest(cols = c(sim_out))
+dev.off()
+
 #### start here ####
-# improve above simulation:
-# set z_nb to 1e-4
-# increase number of z_nc values between 1e-8 and 1e-4
-# let simulation run longer to show PAV go to zero
+# review above pdf -- one of the parameters makes H go very high
+
+# # save simulation output (large)
+# write_csv(pav_inv_z_np, "output/sensitivity_analysis_pav_inv_z_np.csv") # did not do yet
+# pav_inv_z_np <- read_csv("output/sensitivity_analysis_pav_inv_z_np.csv")
