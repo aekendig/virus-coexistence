@@ -280,7 +280,7 @@ pav_inv_qz_nc %>%
 # PAV can always persist unless plant is killed
 
 
-#### q_n/z_n -> plant N conc. ####
+#### q_nc/z_nc -> plant N conc. ####
 
 # values for z and q
 z_nc_vals2 <- 10^c(-18, -12, -11, -10, -9, -8, -6, -2)
@@ -309,6 +309,7 @@ rpv_res_qz_nc %>%
   filter(variable2 == "Q_n") %>%
   ggplot(aes(x = param_val1, y = value, color = as.factor(param_val2))) +
   geom_abline(slope = 1, intercept = 0, color = "black", linetype = "dashed") +
+  geom_hline(yintercept = as.numeric(params_def1["Qmin_n"]), color = "black", linetype = "dashed") +
   geom_line() +
   facet_wrap(~ nutrient) +
   scale_color_viridis_d(name = "RPV N conc (z)") +
@@ -316,8 +317,68 @@ rpv_res_qz_nc %>%
   fig_theme
 #### use N+P panel from this figure ####
 
+# plant biomass
+rpv_res_qz_nc %>%
+  filter(variable2 == "H") %>%
+  ggplot(aes(x = param_val1, y = value, color = as.factor(param_val2))) +
+  geom_abline(slope = 1, intercept = 0, color = "black", linetype = "dashed") +
+  geom_line() +
+  facet_wrap(~ nutrient) +
+  scale_color_viridis_d(name = "RPV N conc (z)") +
+  labs(x = "RPV min N (q)", y = "Plant biomass") +
+  fig_theme
+# increasing plant N concentration increases plant biomass
 
-#### q_p/z_p -> plant P conc. ####
+
+#### q_nb/z_nb -> plant N conc. ####
+
+# values for z and q
+z_nb_vals <- 10^c(-18, -12, -11, -10, -9, -8, -6, -2)
+q_nb_vals2 <- 1.1e-3 * seq(1, 10, length.out = 100)
+
+# data frame
+qz_nb_in <- tibble(param_foc1 = "q_nb",
+                    param_val1 = q_nb_vals2) %>%
+  expand_grid(tibble(param_foc2 = "z_nb",
+                     param_val2 = z_nb_vals))
+
+# PAV alone
+pdf("output/sensitivity_analysis_pav_res_qz_nb.pdf")
+pav_res_qz_nb <- qz_nb_in %>%
+  mutate(first_virus = "PAV") %>%
+  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2, first_virus) param_fun(params_def2, param_foc1, param_val1, param_foc2, param_val2, first_virus, V0_c = 0))) %>%
+  unnest(cols = c(sim_out))
+dev.off()
+
+# save simulation output (large)
+write_csv(pav_res_qz_nb, "output/sensitivity_analysis_pav_res_qz_nb.csv")
+pav_res_qz_nb <- read_csv("output/sensitivity_analysis_pav_res_qz_nb.csv")
+
+# plant nutrient conc.
+pav_res_qz_nb %>%
+  filter(variable2 == "Q_n") %>%
+  ggplot(aes(x = param_val1, y = value, color = as.factor(param_val2))) +
+  geom_abline(slope = 1, intercept = 0, color = "black", linetype = "dashed") +
+  geom_line() +
+  facet_wrap(~ nutrient) +
+  scale_color_viridis_d(name = "PAV N conc (z)") +
+  labs(x = "PAV min N (q)", y = "Plant N concentration") +
+  fig_theme
+
+# plant biomass
+pav_res_qz_nb %>%
+  filter(variable2 == "H") %>%
+  ggplot(aes(x = param_val1, y = value, color = as.factor(param_val2))) +
+  geom_abline(slope = 1, intercept = 0, color = "black", linetype = "dashed") +
+  geom_line() +
+  facet_wrap(~ nutrient) +
+  scale_color_viridis_d(name = "PAV N conc (z)") +
+  labs(x = "PAV min N (q)", y = "Plant biomass") +
+  fig_theme
+# increasing plant N concentration increases plant biomass
+
+
+#### q_pc/z_pc -> plant P conc. ####
 
 # values for z and q
 z_pc_vals <- 10^c(-19, -13, -12, -11, -10, -9, -7, -3)
@@ -357,15 +418,15 @@ rpv_res_qz_pc2 %>%
   fig_theme
 
 
-#### z_n -> invasion ####
+#### z_n -> biomass ####
 
 # values for z
-z_nc_vals3 <- 10^seq(-18, 0, length.out = 100)
-z_nb_vals <- 10^-4
+z_nc_vals3 <- 10^seq(-18, 0, length.out = 10)
+z_nb_vals2 <- 10^seq(-18, 0, length.out = 10)
 
 # data frame
 z_n_in <- tibble(param_foc1 = "z_nb",
-                 param_val1 = z_nb_vals) %>%
+                 param_val1 = z_nb_vals2) %>%
   expand_grid(tibble(param_foc2 = "z_nc",
                      param_val2 = z_nc_vals3))
 
@@ -386,16 +447,65 @@ params_q_n["q_nb"] <- 1.1e-2 # q_nb x 10
 # write_csv(pav_inv_z_n, "output/sensitivity_analysis_pav_inv_z_n.csv")
 pav_inv_z_n <- read_csv("output/sensitivity_analysis_pav_inv_z_n.csv")
 
+# figure
+pav_inv_z_n %>%
+  filter(variable2 == "Q_n") %>%
+  ggplot(aes(x = param_val1, y = value, color = as.factor(param_val2))) +
+  geom_hline(yintercept = as.numeric(params_def1["Qmin_n"]),
+             color = "black", linetype = "dashed") +
+  geom_line() +
+  facet_wrap(~ nutrient) +
+  scale_x_log10() +
+  scale_color_viridis_d(name = "RPV N conc (z)") +
+  labs(x = "PAV N conc (z)", y = "Relative virus concentration") +
+  fig_theme
+
+#### start here ####
+# look at saved PDF and above figure
+# make figure for plant biomass
+# when/why do plants benefit?
+# does this make sense for the model?
+# revise last simulation to prevent extreme plant biomass values
+
+
+#### z_nc -> invasion ####
+
+# values for z
+z_nc_vals4 <- 10^seq(-18, 0, length.out = 100)
+z_nb_vals3 <- 10^-4
+
+# data frame
+z_nc_in <- tibble(param_foc1 = "z_nb",
+                 param_val1 = z_nb_vals3) %>%
+  expand_grid(tibble(param_foc2 = "z_nc",
+                     param_val2 = z_nc_vals4))
+
+# set q values
+params_q_n <- params_def2
+params_q_n["q_nc"] <- 5.5e-3 # q_nc x 5
+params_q_n["q_nb"] <- 1.1e-2 # q_nb x 10
+
+# # PAV invasion
+# pdf("output/sensitivity_analysis_pav_inv_z_nc.pdf")
+# pav_inv_z_nc <- z_nc_in %>%
+#   mutate(first_virus = "RPV") %>%
+#   mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2, first_virus) param_fun(params_q_n, param_foc1, param_val1, param_foc2, param_val2, first_virus, inv_time = (500-11-12)))) %>%
+#   unnest(cols = c(sim_out))
+# dev.off()
+# 
+# # save simulation output (large)
+# write_csv(pav_inv_z_nc, "output/sensitivity_analysis_pav_inv_z_nc.csv")
+pav_inv_z_nc <- read_csv("output/sensitivity_analysis_pav_inv_z_nc.csv")
+
 # scale virus values relative to initial
-pav_inv_z_n2 <- pav_inv_z_n %>%
+pav_inv_z_nc2 <- pav_inv_z_nc %>%
   mutate(value_scale = case_when(variable2 == "PAV_conc" ~ value / log10(V0 + 1),
                                  variable2 == "RPV_conc" ~ value / log10(V0 + 1),
                                  TRUE ~ NA_real_))
 
 # figure
-pav_inv_z_n2 %>%
-  filter(str_detect(variable2, "conc") == T &
-           param_val1 == 1e-4) %>% # set z_nb >= 1e-6
+pav_inv_z_nc2 %>%
+  filter(str_detect(variable2, "conc") == T) %>%
   ggplot(aes(x = param_val2, y = value_scale, color = variable2)) +
   geom_hline(yintercept = 1) +
   geom_line() +
@@ -405,12 +515,25 @@ pav_inv_z_n2 %>%
   labs(x = "RPV P conc (z)", y = "Relative virus concentration") +
   fig_theme
 
+# plant biomass
+pav_inv_z_nc2 %>%
+  filter(variable2 == "H") %>%
+  ggplot(aes(x = param_val2, y = value, color = nutrient, linetype = nutrient)) +
+  geom_line() +
+  scale_color_viridis_d(name = "Nutrient") +
+  scale_linetype(name = "Nutrient") +
+  fig_theme
+# plants with high P reach biomass > 40 g
 
-#### z_n/z_p -> invasion ####
+
+#### z_nc/z_pc -> invasion ####
 
 # values for z
 z_nc_vals4 <- 10^seq(-18, 0, length.out = 19)
 z_pb_vals <- 10^seq(-18, 0, length.out = 19)
+
+z_nc_vals4 <- 10^-18
+z_pb_vals <- 10^-18
 
 # data frame
 z_np_in <- tibble(param_foc1 = "z_pb",
@@ -427,7 +550,6 @@ params_qz_np["q_pc"] <- 7.4e-4 # q_pc x 10
 params_qz_np["q_pb"] <- 3.7e-4 # q_pb x 5
 params_qz_np["z_pc"] <- 10^-4
 
-
 # PAV invasion
 pdf("output/sensitivity_analysis_pav_inv_z_np.pdf")
 pav_inv_z_np <- z_np_in %>%
@@ -436,9 +558,4 @@ pav_inv_z_np <- z_np_in %>%
   unnest(cols = c(sim_out))
 dev.off()
 
-#### start here ####
-# review above pdf -- one of the parameters makes H go very high
-
-# # save simulation output (large)
-# write_csv(pav_inv_z_np, "output/sensitivity_analysis_pav_inv_z_np.csv") # did not do yet
-# pav_inv_z_np <- read_csv("output/sensitivity_analysis_pav_inv_z_np.csv")
+# these simulations crash and the H values go very high - need to resolve
