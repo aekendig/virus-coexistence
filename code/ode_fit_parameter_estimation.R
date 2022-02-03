@@ -340,17 +340,17 @@ manipulate(plot(1:5, cex=size), size = slider(0.5,10,step=0.5))
 
 # time 
 times <- seq(0, max(dat5$dpi), length.out = 100)
-times <- seq(0, 800, length.out = 100)
+times <- seq(0, 100, length.out = 100) # check to see if virus crashes long-term
 
 # PAV
 manipulate(virus_wrapper(c, r, species = "PAV"), c = slider(0, 0.1), r = slider(0, 1))
-# r ~ 0.092
-# c ~ 0.0036
+# r ~ 0.284
+# c ~ 0.0016
 
 # RPV
 manipulate(virus_wrapper(c, r, species = "RPV"), c = slider(0, 0.1), r = slider(0, 1))
-# r ~ 0.272
-# c ~ 0.0116
+# r ~ 0.348
+# c ~ 0.0016
 
 
 #### compare virus model to observations ####
@@ -374,7 +374,8 @@ pav_cost <- function(P){
   
   # update parameter value
   params_in["r"] <- P[1]
-  params_in["c"] <- P[2]
+  # params_in["c"] <- P[2] # model fitting couldn't estimate SE with both parameters
+  params_in["c"] <- 0.0016
   
   # fit model
   out = ode(y = init_virus1, times = times_pav, func = virus1_model, parms = params_in)
@@ -391,7 +392,8 @@ rpv_cost <- function(P){
   
   # update parameter value
   params_in["r"] <- P[1]
-  params_in["c"] <- P[2]
+  # params_in["c"] <- P[2]
+  params_in["c"] <- 0.0016
   
   # fit model
   out = ode(y = init_virus1, times = times_rpv, func = virus1_model, parms = params_in)
@@ -409,14 +411,16 @@ times_pav <- seq(0, max(pav_fit$time), length.out = 100)
 times_rpv <- seq(0, max(rpv_fit$time), length.out = 100)
 
 # fit PAV model
-fit_pav <- modFit(pav_cost, c(0.092, 0.0036), lower = c(0))
+# fit_pav <- modFit(pav_cost, c(0.284, 0.0016), lower = c(0)) # model fitting couldn't estimate SE with both parameters
+fit_pav <- modFit(pav_cost, c(0.284), lower = c(0))
 summary(fit_pav)
 deviance(fit_pav)
 fit_pav$ssr # sum of squared residuals
 fit_pav$ms # mean squared residuals
 
 # fit RPV model
-fit_rpv <- modFit(rpv_cost, c(0.272, 0.0116), lower = c(0))
+# fit_rpv <- modFit(rpv_cost, c(0.348, 0.0016), lower = c(0))
+fit_rpv <- modFit(rpv_cost, c(0.348), lower = c(0))
 summary(fit_rpv)
 deviance(fit_rpv)
 fit_rpv$ssr # sum of squared residuals
@@ -428,15 +432,17 @@ fit_rpv$ms # mean squared residuals
 # add new values
 params_pav <- params_def1
 params_pav["r"] <- fit_pav$par[1]
-params_pav["c"] <- fit_pav$par[2]
+# params_pav["c"] <- fit_pav$par[2]
+params_pav["c"] <- 0.0016
 
 params_rpv <- params_def1
 params_rpv["r"] <- fit_rpv$par[1]
-params_rpv["c"] <- fit_rpv$par[2]
+# params_rpv["c"] <- fit_rpv$par[2]
+params_rpv["c"] <- 0.0016
 
 # virus times
 times <- seq(0, max(dat5$dpi), length.out = 100)
-# times <- seq(0, 100, length.out = 100)
+# times <- seq(0, 100, length.out = 100) # check long-term dynamics
 
 # data for figure
 pav_pred_dat <- ode(init_virus1, times, virus1_model, params_pav) %>%
@@ -457,8 +463,9 @@ pav_pred_dat %>%
 rpv_pred_dat %>%
   ggplot(aes(x = time, y = value)) +
   geom_line() +
-  geom_point(data = pav) +
+  geom_point(data = rpv) +
   facet_wrap(~ nutrient, scales = "free")
+# all except RPV N+P reach stable population sizes
 
 
 #### output ####
