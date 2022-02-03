@@ -451,21 +451,32 @@ pav_inv_z_n <- read_csv("output/sensitivity_analysis_pav_inv_z_n.csv")
 pav_inv_z_n %>%
   filter(variable2 == "Q_n") %>%
   ggplot(aes(x = param_val1, y = value, color = as.factor(param_val2))) +
-  geom_hline(yintercept = as.numeric(params_def1["Qmin_n"]),
+  geom_hline(yintercept = as.numeric(params_def1["Qmin_n"]), # plant's min
              color = "black", linetype = "dashed") +
+  geom_hline(yintercept = 5.5e-3, # RPV's min
+             color = "red", linetype = "dashed") +
+  geom_hline(yintercept = 1.1e-2, # PAV's min
+             color = "pink", linetype = "dashed") +
   geom_line() +
   facet_wrap(~ nutrient) +
   scale_x_log10() +
   scale_color_viridis_d(name = "RPV N conc (z)") +
-  labs(x = "PAV N conc (z)", y = "Relative virus concentration") +
+  labs(x = "PAV N conc (z)", y = "Plant N conc") +
   fig_theme
+# plant N conc settles on one of the three minimums
+# depends on virus N conc
 
-#### start here ####
-# look at saved PDF and above figure
-# make figure for plant biomass
-# when/why do plants benefit?
-# does this make sense for the model?
-# revise last simulation to prevent extreme plant biomass values
+pav_inv_z_n %>%
+  filter(variable2 == "H") %>%
+  ggplot(aes(x = param_val1, y = value, color = as.factor(param_val2))) +
+  geom_line() +
+  facet_wrap(~ nutrient) +
+  scale_x_log10() +
+  scale_color_viridis_d(name = "RPV N conc (z)") +
+  labs(x = "PAV N conc (z)", y = "Plant size (g)") +
+  fig_theme
+# when N is limiting, higher plant N conc from higher virus N conc (above)
+# increases plant biomass
 
 
 #### z_nc -> invasion ####
