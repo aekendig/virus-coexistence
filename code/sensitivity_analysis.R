@@ -1,8 +1,5 @@
 ## Goal: sensitivity analysis of virus parameters
 
-#### start here ####
-
-
 #### set up ####
 
 # clear all existing data
@@ -31,9 +28,9 @@ param_fun <- function(params_in, param_foc1, param_val1, param_foc2, param_val2,
   
   # update resource supply
   if(param_foc1 == "a_n_lo"){
-    # inits_in["R_n_low"] <- 5.6e-5 * 7 + param_val1 * 3
+    # inits_in["R_n_low"] <- 5.6e-5 * 7 + param_val1 * 3 # settings for model fitting and primary results
     # inits_in["R_n_p"] <- 5.6e-5 * 7 + param_val1 * 3
-    inits_in["R_n_low"] <- param_val1 * 10
+    inits_in["R_n_low"] <- param_val1 * 10 # gives a_n_lo larger influence over R_n
     inits_in["R_n_p"] <- param_val1 * 10
   }
   if(param_foc2 == "a_p_lo"){
@@ -108,21 +105,23 @@ virus2_model_sim(params_def2, "RPV", V0_b = V0, V0_c = V0,
   mutate(virus_conc = log10(value + 1))
 
 pdf("output/temp_sensitivity_analysis_fig.pdf")
-param_fun(params_def2, "r_b", 0.0961, "r_c", 0.221, "RPV") %>%
+param_fun(params_def2, "r_b", 0.228, "r_c", 0.358, "RPV") %>%
   filter(variable2 %in% c("PAV_conc", "PAV_pop"))
 dev.off()
+# output should match output of above
 
 pdf("output/temp_sensitivity_analysis_fig.pdf")
-param_fun(params_def2, "a_n_lo", 1.1e-10, "r_c", 0.221, "RPV") %>%
+param_fun(params_def2, "a_n_lo", 1.1e-10, "r_c", 0.358, "RPV") %>%
   filter(variable2 %in% c("PAV_conc", "PAV_pop"))
 dev.off()
+# output should match output of above unless N supply is low
 
 
 #### resource supply rates ####
 
 # values for low nutrient supply
-a_n_vals <- 10^(-13:-4)
-a_p_vals <- 10^(-13:-4)
+a_n_vals <- 10^seq(-13, -4, length.out = 5)
+a_p_vals <- 10^seq(-13, -4, length.out = 5)
 
 # data frame
 a_in <- tibble(param_foc1 = "a_n_lo",
@@ -144,7 +143,7 @@ pav_inv_a %>%
   ggplot(aes(x = param_val1, y = param_val2, color = value)) +
   geom_point(size = 10) +
   facet_wrap(~ nutrient) +
-  scale_color_viridis_c() +
+  scale_color_viridis_c(name = "PAV conc", direction = -1) +
   scale_x_log10() +
   scale_y_log10() +
   labs(x = "N supply", y = "P supply")
@@ -154,24 +153,12 @@ pav_inv_a %>%
   ggplot(aes(x = param_val1, y = param_val2, color = value)) +
   geom_point(size = 10) +
   facet_wrap(~ nutrient) +
-  scale_color_viridis_c() +
+  scale_color_viridis_c(name = "PAV pop", direction = -1) +
   scale_x_log10() +
   scale_y_log10() +
   labs(x = "N supply", y = "P supply")
-
-pav_inv_a %>%
-  filter(variable2 == "RPV_pop") %>%
-  ggplot(aes(x = param_val1, y = param_val2, color = value)) +
-  geom_point(size = 10) +
-  facet_wrap(~ nutrient) +
-  scale_color_viridis_c() +
-  scale_x_log10() +
-  scale_y_log10() +
-  labs(x = "N supply", y = "P supply")
-
-# why are the viruses always present?
-# looking at plant dynamics pdf:
 # Q is only drawn down so fast, giving viruses some nutrients
+# regardless of resource supply rate
 
 
 #### later invasion ####
@@ -180,15 +167,15 @@ pav_inv_a %>%
 param_fun(params_def2, "r_b", 0.0961, "r_c", 0.221, "RPV",
           plant_time = 11, res_time = 100-11, inv_time = 100) %>%
   filter(variable2 %in% c("PAV_conc", "PAV_pop"))
-# abundances are comparable to very low nutrients
+# abundances are comparable to low nutrient values
 # viruses can always invade when Q is at Qmin because of their q values
 
 
-#### minimum nutrient concentrations (q) ####
+#### minimum N concentrations (q_n) ####
 
 # values for low nutrient supply
-q_nb_vals <- 10^(-3:6)
-q_nc_vals <- 10^(-3:6)
+q_nb_vals <- 10^seq(-3, 6, length.out = 5)
+q_nc_vals <- 10^seq(-3, 6, length.out = 5)
 
 # data frame
 q_n_in <- tibble(param_foc1 = "q_nb",
@@ -213,7 +200,7 @@ pav_inv_q_n %>%
   ggplot(aes(x = param_val1, y = param_val2, color = value)) +
   geom_point(size = 10) +
   facet_wrap(~ nutrient) +
-  scale_color_viridis_c() +
+  scale_color_viridis_c(name = "PAV conc", direction = -1) +
   scale_x_log10() +
   scale_y_log10() +
   labs(x = "PAV min N", y = "RPV min N")
@@ -223,7 +210,7 @@ pav_inv_q_n %>%
   ggplot(aes(x = param_val1, y = param_val2, color = value)) +
   geom_point(size = 10) +
   facet_wrap(~ nutrient) +
-  scale_color_viridis_c() +
+  scale_color_viridis_c(name = "RPV conc", direction = -1) +
   scale_x_log10() +
   scale_y_log10() +
   labs(x = "PAV min N", y = "RPV min N")
@@ -232,8 +219,8 @@ pav_inv_q_n %>%
 #### minimum nutrient concentration (q_n)/nutrient content of virus (z_n) ####
 
 # values for z and q
-z_nc_vals <- 10^seq(-18, 0, length.out = 10)
-q_nc_vals2 <- 10^(-4:5) # simulations crash for low q's
+z_nc_vals <- 10^seq(-18, 0, length.out = 5)
+q_nc_vals2 <- 10^seq(-4, 5, length.out = 5) # simulations crash for low q's
 
 # data frame
 qz_nc_in <- tibble(param_foc1 = "q_nc",
@@ -248,6 +235,9 @@ pav_inv_qz_nc <- qz_nc_in %>%
   mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2, first_virus) param_fun(params_def2, param_foc1, param_val1, param_foc2, param_val2, first_virus))) %>%
   unnest(cols = c(sim_out))
 dev.off()
+
+#### left off here with revised model ####
+
 # lowest q (RPV min N) 1e-4:
 # increasing z (RPV N conc) up to 1e-4 gives RPV more control of Q_n
 # Q_n decreases -> host and PAV decrease
