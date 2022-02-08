@@ -39,23 +39,25 @@ params_def2 <- c(a_n_lo = 1.1e-6,
                  z_pb = 2.6e-19,
                  z_nc = 1.7e-18,
                  z_pc = 2.6e-19,
-                 m = 0.000860,
-                 g = 0.136,
-                 c_b = 0.0016,
-                 c_c = 0.0016,
-                 r_b = 0.228,
-                 r_c = 0.358)
+                 m = 0.001,
+                 g = 0.164,
+                 c_b = 0.00445,
+                 c_c = 0.005,
+                 r_b = 0.288,
+                 r_c = 0.451)
 
 
 #### initial values ####
 
 # initial values
 H0 <- 1e-2
-Q0_n <- as.numeric(params_def1["Qmin_n"]) * 3
-Q0_p <- as.numeric(params_def1["Qmin_p"]) * 3
-R0_n_lo <- as.numeric(params_def1["a_n_hi"]) * 7 + as.numeric(params_def1["a_n_lo"]) * 3
+Q0_n <- as.numeric(params_def1["Qmin_n"]) * 5
+Q0_p <- as.numeric(params_def1["Qmin_p"]) * 5
+# R0_n_lo <- as.numeric(params_def1["a_n_hi"]) * 7 + as.numeric(params_def1["a_n_lo"]) * 3
+R0_n_lo <- as.numeric(params_def1["a_n_hi"]) * 10
 R0_n_hi <- as.numeric(params_def1["a_n_hi"]) * 10
-R0_p_lo <- as.numeric(params_def1["a_p_hi"]) * 7 + as.numeric(params_def1["a_p_lo"]) * 3
+# R0_p_lo <- as.numeric(params_def1["a_p_hi"]) * 7 + as.numeric(params_def1["a_p_lo"]) * 3
+R0_p_lo <- as.numeric(params_def1["a_p_hi"]) * 10
 R0_p_hi <- as.numeric(params_def1["a_p_hi"]) * 10
 V0 <- 5e5
 
