@@ -28,14 +28,10 @@ param_fun <- function(params_in, param_foc1, param_val1, param_foc2, param_val2,
   
   # update resource supply
   if(param_foc1 == "a_n_lo"){
-    # inits_in["R_n_low"] <- 5.6e-5 * 7 + param_val1 * 3 # settings for model fitting and primary results
-    # inits_in["R_n_p"] <- 5.6e-5 * 7 + param_val1 * 3
-    inits_in["R_n_low"] <- param_val1 * 10 # gives a_n_lo larger influence over R_n
+    inits_in["R_n_low"] <- param_val1 * 10
     inits_in["R_n_p"] <- param_val1 * 10
   }
   if(param_foc2 == "a_p_lo"){
-    # inits_in["R_p_low"] <- 8.2e-6 * 7 + param_val2 * 3
-    # inits_in["R_p_n"] <- 8.2e-6 * 7 + param_val2 * 3
     inits_in["R_p_low"] <- param_val2 * 10
     inits_in["R_p_n"] <- param_val2 * 10
   }
@@ -105,13 +101,13 @@ virus2_model_sim(params_def2, "RPV", V0_b = V0, V0_c = V0,
   mutate(virus_conc = log10(value + 1))
 
 pdf("output/temp_sensitivity_analysis_fig.pdf")
-param_fun(params_def2, "r_b", 0.228, "r_c", 0.358, "RPV") %>%
+param_fun(params_def2, "r_b", 0.288, "r_c", 0.451, "RPV") %>%
   filter(variable2 %in% c("PAV_conc", "PAV_pop"))
 dev.off()
 # output should match output of above
 
 pdf("output/temp_sensitivity_analysis_fig.pdf")
-param_fun(params_def2, "a_n_lo", 1.1e-10, "r_c", 0.358, "RPV") %>%
+param_fun(params_def2, "a_n_lo", 1.1e-10, "r_c", 0.451, "RPV") %>%
   filter(variable2 %in% c("PAV_conc", "PAV_pop"))
 dev.off()
 # output should match output of above unless N supply is low
@@ -164,7 +160,7 @@ pav_inv_a %>%
 #### later invasion ####
 
 # use default parameters
-param_fun(params_def2, "r_b", 0.0961, "r_c", 0.221, "RPV",
+param_fun(params_def2, "r_b", 0.288, "r_c", 0.451, "RPV",
           plant_time = 11, res_time = 100-11, inv_time = 100) %>%
   filter(variable2 %in% c("PAV_conc", "PAV_pop"))
 # abundances are comparable to low nutrient values
@@ -235,8 +231,11 @@ pav_inv_qz_nc <- qz_nc_in %>%
   mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2, first_virus) param_fun(params_def2, param_foc1, param_val1, param_foc2, param_val2, first_virus))) %>%
   unnest(cols = c(sim_out))
 dev.off()
+#### start here ####
+# Q_P exceeds its maximum
+# insert max(0, x) functions where needed because I think this means something is going negative and making Q grow
+# 1 - Qmin_n / Q_n_np: Q is going lower than plant's min Q, making the ratio greater than 1 -- should choose zero over negative value
 
-#### left off here with revised model ####
 
 # lowest q (RPV min N) 1e-4:
 # increasing z (RPV N conc) up to 1e-4 gives RPV more control of Q_n
@@ -255,7 +254,7 @@ pav_inv_qz_nc %>%
   ggplot(aes(x = param_val1, y = param_val2, color = value)) +
   geom_point(size = 10) +
   facet_wrap(~ nutrient) +
-  scale_color_viridis_c() +
+  scale_color_viridis_c(name = "RPV pop", direction = -1) +
   scale_x_log10() +
   scale_y_log10() +
   labs(x = "RPV min N (q)", y = "RPV N conc (z)")
@@ -265,7 +264,7 @@ pav_inv_qz_nc %>%
   ggplot(aes(x = param_val1, y = param_val2, color = value)) +
   geom_point(size = 10) +
   facet_wrap(~ nutrient) +
-  scale_color_viridis_c() +
+  scale_color_viridis_c(name = "PAV pop", direction = -1) +
   scale_x_log10() +
   scale_y_log10() +
   labs(x = "RPV min N (q)", y = "RPV N conc (z)")

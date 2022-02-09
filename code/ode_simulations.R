@@ -26,7 +26,7 @@ long_term_plant <- virus2_model_sim(params_def2, "PAV", V0_b = 0, V0_c = 0,
 
 # figure
 pdf("output/long_term_plant_simulation_figure.pdf", width = 6.5, height = 3.75)
-plant_fig_fun(long_term_plant, params_def2, -3e-3, -1e-3)
+plant_fig_fun(long_term_plant, params_def2, -8e-4, -5e-4)
 dev.off()
 
 
@@ -45,7 +45,7 @@ short_term_plant <- virus2_model_sim(params_def2, "PAV", V0_b = 0, V0_c = 0,
 
 # figure
 pdf("output/short_term_plant_simulation_figure.pdf", width = 6.5, height = 3.75)
-plant_fig_fun(short_term_plant, params_def2, -2e-3, -5e-4)
+plant_fig_fun(short_term_plant, params_def2, -7e-4, -4e-4)
 dev.off()
 
 
@@ -191,17 +191,17 @@ dev.off()
 #### plant figures with viruses ####
 
 pdf("output/pav_only_plant_simulation_figure.pdf", width = 6.5, height = 3.75)
-plant_fig_fun(pav_first_sim, params_def2, -2e-3, -5e-4)
+plant_fig_fun(pav_first_sim, params_def2, -7e-4, -4e-4)
 dev.off()
 
 pdf("output/rpv_only_plant_simulation_figure.pdf", width = 6.5, height = 3.75)
-plant_fig_fun(rpv_first_sim, params_def2, -2e-3, -5e-4)
+plant_fig_fun(rpv_first_sim, params_def2, -7e-4, -4e-4)
 dev.off()
 
 pdf("output/pav_inv_plant_simulation_figure.pdf", width = 6.5, height = 3.75)
-plant_fig_fun(pav_inv_sim, params_def2, -2e-3, -5e-4)
+plant_fig_fun(pav_inv_sim, params_def2, -7e-4, -4e-4)
 dev.off()
 
 pdf("output/rpv_inv_plant_simulation_figure.pdf", width = 6.5, height = 3.75)
-plant_fig_fun(rpv_inv_sim, params_def2, -2e-3, -5e-4)
+plant_fig_fun(rpv_inv_sim, params_def2, -7e-4, -4e-4)
 dev.off()
