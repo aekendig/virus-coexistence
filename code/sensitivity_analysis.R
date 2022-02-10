@@ -101,13 +101,13 @@ virus2_model_sim(params_def2, "RPV", V0_b = V0, V0_c = V0,
   mutate(virus_conc = log10(value + 1))
 
 pdf("output/temp_sensitivity_analysis_fig.pdf")
-param_fun(params_def2, "r_b", 0.288, "r_c", 0.451, "RPV") %>%
+param_fun(params_def2, "q_nb", 1.1e-3, "q_pb", 7.4e-5, "RPV") %>%
   filter(variable2 %in% c("PAV_conc", "PAV_pop"))
 dev.off()
 # output should match output of above
 
 pdf("output/temp_sensitivity_analysis_fig.pdf")
-param_fun(params_def2, "a_n_lo", 1.1e-10, "r_c", 0.451, "RPV") %>%
+param_fun(params_def2, "a_n_lo", 1.1e-10, "q_pb", 7.4e-5, "RPV") %>%
   filter(variable2 %in% c("PAV_conc", "PAV_pop"))
 dev.off()
 # output should match output of above unless N supply is low
@@ -186,9 +186,6 @@ pav_inv_q_n <- q_n_in %>%
   mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2, first_virus) param_fun(params_def2, param_foc1, param_val1, param_foc2, param_val2, first_virus))) %>%
   unnest(cols = c(sim_out))
 dev.off()
-# increasing q makes virus go extinct
-# the time to extinction decreases with larger q
-# this is about the virus-plant interaction, not virus-virus
 
 # figure
 pav_inv_q_n %>%
@@ -200,6 +197,7 @@ pav_inv_q_n %>%
   scale_x_log10() +
   scale_y_log10() +
   labs(x = "PAV min N", y = "RPV min N")
+# increasing the virus's q above the plants makes it grow slower, no matter how much larger
 
 pav_inv_q_n %>%
   filter(variable2 == "RPV_conc") %>%
@@ -231,22 +229,6 @@ pav_inv_qz_nc <- qz_nc_in %>%
   mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2, first_virus) param_fun(params_def2, param_foc1, param_val1, param_foc2, param_val2, first_virus))) %>%
   unnest(cols = c(sim_out))
 dev.off()
-#### start here ####
-# Q_P exceeds its maximum
-# insert max(0, x) functions where needed because I think this means something is going negative and making Q grow
-# 1 - Qmin_n / Q_n_np: Q is going lower than plant's min Q, making the ratio greater than 1 -- should choose zero over negative value
-
-
-# lowest q (RPV min N) 1e-4:
-# increasing z (RPV N conc) up to 1e-4 gives RPV more control of Q_n
-# Q_n decreases -> host and PAV decrease
-# this occurs because 1e-4 is below the host's Q_min (1.1e-3)
-# when z >= 1e-4 -> Q_n < 0 (unrealistic/simulation error) -> P becomes the limiting nutrient
-# q = 1e-3:
-# I think Q_n is pulled to 1e-3 with higher z, decreasing plant growth (because 1e-3 < 1.1e-3), but not killing the plant (in this time frame)
-# q = 1e-2:
-# RPV can't persist until it's z is high enough to influence Q
-# PAV and host can persist because their q's are lower
 
 # figure
 pav_inv_qz_nc %>%
@@ -258,6 +240,10 @@ pav_inv_qz_nc %>%
   scale_x_log10() +
   scale_y_log10() +
   labs(x = "RPV min N (q)", y = "RPV N conc (z)")
+# increasing q decreases growth regardless of z
+# increasing z decreases growth
+# growth increases when z is set at its highest level, but this is a computation error
+# Q_n skips to a negative value despite max functions
 
 pav_inv_qz_nc %>%
   filter(variable2 == "PAV_pop") %>%
@@ -268,7 +254,11 @@ pav_inv_qz_nc %>%
   scale_x_log10() +
   scale_y_log10() +
   labs(x = "RPV min N (q)", y = "RPV N conc (z)")
-# PAV can always persist unless plant is killed
+# increasing RPV's q doesn't affect PAV much, if at all
+# increasing RPV's z decreases PAV's growth (until last value, see above)
+# increasing RPV's z decreases plant growth
+
+#### start here ####
 
 
 #### q_nc/z_nc -> plant N conc. ####

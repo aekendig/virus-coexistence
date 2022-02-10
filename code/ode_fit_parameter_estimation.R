@@ -377,8 +377,8 @@ pav_cost <- function(P){
   
   # update parameter value
   params_in["r"] <- P[1]
-  params_in["c"] <- P[2] 
-  # params_in["c"] <- 0.005
+  # params_in["c"] <- P[2] 
+  params_in["c"] <- 0.005
   
   # fit model
   out = ode(y = init_virus1, times = times_pav, func = virus1_model, parms = params_in)
@@ -414,8 +414,8 @@ times_pav <- seq(0, max(pav_fit$time), length.out = 100)
 times_rpv <- seq(0, max(rpv_fit$time), length.out = 100)
 
 # fit PAV model
-fit_pav <- modFit(pav_cost, c(0.35, 0.005), lower = c(0))
-# fit_pav <- modFit(pav_cost, c(0.35), lower = c(0))
+# fit_pav <- modFit(pav_cost, c(0.35, 0.005), lower = c(0))
+fit_pav <- modFit(pav_cost, c(0.35), lower = c(0))
 summary(fit_pav)
 deviance(fit_pav)
 fit_pav$ssr # sum of squared residuals
@@ -435,8 +435,8 @@ fit_rpv$ms # mean squared residuals
 # add new values
 params_pav <- params_def1
 params_pav["r"] <- fit_pav$par[1]
-params_pav["c"] <- fit_pav$par[2]
-# params_pav["c"] <- 0.005
+# params_pav["c"] <- fit_pav$par[2]
+params_pav["c"] <- 0.005
 
 params_rpv <- params_def1
 params_rpv["r"] <- fit_rpv$par[1]
@@ -468,7 +468,6 @@ rpv_pred_dat %>%
   geom_line() +
   geom_point(data = rpv) +
   facet_wrap(~ nutrient, scales = "free")
-# all except RPV N+P reach stable population sizes
 
 
 #### output ####
