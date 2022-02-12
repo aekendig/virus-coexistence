@@ -213,8 +213,8 @@ pav_inv_q_n %>%
 #### minimum nutrient concentration (q_n)/nutrient content of virus (z_n) ####
 
 # values for z and q
-z_nc_vals <- 10^seq(-18, 0, length.out = 5)
-q_nc_vals2 <- 10^seq(-4, 5, length.out = 5) # simulations crash for low q's
+z_nc_vals <- 1.7*10^c(-18, -12, -6, -1)
+q_nc_vals2 <- 1.1*10^c(-5, -4, -3, -2, -1) 
 
 # data frame
 qz_nc_in <- tibble(param_foc1 = "q_nc",
@@ -242,8 +242,11 @@ pav_inv_qz_nc %>%
   labs(x = "RPV min N (q)", y = "RPV N conc (z)")
 # increasing q decreases growth regardless of z
 # increasing z decreases growth
-# growth increases when z is set at its highest level, but this is a computation error
-# Q_n skips to a negative value despite max functions
+# this is because at low z, the plant controls the nutrients levels, so there are excess
+# nutrients for the virus and it can grow a lot, but as z increases, the nutrient levels
+# meet the virus's requirements and there aren't as much excess for fast growth
+# growth increases when z is set at its highest level and lowest q level, 
+# but this is a computation error -- Q_n skips to a negative value despite max functions
 
 pav_inv_qz_nc %>%
   filter(variable2 == "PAV_pop") %>%
@@ -257,9 +260,122 @@ pav_inv_qz_nc %>%
 # increasing RPV's q doesn't affect PAV much, if at all
 # increasing RPV's z decreases PAV's growth (until last value, see above)
 # increasing RPV's z decreases plant growth
+# for high z, decreasing q below the plant's decreases plant and PAV growth
+
+
+#### minimum N concentrations (q_n) with higher z_nc ####
+
+# values for z and q
+q_nc_vals2 <- 1.1*10^c(-5, -4, -3, -2, -1) # same as above
+q_nb_vals2 <- 1.1*10^c(-5, -4, -3, -2, -1)
+
+# data frame
+q_n_in2 <- tibble(param_foc1 = "q_nc",
+                   param_val1 = q_nc_vals2) %>%
+    expand_grid(tibble(param_foc2 = "q_nb",
+                     param_val2 = q_nb_vals2))
+
+# set RPV (resident's) z higher
+params_q_n <- params_def2
+params_q_n["z_nc"] <- 1.7 * 10^-6
+
+# PAV invades RPV
+pdf("output/sensitivity_analysis_pav_inv_q_n_high_z.pdf")
+pav_inv_q_n2 <- q_n_in2 %>%
+  mutate(first_virus = "RPV") %>%
+  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2, first_virus) param_fun(params_q_n, param_foc1, param_val1, param_foc2, param_val2, first_virus))) %>%
+  unnest(cols = c(sim_out))
+dev.off()
+
+# figure
+pav_inv_q_n2 %>%
+  filter(variable2 == "RPV_pop") %>%
+  ggplot(aes(x = param_val1, y = param_val2, color = value)) +
+  geom_point(size = 10) +
+  facet_wrap(~ nutrient) +
+  scale_color_viridis_c(name = "RPV pop", direction = -1) +
+  scale_x_log10() +
+  scale_y_log10() +
+  labs(x = "RPV min N (q)", y = "PAV min N (q)")
+# RPV grows slightly faster with lower q (more excess nutrients)
+
+pav_inv_q_n2 %>%
+  filter(variable2 == "PAV_pop") %>%
+  ggplot(aes(x = param_val1, y = param_val2, color = value)) +
+  geom_point(size = 10) +
+  facet_wrap(~ nutrient) +
+  scale_color_viridis_c(name = "PAV pop", direction = -1) +
+  scale_x_log10() +
+  scale_y_log10() +
+  labs(x = "RPV min N (q)", y = "PAV min N (q)")
+# when PAV's q is lower than RPV's, it can grow fast because of excess nutrients
+# it grows slowly when its q is equal to or greater than RPV's
+# because resources are limited (it's actually only dying here, but m is low)
+
+
+#### minimum N concentration (q_n)/mortality (c) with higher z_nc ####
+
+# hypothesis: when PAV's q is greater than RPV's and it's m is high, it will decline
+
+# values for z and q
+q_nc_vals2 <- 1.1*10^c(-5, -4, -3, -2, -1) # same as above
+c_b_vals <- c(0.1, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19)
+
+# data frame
+qnc_cb_in <- tibble(param_foc1 = "q_nc",
+                       param_val1 = q_nc_vals2) %>%
+  expand_grid(tibble(param_foc2 = "c_b",
+                     param_val2 = c_b_vals))
+
+# set RPV (resident's) z higher
+params_qnc_cb <- params_def2
+params_qnc_cb["z_nc"] <- 1.7 * 10^-6
+
+# PAV invades RPV
+pdf("output/sensitivity_analysis_pav_inv_qnc_cb_high_znc.pdf")
+pav_inv_qnc_cb <- qnc_cb_in %>%
+  mutate(first_virus = "RPV") %>%
+  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2, first_virus) param_fun(params_qnc_cb, param_foc1, param_val1, param_foc2, param_val2, first_virus))) %>%
+  unnest(cols = c(sim_out))
+dev.off()
+
+# figure
+pav_inv_qnc_cb %>%
+  filter(variable2 == "RPV_pop") %>%
+  ggplot(aes(x = param_val1, y = param_val2, color = value)) +
+  geom_point(size = 10) +
+  facet_wrap(~ nutrient) +
+  scale_color_viridis_c(name = "RPV pop", direction = -1) +
+  scale_x_log10() +
+  scale_y_log10() +
+  labs(x = "RPV min N (q)", y = "PAV mortality (c)")
+# RPV grows slightly faster with lower q (more excess nutrients)
+
+pav_inv_qnc_cb %>%
+  filter(variable2 == "PAV_pop") %>%
+  ggplot(aes(x = param_val1, y = param_val2, color = value)) +
+  geom_point(size = 10) +
+  facet_wrap(~ nutrient) +
+  scale_color_viridis_c(name = "PAV pop", direction = -1) +
+  scale_x_log10() +
+  labs(x = "RPV min N (q)", y = "PAV mortality (c)")
+# a high enough c_b makes PAV decline rather than grow
+# decreasing RPV's q can pull down resources more,
+# which accelerates PAV's decline
+# RPV's q alone can make PAV go from positive to negative growth
+# but the change is relatively small with low c_b
+# could measure PAV's growth rate next
+# growth rate in response to RPV's q (and z)
+# should go from positive to negative
+# may need to ramp up c_b if the changes are too subtle
+
 
 #### start here ####
 
+# create function to measure invader's growth rate
+
+
+#### older code ####
 
 #### q_nc/z_nc -> plant N conc. ####
 
