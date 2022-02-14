@@ -10,6 +10,7 @@ library(tidyverse)
 library(deSolve)
 library(cowplot)
 library(lemon)
+library(janitor)
 
 # load model and settings
 source("code/model_settings.R")
@@ -18,8 +19,9 @@ source("code/model_settings.R")
 #### model functions ####
 
 # change parameter value
-param_fun <- function(params_in, param_foc1, param_val1, param_foc2, param_val2, 
-                      first_virus, V0_b = V0, V0_c = V0, inits_in = init_def2,
+param_fun <- function(params_in, param_foc1, param_val1, param_foc2, param_val2,
+                      first_virus, output_type = "last",
+                      V0_b = V0, V0_c = V0, inits_in = init_def2,
                       plant_time = 11, res_time = 12, inv_time = 100-11-12){
   
   # update parameter value
@@ -69,13 +71,13 @@ param_fun <- function(params_in, param_foc1, param_val1, param_foc2, param_val2,
                                  str_starts(variable, "V_c") == T ~ "RPV_conc",
                                  str_starts(variable, "VbH") == T ~ "PAV_pop",
                                  str_starts(variable, "VcH") == T ~ "RPV_pop"),
-           value = if_else(str_starts(variable, "V") == T, 
+           value2 = if_else(str_starts(variable, "V") == T, 
                                  log10(value + 1), value),
            abund_type = if_else(str_starts(variable, "V") == T, 
                                 str_sub(variable2, 5, 7), NA_character_))
   
   # save time series
-  print(ggplot(mod_out2, aes(x = time, y = value, 
+  print(ggplot(mod_out2, aes(x = time, y = value2, 
                              color = nutrient, linetype = nutrient)) +
           geom_line() +
           facet_wrap(~ variable2, scales = "free_y") +
@@ -83,9 +85,49 @@ param_fun <- function(params_in, param_foc1, param_val1, param_foc2, param_val2,
           fig_theme +
           labs(title = paste0(param_foc1, " = ", param_val1, "; ", param_foc2, " = ", param_val2)))
   
-  # last time point
-  mod_out3 <- mod_out2 %>%
-    filter(time == max(time))
+  # outputs
+  if(output_type == "last"){
+    
+    # extract last time point
+    mod_out3 <- mod_out2 %>%
+      filter(time == max(time))
+    
+  } else if(first_virus == "RPV") {
+    
+    # extract first two time points of invasion
+    # calculate invader's growth rate
+    mod_out3 <- mod_out2 %>%
+      mutate(time_diff = abs(time - (plant_time + res_time + 1))) %>%
+      filter((time == plant_time + res_time | time_diff == min(time_diff)) &
+               variable2 == "PAV_conc") %>%
+      mutate(time = round_half_up(time),
+             time = as.factor(time) %>%
+               fct_recode("first" = as.character(plant_time + res_time),
+                          "last" = as.character(plant_time + res_time + 1))) %>%
+      select(-c(time_diff, value2)) %>%
+      pivot_wider(names_from = "time",
+                  values_from = "value") %>%
+      mutate(growth = log(last/first))
+    
+  } else {
+    
+    # extract first two time points of invasion
+    # calculate invader's growth rate
+    mod_out3 <- mod_out2 %>%
+      mutate(time_diff = abs(time - (plant_time + res_time + 1))) %>%
+      filter((time == plant_time + res_time | time_diff == min(time_diff)) &
+               variable2 == "RPV_conc") %>%
+      mutate(time = round_half_up(time),
+             time = as.factor(time) %>%
+               fct_recode("first" = as.character(plant_time + res_time),
+                          "last" = as.character(plant_time + res_time + 1))) %>%
+      select(-c(time_diff, value2)) %>%
+      pivot_wider(names_from = "time",
+                  values_from = "value") %>%
+      mutate(growth = log(last/first))
+    
+  }
+  
   
   # return output
   return(mod_out3)
@@ -128,15 +170,14 @@ a_in <- tibble(param_foc1 = "a_n_lo",
 # PAV invades RPV
 pdf("output/sensitivity_analysis_pav_inv_a.pdf")
 pav_inv_a <- a_in %>%
-  mutate(first_virus = "RPV") %>%
-  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2, first_virus) param_fun(params_def2, param_foc1, param_val1, param_foc2, param_val2, first_virus))) %>%
+  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2) param_fun(params_def2, param_foc1, param_val1, param_foc2, param_val2, first_virus = "RPV", output_type = "last"))) %>%
   unnest(cols = c(sim_out))
 dev.off()
 
 # figure
 pav_inv_a %>%
   filter(variable2 == "PAV_conc") %>%
-  ggplot(aes(x = param_val1, y = param_val2, color = value)) +
+  ggplot(aes(x = param_val1, y = param_val2, color = value2)) +
   geom_point(size = 10) +
   facet_wrap(~ nutrient) +
   scale_color_viridis_c(name = "PAV conc", direction = -1) +
@@ -146,7 +187,7 @@ pav_inv_a %>%
 
 pav_inv_a %>%
   filter(variable2 == "PAV_pop") %>%
-  ggplot(aes(x = param_val1, y = param_val2, color = value)) +
+  ggplot(aes(x = param_val1, y = param_val2, color = value2)) +
   geom_point(size = 10) +
   facet_wrap(~ nutrient) +
   scale_color_viridis_c(name = "PAV pop", direction = -1) +
@@ -160,11 +201,10 @@ pav_inv_a %>%
 #### later invasion ####
 
 # use default parameters
-param_fun(params_def2, "r_b", 0.288, "r_c", 0.451, "RPV",
+param_fun(params_def2, "r_b", 0.288, "r_c", 0.451, "RPV", output_type = "first",
           plant_time = 11, res_time = 100-11, inv_time = 100) %>%
   filter(variable2 %in% c("PAV_conc", "PAV_pop"))
-# abundances are comparable to low nutrient values
-# viruses can always invade when Q is at Qmin because of their q values
+# virus can't invade later, but decline in concentration is tiny
 
 
 #### minimum N concentrations (q_n) ####
@@ -182,15 +222,14 @@ q_n_in <- tibble(param_foc1 = "q_nb",
 # PAV invades RPV
 pdf("output/sensitivity_analysis_pav_inv_q_n.pdf")
 pav_inv_q_n <- q_n_in %>%
-  mutate(first_virus = "RPV") %>%
-  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2, first_virus) param_fun(params_def2, param_foc1, param_val1, param_foc2, param_val2, first_virus))) %>%
+  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2) param_fun(params_def2, param_foc1, param_val1, param_foc2, param_val2, first_virus = "RPV", output_type = "last"))) %>%
   unnest(cols = c(sim_out))
 dev.off()
 
 # figure
 pav_inv_q_n %>%
   filter(variable2 == "PAV_conc") %>%
-  ggplot(aes(x = param_val1, y = param_val2, color = value)) +
+  ggplot(aes(x = param_val1, y = param_val2, color = value2)) +
   geom_point(size = 10) +
   facet_wrap(~ nutrient) +
   scale_color_viridis_c(name = "PAV conc", direction = -1) +
@@ -201,7 +240,7 @@ pav_inv_q_n %>%
 
 pav_inv_q_n %>%
   filter(variable2 == "RPV_conc") %>%
-  ggplot(aes(x = param_val1, y = param_val2, color = value)) +
+  ggplot(aes(x = param_val1, y = param_val2, color = value2)) +
   geom_point(size = 10) +
   facet_wrap(~ nutrient) +
   scale_color_viridis_c(name = "RPV conc", direction = -1) +
@@ -225,15 +264,14 @@ qz_nc_in <- tibble(param_foc1 = "q_nc",
 # PAV invades RPV
 pdf("output/sensitivity_analysis_pav_inv_qz_nc.pdf")
 pav_inv_qz_nc <- qz_nc_in %>%
-  mutate(first_virus = "RPV") %>%
-  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2, first_virus) param_fun(params_def2, param_foc1, param_val1, param_foc2, param_val2, first_virus))) %>%
+  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2) param_fun(params_def2, param_foc1, param_val1, param_foc2, param_val2, first_virus = "RPV", output_type = "last"))) %>%
   unnest(cols = c(sim_out))
 dev.off()
 
 # figure
 pav_inv_qz_nc %>%
   filter(variable2 == "RPV_pop") %>%
-  ggplot(aes(x = param_val1, y = param_val2, color = value)) +
+  ggplot(aes(x = param_val1, y = param_val2, color = value2)) +
   geom_point(size = 10) +
   facet_wrap(~ nutrient) +
   scale_color_viridis_c(name = "RPV pop", direction = -1) +
@@ -250,7 +288,7 @@ pav_inv_qz_nc %>%
 
 pav_inv_qz_nc %>%
   filter(variable2 == "PAV_pop") %>%
-  ggplot(aes(x = param_val1, y = param_val2, color = value)) +
+  ggplot(aes(x = param_val1, y = param_val2, color = value2)) +
   geom_point(size = 10) +
   facet_wrap(~ nutrient) +
   scale_color_viridis_c(name = "PAV pop", direction = -1) +
@@ -282,15 +320,14 @@ params_q_n["z_nc"] <- 1.7 * 10^-6
 # PAV invades RPV
 pdf("output/sensitivity_analysis_pav_inv_q_n_high_z.pdf")
 pav_inv_q_n2 <- q_n_in2 %>%
-  mutate(first_virus = "RPV") %>%
-  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2, first_virus) param_fun(params_q_n, param_foc1, param_val1, param_foc2, param_val2, first_virus))) %>%
+  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2, first_virus) param_fun(params_q_n, param_foc1, param_val1, param_foc2, param_val2, first_virus = "RPV", output_type = "last"))) %>%
   unnest(cols = c(sim_out))
 dev.off()
 
 # figure
 pav_inv_q_n2 %>%
   filter(variable2 == "RPV_pop") %>%
-  ggplot(aes(x = param_val1, y = param_val2, color = value)) +
+  ggplot(aes(x = param_val1, y = param_val2, color = value2)) +
   geom_point(size = 10) +
   facet_wrap(~ nutrient) +
   scale_color_viridis_c(name = "RPV pop", direction = -1) +
@@ -301,7 +338,7 @@ pav_inv_q_n2 %>%
 
 pav_inv_q_n2 %>%
   filter(variable2 == "PAV_pop") %>%
-  ggplot(aes(x = param_val1, y = param_val2, color = value)) +
+  ggplot(aes(x = param_val1, y = param_val2, color = value2)) +
   geom_point(size = 10) +
   facet_wrap(~ nutrient) +
   scale_color_viridis_c(name = "PAV pop", direction = -1) +
@@ -342,7 +379,7 @@ dev.off()
 # figure
 pav_inv_qnc_cb %>%
   filter(variable2 == "RPV_pop") %>%
-  ggplot(aes(x = param_val1, y = param_val2, color = value)) +
+  ggplot(aes(x = param_val1, y = param_val2, color = value2)) +
   geom_point(size = 10) +
   facet_wrap(~ nutrient) +
   scale_color_viridis_c(name = "RPV pop", direction = -1) +
@@ -353,7 +390,7 @@ pav_inv_qnc_cb %>%
 
 pav_inv_qnc_cb %>%
   filter(variable2 == "PAV_pop") %>%
-  ggplot(aes(x = param_val1, y = param_val2, color = value)) +
+  ggplot(aes(x = param_val1, y = param_val2, color = value2)) +
   geom_point(size = 10) +
   facet_wrap(~ nutrient) +
   scale_color_viridis_c(name = "PAV pop", direction = -1) +
@@ -372,7 +409,7 @@ pav_inv_qnc_cb %>%
 
 #### start here ####
 
-# create function to measure invader's growth rate
+# measure invader's growth rate
 
 
 #### older code ####
