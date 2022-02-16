@@ -41,10 +41,10 @@ params_def2 <- c(a_n_lo = 1.1e-6,
                  z_pc = 2.6e-19,
                  m = 0.001,
                  g = 0.164,
-                 c_b = 0.005,
-                 c_c = 0.005,
-                 r_b = 0.350,
-                 r_c = 0.451)
+                 c_b = 0.363,
+                 c_c = 0.522,
+                 r_b = 0.817,
+                 r_c = 1.22)
 
 
 #### initial values ####
@@ -505,6 +505,76 @@ virus2_model_format <- function(mod_in, params){
                 select(nutrient, time, lim_nut_H))
   
   return(mod_out2)
+  
+}
+
+virus2_growth_rate <- function(mod_dat, first_virus, plant_time = plant_time, res_time = res_time){
+
+  if(first_virus == "RPV") {
+    
+    # extract first two time points of invasion
+    # calculate invader's growth rate
+    inv_out <- mod_dat %>%
+      mutate(time_diff = abs(time - (plant_time + res_time + 1))) %>%
+      filter((time == plant_time + res_time | time_diff == min(time_diff)) &
+               variable2 == "PAV_conc") %>%
+      mutate(time = round_half_up(time),
+             time = as.factor(time) %>%
+               fct_recode("first" = as.character(plant_time + res_time),
+                          "last" = as.character(plant_time + res_time + 1))) %>%
+      select(variable2, nutrient, time, value) %>%
+      pivot_wider(names_from = "time",
+                  values_from = "value") %>%
+      mutate(growth = log(last/first))
+    
+    res_out <- mod_dat %>%
+      mutate(time_diff = abs(time - (plant_time + 1))) %>%
+      filter((time == plant_time | time_diff == min(time_diff)) &
+               variable2 == "RPV_conc") %>%
+      mutate(time = round_half_up(time),
+             time = as.factor(time) %>%
+               fct_recode("first" = as.character(plant_time),
+                          "last" = as.character(plant_time + 1))) %>%
+      select(variable2, nutrient, time, value) %>%
+      pivot_wider(names_from = "time",
+                  values_from = "value") %>%
+      mutate(growth = log(last/first))
+    
+    mod_out <- full_join(inv_out, res_out)
+    
+  } else {
+    
+    # extract first two time points of invasion
+    # calculate invader's growth rate
+    inv_out <- mod_dat %>%
+      mutate(time_diff = abs(time - (plant_time + res_time + 1))) %>%
+      filter((time == plant_time + res_time | time_diff == min(time_diff)) &
+               variable2 == "RPV_conc") %>%
+      mutate(time = round_half_up(time),
+             time = as.factor(time) %>%
+               fct_recode("first" = as.character(plant_time + res_time),
+                          "last" = as.character(plant_time + res_time + 1))) %>%
+      select(variable2, nutrient, time, value) %>%
+      pivot_wider(names_from = "time",
+                  values_from = "value") %>%
+      mutate(growth = log(last/first))
+    
+    res_out <- mod_dat %>%
+      mutate(time_diff = abs(time - (plant_time + 1))) %>%
+      filter((time == plant_time | time_diff == min(time_diff)) &
+               variable2 == "PAV_conc") %>%
+      mutate(time = round_half_up(time),
+             time = as.factor(time) %>%
+               fct_recode("first" = as.character(plant_time),
+                          "last" = as.character(plant_time + 1))) %>%
+      select(variable2, nutrient, time, value) %>%
+      pivot_wider(names_from = "time",
+                  values_from = "value") %>%
+      mutate(growth = log(last/first))
+    
+    mod_out <- full_join(inv_out, res_out)
+    
+  }
   
 }
 

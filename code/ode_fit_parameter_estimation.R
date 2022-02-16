@@ -346,14 +346,14 @@ times <- seq(0, max(dat5$dpi), length.out = 100)
 # times <- seq(0, 100, length.out = 100) # check to see if virus crashes long-term
 
 # PAV
-manipulate(virus_wrapper(c, r, species = "PAV"), c = slider(0, 0.1), r = slider(0, 1))
-# r ~ 0.35
-# c ~ 0.005
+manipulate(virus_wrapper(c, r, species = "PAV"), c = slider(0, 1), r = slider(0, 1))
+# r ~ 0.66
+# c ~ 0.24
 
 # RPV
-manipulate(virus_wrapper(c, r, species = "RPV"), c = slider(0, 0.1), r = slider(0, 1))
-# r ~ 0.5
-# c ~ 0.005
+manipulate(virus_wrapper(c, r, species = "RPV"), c = slider(0, 1), r = slider(0, 2.1))
+# r ~ 0.80
+# c ~ 0.22
 
 
 #### compare virus model to observations ####
@@ -377,8 +377,8 @@ pav_cost <- function(P){
   
   # update parameter value
   params_in["r"] <- P[1]
-  # params_in["c"] <- P[2] 
-  params_in["c"] <- 0.005
+  params_in["c"] <- P[2] 
+  # params_in["c"] <- 0.005
   
   # fit model
   out = ode(y = init_virus1, times = times_pav, func = virus1_model, parms = params_in)
@@ -395,8 +395,8 @@ rpv_cost <- function(P){
   
   # update parameter value
   params_in["r"] <- P[1]
-  # params_in["c"] <- P[2]
-  params_in["c"] <- 0.005
+  params_in["c"] <- P[2]
+  # params_in["c"] <- 0.005
   
   # fit model
   out = ode(y = init_virus1, times = times_rpv, func = virus1_model, parms = params_in)
@@ -414,16 +414,16 @@ times_pav <- seq(0, max(pav_fit$time), length.out = 100)
 times_rpv <- seq(0, max(rpv_fit$time), length.out = 100)
 
 # fit PAV model
-# fit_pav <- modFit(pav_cost, c(0.35, 0.005), lower = c(0))
-fit_pav <- modFit(pav_cost, c(0.35), lower = c(0))
+fit_pav <- modFit(pav_cost, c(0.66, 0.24), lower = c(0))
+# fit_pav <- modFit(pav_cost, c(0.35), lower = c(0))
 summary(fit_pav)
 deviance(fit_pav)
 fit_pav$ssr # sum of squared residuals
 fit_pav$ms # mean squared residuals
 
 # fit RPV model
-# fit_rpv <- modFit(rpv_cost, c(0.5, 0.005), lower = c(0))
-fit_rpv <- modFit(rpv_cost, c(0.5), lower = c(0))
+fit_rpv <- modFit(rpv_cost, c(0.8, 0.22), lower = c(0))
+# fit_rpv <- modFit(rpv_cost, c(0.5), lower = c(0))
 summary(fit_rpv)
 deviance(fit_rpv)
 fit_rpv$ssr # sum of squared residuals
@@ -435,13 +435,13 @@ fit_rpv$ms # mean squared residuals
 # add new values
 params_pav <- params_def1
 params_pav["r"] <- fit_pav$par[1]
-# params_pav["c"] <- fit_pav$par[2]
-params_pav["c"] <- 0.005
+params_pav["c"] <- fit_pav$par[2]
+# params_pav["c"] <- 0.005
 
 params_rpv <- params_def1
 params_rpv["r"] <- fit_rpv$par[1]
-# params_rpv["c"] <- fit_rpv$par[2]
-params_rpv["c"] <- 0.005
+params_rpv["c"] <- fit_rpv$par[2]
+# params_rpv["c"] <- 0.005
 
 # virus times
 times <- seq(0, max(dat5$dpi), length.out = 100)
