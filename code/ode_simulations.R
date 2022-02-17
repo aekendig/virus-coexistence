@@ -17,13 +17,18 @@ library(ggpattern)
 # load model and settings
 source("code/model_settings.R")
 
+# settings for short-term simulations
+plant_days <- 11
+res_days <- 12
+inv_days <- 19
+
 
 #### long-term plant ####
 
 # simulation
 long_term_plant <- virus2_model_sim(params_def2, "PAV", V0_b = 0, V0_c = 0,
                                     plant_time = 250, res_time = 12, 
-                                    inv_time = 10000-250-12) %>%
+                                    inv_time = 7500-250-12) %>%
   virus2_model_format(params_def2)
 
 # figure
@@ -33,11 +38,6 @@ dev.off()
 
 
 #### short-term plant ####
-
-# settings for short-term simulations
-plant_days <- 11
-res_days <- 12
-inv_days <- 19
 
 # simulation
 short_term_plant <- virus2_model_sim(params_def2, "PAV", V0_b = 0, V0_c = 0, 
@@ -170,7 +170,7 @@ ggplot(filter(virus_sim, abund_type == "con"),
   guides(color = guide_legend(order = 1, override.aes = list(size = 1.2)), linetype = guide_legend(order = 1))
 dev.off()
 
-pdf("output/invasion_simulation_ population_figure.pdf", width = 6.5, height = 3.75)
+pdf("output/invasion_simulation_population_figure.pdf", width = 6.5, height = 3.75)
 ggplot(filter(virus_sim, abund_type == "pop"), 
        aes(x = time, y = virus_abund, color = nutrient, linetype = nutrient)) +
   geom_line(aes(size = lim_nut_H)) +
@@ -234,13 +234,13 @@ rpv_second_gr <- rpv_second_sim %>%
   filter(virus == "RPV")
 
 pav_first_gr <- pav_first_sim %>%
-  virus2_growth_rate("RPV", plant_days, res_days) %>%
+  virus2_growth_rate("PAV", plant_days, res_days) %>%
   mutate(virus = str_sub(variable2, 1, 3),
          DPP = plant_days) %>%
   filter(virus == "PAV")
 
 rpv_first_gr <- rpv_first_sim %>%
-  virus2_growth_rate("PAV", plant_days, res_days) %>%
+  virus2_growth_rate("RPV", plant_days, res_days) %>%
   mutate(virus = str_sub(variable2, 1, 3),
          DPP = plant_days) %>%
   filter(virus == "RPV")
@@ -255,11 +255,13 @@ alone_gr <- pav_first_gr %>%
   full_join(rpv_first_gr) %>%
   full_join(pav_second_gr) %>%
   full_join(rpv_second_gr) %>%
-  mutate(role = if_else(DPP == 11, "resident", "invader"))
+  mutate(role = if_else(DPP == 11, "resident", "invader") %>%
+           fct_relevel("resident"))
 
 
 #### growth rate figures ####
 
+pdf("output/invasion_growth_rate_figure.pdf", width = 4.5, height = 2.5)
 ggplot(inv_gr, aes(x = DPP, y = growth)) +
   geom_hline(yintercept = 0, color = "black", size = 0.5) +
   geom_col_pattern(aes(pattern = role, fill = nutrient),
@@ -270,15 +272,38 @@ ggplot(inv_gr, aes(x = DPP, y = growth)) +
                    pattern_density = 0.1,
                    pattern_key_scale_factor = 0.6) +
   facet_wrap(~ virus) +
+  annotate("segment", x = -Inf, xend = -Inf, y = -Inf, yend = Inf, size = 1) +
   scale_pattern_manual(values = c(resident = "none", invader = "stripe"),
                        name = "Virus\nrole") +
   scale_x_continuous(breaks = c(plant_days, plant_days + res_days)) +
-  coord_cartesian(ylim = c(-0.105, 0.4)) +
   scale_fill_viridis_d(end = 0.7, name = "Nutrient\nsupply") +
   labs(y = "Growth rate when rare", x = "Days post planting") +
   fig_theme + 
+  theme(panel.spacing.x = unit(1,"line"),
+        axis.line.y.left = element_blank()) +
   guides(pattern = guide_legend(override.aes = list(fill = "white")),
          fill = guide_legend(override.aes = list(pattern = "none")))
+dev.off()
 
-#### start here ####
-# make above for single virus 
+pdf("output/alone_growth_rate_figure.pdf", width = 4.5, height = 2.5)
+ggplot(alone_gr, aes(x = DPP, y = growth)) +
+  geom_hline(yintercept = 0, color = "black", size = 0.5) +
+  geom_col_pattern(aes(pattern = role, fill = nutrient),
+                   position = "dodge",
+                   color = "black", 
+                   pattern_fill = "black",
+                   pattern_color = "black",
+                   pattern_density = 0.1,
+                   pattern_key_scale_factor = 0.6) +
+  facet_wrap(~ virus) +
+  annotate("segment", x = -Inf, xend = -Inf, y = -Inf, yend = Inf, size = 1) +
+  scale_pattern_manual(values = c(resident = "none", invader = "none"),
+                       guide = "none") +
+  scale_x_continuous(breaks = c(plant_days, plant_days + res_days)) +
+  scale_fill_viridis_d(end = 0.7, name = "Nutrient\nsupply") +
+  labs(y = "Growth rate when rare", x = "Days post planting") +
+  fig_theme +
+  theme(panel.spacing.x = unit(1,"line"),
+        axis.line.y.left = element_blank()) +
+  guides(fill = guide_legend(override.aes = list(pattern = "none")))
+dev.off()
