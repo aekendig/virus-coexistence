@@ -22,21 +22,11 @@ source("code/model_settings.R")
 param_fun <- function(params_in, param_foc1, param_val1, param_foc2, param_val2,
                       first_virus, output_type = "last",
                       V0_b = V0, V0_c = V0, inits_in = init_def2,
-                      plant_time = 11, res_time = 12, inv_time = 100-11-12){
+                      plant_time = 11, res_time = 12, inv_time = 19){
   
   # update parameter value
   params_in[param_foc1] <- param_val1
   params_in[param_foc2] <- param_val2
-  
-  # update resource supply
-  # if(param_foc1 == "a_n_lo"){
-  #   inits_in["R_n_low"] <- param_val1 * 10
-  #   inits_in["R_n_p"] <- param_val1 * 10
-  # }
-  # if(param_foc2 == "a_p_lo"){
-  #   inits_in["R_p_low"] <- param_val2 * 10
-  #   inits_in["R_p_n"] <- param_val2 * 10
-  # }
   
   # run model
   mod_out <- virus2_model_sim(params = params_in, first_virus = first_virus, 
@@ -45,36 +35,7 @@ param_fun <- function(params_in, param_foc1, param_val1, param_foc2, param_val2,
                               inits = inits_in)
   
   # edit output
-  mod_out2 <- mod_out %>%
-    mutate(VbH_low = V_b_low * H_low,
-           VbH_n = V_b_n * H_n,
-           VbH_p = V_b_p * H_p,
-           VbH_np = V_b_np * H_np,
-           VcH_low = V_c_low * H_low,
-           VcH_n = V_c_n * H_n,
-           VcH_p = V_c_p * H_p,
-           VcH_np = V_c_np * H_np) %>%
-    pivot_longer(cols = -time,
-                 names_to = "variable",
-                 values_to = "value") %>%
-    mutate(nutrient = case_when(str_ends(variable, "low") == T ~ "low",
-                                str_ends(variable, "np") == T ~ "+N+P",
-                                str_ends(variable, "n") == T ~ "+N",
-                                str_ends(variable, "p") == T ~ "+P") %>%
-             fct_relevel("low", "+N", "+P"),
-           variable2 = case_when(str_starts(variable, "R_n") == T ~ "R_n",
-                                 str_starts(variable, "R_p") == T ~ "R_p",
-                                 str_starts(variable, "Q_n") == T ~ "Q_n",
-                                 str_starts(variable, "Q_p") == T ~ "Q_p",
-                                 str_starts(variable, "H") == T ~ "H",
-                                 str_starts(variable, "V_b") == T ~ "PAV_conc",
-                                 str_starts(variable, "V_c") == T ~ "RPV_conc",
-                                 str_starts(variable, "VbH") == T ~ "PAV_pop",
-                                 str_starts(variable, "VcH") == T ~ "RPV_pop"),
-           value2 = if_else(str_starts(variable, "V") == T, 
-                                 log10(value + 1), value),
-           abund_type = if_else(str_starts(variable, "V") == T, 
-                                str_sub(variable2, 5, 7), NA_character_))
+  mod_out2 <- virus2_model_format(mod_out, params_in, Qlim = F)
   
   # save time series
   print(ggplot(mod_out2, aes(x = time, y = value2, 
@@ -95,7 +56,8 @@ param_fun <- function(params_in, param_foc1, param_val1, param_foc2, param_val2,
   } else {
     
     # calculate virus growth rates
-    mod_out3 <- virus2_growth_rate(mod_out2, first_virus)
+    mod_out3 <- virus2_growth_rate(mod_out2, first_virus, 
+                                   plant_time = plant_time, res_time = res_time)
     
   }
   
@@ -108,7 +70,7 @@ param_fun <- function(params_in, param_foc1, param_val1, param_foc2, param_val2,
 # test function
 virus2_model_sim(params_def2, "RPV", V0_b = V0, V0_c = V0,
                  plant_time = 11, res_time = 12, 
-                 inv_time = 100-11-12) %>%
+                 inv_time = 19) %>%
   virus2_model_format(params_def2) %>%
   filter(time == max(time) & variable2 %in% c("PAV_conc", "PAV_pop")) %>%
   mutate(virus_conc = log10(value + 1))
@@ -125,12 +87,15 @@ param_fun(params_def2, "a_n_lo", 1.1e-10, "q_pb", 7.4e-5, "RPV") %>%
 dev.off()
 # output should match output of above unless N supply is low
 
+# growth rate when rare
+param_fun(params_def2, "q_nb", 1.1e-3, "q_pb", 7.4e-5, "RPV", "first")
+
 
 #### resource supply rates ####
 
 # values for low nutrient supply
 a_n_vals <- c(1.1e-13, 1.1e-10, 1.1e-6, 5.6e-5)
-a_p_vals <- c(1.6e-14, 1.6e-11, 1.6e-7, 8.2e-6)
+a_p_vals <- c(1.6e-14, 1.6e-11, 1.6e-7, 8.2e-6, 5.6e-5)
 
 # data frame
 a_in <- tibble(param_foc1 = "a_n_lo",
@@ -141,39 +106,12 @@ a_in <- tibble(param_foc1 = "a_n_lo",
 # PAV invades RPV
 pdf("output/sensitivity_analysis_pav_inv_a.pdf")
 pav_inv_a <- a_in %>%
-  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2) param_fun(params_def2, param_foc1, param_val1, param_foc2, param_val2, first_virus = "RPV", output_type = "last"))) %>%
+  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2) param_fun(params_def2, param_foc1, param_val1, param_foc2, param_val2, first_virus = "RPV", output_type = "first"))) %>%
   unnest(cols = c(sim_out))
 dev.off()
 
 # figure
 pav_inv_a %>%
-  filter(variable2 %in% c("PAV_conc", "RPV_conc") & nutrient == "low") %>%
-  ggplot(aes(x = param_val1, y = param_val2, color = value2)) +
-  geom_point(size = 10) +
-  facet_wrap(~ variable2) +
-  scale_color_viridis_c(name = "Concentration", direction = -1) +
-  scale_x_log10() +
-  scale_y_log10() +
-  labs(x = "N supply", y = "P supply")
-
-pav_inv_a %>%
-  filter(variable2 %in% c("PAV_pop", "RPV_pop") & nutrient == "low") %>%
-  ggplot(aes(x = param_val1, y = param_val2, color = value2)) +
-  geom_point(size = 10) +
-  facet_wrap(~ variable2) +
-  scale_color_viridis_c(name = "Population size", direction = -1) +
-  scale_x_log10() +
-  scale_y_log10() +
-  labs(x = "N supply", y = "P supply")
-# Q is only drawn down so fast, giving viruses some nutrients
-# regardless of resource supply rate
-
-# invasion growth rate
-pav_inv_a2 <- a_in %>%
-  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2) param_fun(params_def2, param_foc1, param_val1, param_foc2, param_val2, first_virus = "RPV", output_type = "first"))) %>%
-  unnest(cols = c(sim_out))
-
-pav_inv_a2 %>%
   filter(variable2 %in% c("PAV_conc", "RPV_conc") & nutrient == "low") %>%
   mutate(growth_sign = ifelse(growth <= 0, "<= 0", "> 0")) %>%
   ggplot(aes(x = param_val1, y = param_val2, color = growth, shape = growth_sign)) +
@@ -183,57 +121,41 @@ pav_inv_a2 %>%
   scale_x_log10() +
   scale_y_log10() +
   labs(x = "N supply", y = "P supply")
+# growth rate increases with N, but not P
 
 
-#### later invasion ####
-
-# use default parameters
-param_fun(params_def2, "r_b", 0.288, "r_c", 0.451, "RPV", output_type = "first",
-          plant_time = 11, res_time = 100-11, inv_time = 100) %>%
-  filter(variable2 %in% c("PAV_conc", "PAV_pop"))
-# virus can't invade later, but decline in concentration is tiny
-
-
-#### minimum N concentrations (q_n) ####
+#### minimum nutrient concentrations ####
 
 # values for low nutrient supply
-q_nb_vals <- 10^seq(-3, 6, length.out = 5)
-q_nc_vals <- 10^seq(-3, 6, length.out = 5)
+q_nb_vals <- q_pb_vals <- 10^seq(-6, -2, length.out = 5)
 
 # data frame
-q_n_in <- tibble(param_foc1 = "q_nb",
+q_b_in <- tibble(param_foc1 = "q_nb",
                  param_val1 = q_nb_vals) %>%
-  expand_grid(tibble(param_foc2 = "q_nc",
-                     param_val2 = q_nc_vals))
+  expand_grid(tibble(param_foc2 = "q_pb",
+                     param_val2 = q_pb_vals))
 
 # PAV invades RPV
-pdf("output/sensitivity_analysis_pav_inv_q_n.pdf")
-pav_inv_q_n <- q_n_in %>%
-  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2) param_fun(params_def2, param_foc1, param_val1, param_foc2, param_val2, first_virus = "RPV", output_type = "last"))) %>%
+pdf("output/sensitivity_analysis_pav_2nd_q.pdf")
+pav_2nd_q <- q_b_in %>%
+  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2) param_fun(params_def2, param_foc1, param_val1, param_foc2, param_val2, first_virus = "RPV", output_type = "first", V0_c = 0))) %>%
   unnest(cols = c(sim_out))
 dev.off()
 
-# figure
-pav_inv_q_n %>%
-  filter(variable2 == "PAV_conc") %>%
-  ggplot(aes(x = param_val1, y = param_val2, color = value2)) +
-  geom_point(size = 10) +
-  facet_wrap(~ nutrient) +
-  scale_color_viridis_c(name = "PAV conc", direction = -1) +
-  scale_x_log10() +
-  scale_y_log10() +
-  labs(x = "PAV min N", y = "RPV min N")
-# increasing the virus's q above the plants makes it grow slower, no matter how much larger
+#### start here ####
+# make below into figure for paper
 
-pav_inv_q_n %>%
-  filter(variable2 == "RPV_conc") %>%
-  ggplot(aes(x = param_val1, y = param_val2, color = value2)) +
+# figure
+pav_2nd_q %>%
+  filter(variable2 == "PAV_conc") %>%
+  mutate(growth_sign = ifelse(growth <= 0, "<= 0", "> 0")) %>%
+  ggplot(aes(x = param_val1, y = param_val2, color = growth, shape = growth_sign)) +
   geom_point(size = 10) +
   facet_wrap(~ nutrient) +
-  scale_color_viridis_c(name = "RPV conc", direction = -1) +
+  scale_color_viridis_c(name = "Growth rate", direction = -1) +
   scale_x_log10() +
   scale_y_log10() +
-  labs(x = "PAV min N", y = "RPV min N")
+  labs(x = "Min N conc.", y = "Min P conc.")
 
 
 #### minimum nutrient concentration (q_n)/nutrient content of virus (z_n) ####

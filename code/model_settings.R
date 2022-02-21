@@ -431,78 +431,119 @@ virus2_model_sim <- function(params, first_virus, V0_b, V0_c, plant_time, res_ti
   
 }
 
-virus2_model_format <- function(mod_in, params){
+virus2_model_format <- function(mod_in, params, Qlim = T){
   
-  # min nutrient conc.
-  Qmin_n <- as.numeric(params["Qmin_n"])
-  Qmin_p <- as.numeric(params["Qmin_p"])
-  
-  # format
-  mod_out <- mod_in  %>%
-    as_tibble() %>%
-    mutate(across(everything(), as.double)) %>%
-    mutate(VbH_low = V_b_low * H_low,
-           VbH_n = V_b_n * H_n,
-           VbH_p = V_b_p * H_p,
-           VbH_np = V_b_np * H_np,
-           VcH_low = V_c_low * H_low,
-           VcH_n = V_c_n * H_n,
-           VcH_p = V_c_p * H_p,
-           VcH_np = V_c_np * H_np,
-           Qlim_n_low = Qmin_n / Q_n_low,
-           Qlim_n_n = Qmin_n / Q_n_n,
-           Qlim_n_p = Qmin_n / Q_n_p,
-           Qlim_n_np = Qmin_n / Q_n_np,
-           Qlim_p_low = Qmin_p / Q_p_low,
-           Qlim_p_n = Qmin_p / Q_p_n,
-           Qlim_p_p = Qmin_p / Q_p_p,
-           Qlim_p_np = Qmin_p / Q_p_np) %>%
-    rowwise() %>%
-    mutate(LimQ_low = max(Qlim_n_low, Qlim_p_low),
-           LimQ_n = max(Qlim_n_n, Qlim_p_n),
-           LimQ_p = max(Qlim_n_p, Qlim_p_p),
-           LimQ_np = max(Qlim_n_np, Qlim_p_np)) %>%
-    ungroup() %>%
-    mutate(lim_N_H_low = case_when(LimQ_low == Qlim_n_low ~ 1,
+  if(Qlim == T){
+    
+    # min nutrient conc.
+    Qmin_n <- as.numeric(params["Qmin_n"])
+    Qmin_p <- as.numeric(params["Qmin_p"])
+    
+    # format
+    mod_out <- mod_in  %>%
+      as_tibble() %>%
+      mutate(across(everything(), as.double)) %>%
+      mutate(VbH_low = V_b_low * H_low,
+             VbH_n = V_b_n * H_n,
+             VbH_p = V_b_p * H_p,
+             VbH_np = V_b_np * H_np,
+             VcH_low = V_c_low * H_low,
+             VcH_n = V_c_n * H_n,
+             VcH_p = V_c_p * H_p,
+             VcH_np = V_c_np * H_np,
+             Qlim_n_low = Qmin_n / Q_n_low,
+             Qlim_n_n = Qmin_n / Q_n_n,
+             Qlim_n_p = Qmin_n / Q_n_p,
+             Qlim_n_np = Qmin_n / Q_n_np,
+             Qlim_p_low = Qmin_p / Q_p_low,
+             Qlim_p_n = Qmin_p / Q_p_n,
+             Qlim_p_p = Qmin_p / Q_p_p,
+             Qlim_p_np = Qmin_p / Q_p_np) %>%
+      rowwise() %>%
+      mutate(LimQ_low = max(Qlim_n_low, Qlim_p_low),
+             LimQ_n = max(Qlim_n_n, Qlim_p_n),
+             LimQ_p = max(Qlim_n_p, Qlim_p_p),
+             LimQ_np = max(Qlim_n_np, Qlim_p_np)) %>%
+      ungroup() %>%
+      mutate(lim_N_H_low = case_when(LimQ_low == Qlim_n_low ~ 1,
+                                     TRUE ~ 0),
+             lim_N_H_n = case_when(LimQ_n == Qlim_n_n ~ 1,
                                    TRUE ~ 0),
-           lim_N_H_n = case_when(LimQ_n == Qlim_n_n ~ 1,
-                                 TRUE ~ 0),
-           lim_N_H_p = case_when(LimQ_p == Qlim_n_p ~ 1,
-                                 TRUE ~ 0),
-           lim_N_H_np = case_when(LimQ_np == Qlim_n_np ~ 1,
-                                  TRUE ~ 0)) %>%
-    pivot_longer(cols = -time,
-                 names_to = "variable",
-                 values_to = "value") %>%
-    mutate(nutrient = case_when(str_ends(variable, "low") == T ~ "low",
-                                str_ends(variable, "np") == T ~ "+N+P",
-                                str_ends(variable, "n") == T ~ "+N",
-                                str_ends(variable, "p") == T ~ "+P") %>%
-             fct_relevel("low", "+N", "+P"),
-           variable2 = case_when(str_starts(variable, "R_n") == T ~ "R_n",
-                                 str_starts(variable, "R_p") == T ~ "R_p",
-                                 str_starts(variable, "Q_n") == T ~ "Q_n",
-                                 str_starts(variable, "Q_p") == T ~ "Q_p",
-                                 str_starts(variable, "H") == T ~ "H",
-                                 str_starts(variable, "V_b") == T ~ "PAV_conc",
-                                 str_starts(variable, "V_c") == T ~ "RPV_conc",
-                                 str_starts(variable, "VbH") == T ~ "PAV_pop",
-                                 str_starts(variable, "VcH") == T ~ "RPV_pop",
-                                 str_starts(variable, "Qlim_n") == T ~ "Qlim_n",
-                                 str_starts(variable, "Qlim_p") == T ~ "Qlim_p",
-                                 str_starts(variable, "LimQ") == T ~ "Qlim",
-                                 str_starts(variable, "lim_N") == T ~ "lim_N"))
+             lim_N_H_p = case_when(LimQ_p == Qlim_n_p ~ 1,
+                                   TRUE ~ 0),
+             lim_N_H_np = case_when(LimQ_np == Qlim_n_np ~ 1,
+                                    TRUE ~ 0)) %>%
+      pivot_longer(cols = -time,
+                   names_to = "variable",
+                   values_to = "value") %>%
+      mutate(nutrient = case_when(str_ends(variable, "low") == T ~ "low",
+                                  str_ends(variable, "np") == T ~ "+N+P",
+                                  str_ends(variable, "n") == T ~ "+N",
+                                  str_ends(variable, "p") == T ~ "+P") %>%
+               fct_relevel("low", "+N", "+P"),
+             variable2 = case_when(str_starts(variable, "R_n") == T ~ "R_n",
+                                   str_starts(variable, "R_p") == T ~ "R_p",
+                                   str_starts(variable, "Q_n") == T ~ "Q_n",
+                                   str_starts(variable, "Q_p") == T ~ "Q_p",
+                                   str_starts(variable, "H") == T ~ "H",
+                                   str_starts(variable, "V_b") == T ~ "PAV_conc",
+                                   str_starts(variable, "V_c") == T ~ "RPV_conc",
+                                   str_starts(variable, "VbH") == T ~ "PAV_pop",
+                                   str_starts(variable, "VcH") == T ~ "RPV_pop",
+                                   str_starts(variable, "Qlim_n") == T ~ "Qlim_n",
+                                   str_starts(variable, "Qlim_p") == T ~ "Qlim_p",
+                                   str_starts(variable, "LimQ") == T ~ "Qlim",
+                                   str_starts(variable, "lim_N") == T ~ "lim_N"))
+    
+    # add limiting nutrient to all rows
+    mod_out2 <- mod_out %>%
+      filter(!(variable2 %in% c("Qlim_n", "Qlim_p", "LimQ", "lim_N"))) %>%
+      full_join(mod_out %>%
+                  filter(variable2 == "lim_N") %>%
+                  mutate(value = fct_recode(as.character(value), 
+                                            "Q[N]" = "1", "Q[P]" = "0") %>%
+                           fct_relevel("Q[N]")) %>%
+                  rename("lim_nut_H" = "value") %>%
+                  select(nutrient, time, lim_nut_H))
+    
+  } else {
+    
+    # format
+    mod_out2 <- mod_in  %>%
+      as_tibble() %>%
+      mutate(across(everything(), as.double)) %>%
+      mutate(VbH_low = V_b_low * H_low,
+             VbH_n = V_b_n * H_n,
+             VbH_p = V_b_p * H_p,
+             VbH_np = V_b_np * H_np,
+             VcH_low = V_c_low * H_low,
+             VcH_n = V_c_n * H_n,
+             VcH_p = V_c_p * H_p,
+             VcH_np = V_c_np * H_np) %>%
+      pivot_longer(cols = -time,
+                   names_to = "variable",
+                   values_to = "value") %>%
+      mutate(nutrient = case_when(str_ends(variable, "low") == T ~ "low",
+                                  str_ends(variable, "np") == T ~ "+N+P",
+                                  str_ends(variable, "n") == T ~ "+N",
+                                  str_ends(variable, "p") == T ~ "+P") %>%
+               fct_relevel("low", "+N", "+P"),
+             variable2 = case_when(str_starts(variable, "R_n") == T ~ "R_n",
+                                   str_starts(variable, "R_p") == T ~ "R_p",
+                                   str_starts(variable, "Q_n") == T ~ "Q_n",
+                                   str_starts(variable, "Q_p") == T ~ "Q_p",
+                                   str_starts(variable, "H") == T ~ "H",
+                                   str_starts(variable, "V_b") == T ~ "PAV_conc",
+                                   str_starts(variable, "V_c") == T ~ "RPV_conc",
+                                   str_starts(variable, "VbH") == T ~ "PAV_pop",
+                                   str_starts(variable, "VcH") == T ~ "RPV_pop"),
+             value2 = if_else(str_starts(variable, "V") == T, 
+                              log10(value + 1), value),
+             abund_type = if_else(str_starts(variable, "V") == T, 
+                                  str_sub(variable2, 5, 7), NA_character_))
+    
+  }
   
-  # add limiting nutrient to all rows
-  mod_out2 <- mod_out %>%
-    filter(!(variable2 %in% c("Qlim_n", "Qlim_p", "LimQ", "lim_N"))) %>%
-    full_join(mod_out %>%
-                filter(variable2 == "lim_N") %>%
-                mutate(value = fct_recode(as.character(value), 
-                                          "Q[N]" = "1", "Q[P]" = "0") %>%
-                         fct_relevel("Q[N]")) %>%
-                rename("lim_nut_H" = "value") %>%
-                select(nutrient, time, lim_nut_H))
   
   return(mod_out2)
   
@@ -583,14 +624,22 @@ plant_fig_fun <- function(mod_dat, params, q_adj_n, q_adj_p){
   # min nutrient conc.
   Qmin_n <- as.numeric(params["Qmin_n"])
   Qmin_p <- as.numeric(params["Qmin_p"])
+  # Qmax_n <- as.numeric(params["Qmax_n"])
+  # Qmax_p <- as.numeric(params["Qmax_p"])
   
   # figure labels
-  Qn_lab <- tibble(time = 0, 
+  Qmin_n_lab <- tibble(time = 0, 
                    value = Qmin_n, 
                    label = "Q['min,N']")
-  Qp_lab <- tibble(time = 0, 
+  Qmin_p_lab <- tibble(time = 0, 
                    value = Qmin_p, 
                    label = "Q['min,P']")
+  # Qmax_n_lab <- tibble(time = 0, 
+  #                      value = Qmax_n, 
+  #                      label = "Q['max,N']")
+  # Qmax_p_lab <- tibble(time = 0, 
+  #                      value = Qmax_p, 
+  #                      label = "Q['max,P']")
   
   # panels
   plant_H_fig <- filter(mod_dat, variable2 == "H") %>%
@@ -641,8 +690,11 @@ plant_fig_fun <- function(mod_dat, params, q_adj_n, q_adj_p){
   plant_Qn_fig <- filter(mod_dat, variable2 == "Q_n") %>%
     ggplot(aes(time, value)) +
     geom_hline(yintercept = Qmin_n, color = "black") +
-    geom_text(data = Qn_lab, aes(label = label), parse = T, color = "black", fontface = "italic",
+    # geom_hline(yintercept = Qmax_n, color = "black") +
+    geom_text(data = Qmin_n_lab, aes(label = label), parse = T, color = "black", fontface = "italic",
               size = 3, hjust = 0, vjust = 0, nudge_y = q_adj_n) +
+    # geom_text(data = Qmax_n_lab, aes(label = label), parse = T, color = "black", fontface = "italic",
+    #           size = 3, hjust = 0, vjust = 1) +
     geom_line(aes(linetype = nutrient, color = nutrient, size = lim_nut_H)) +
     scale_color_viridis_d(end = 0.7) +
     scale_size_manual(values = c(1.2, 0.6)) +
@@ -653,8 +705,11 @@ plant_fig_fun <- function(mod_dat, params, q_adj_n, q_adj_p){
   plant_Qp_fig <- filter(mod_dat, variable2 == "Q_p") %>%
     ggplot(aes(time, value)) +
     geom_hline(yintercept = Qmin_p, color = "black") +
-    geom_text(data = Qp_lab, aes(label = label), parse = T, color = "black", fontface = "italic",
+    # geom_hline(yintercept = Qmax_p, color = "black") +
+    geom_text(data = Qmin_p_lab, aes(label = label), parse = T, color = "black", fontface = "italic",
               size = 3, hjust = 0, vjust = 0, nudge_y = q_adj_p) +
+    # geom_text(data = Qmax_p_lab, aes(label = label), parse = T, color = "black", fontface = "italic",
+    #           size = 3, hjust = 0, vjust = 1) +
     geom_line(aes(linetype = nutrient, color = nutrient, size = lim_nut_H)) +
     scale_color_viridis_d(end = 0.7) +
     scale_size_manual(values = c(1.2, 0.6)) +
