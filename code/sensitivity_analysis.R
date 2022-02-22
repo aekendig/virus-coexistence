@@ -11,6 +11,7 @@ library(deSolve)
 library(cowplot)
 library(lemon)
 library(janitor)
+library(patchwork)
 
 # load model and settings
 source("code/model_settings.R")
@@ -127,7 +128,9 @@ pav_inv_a %>%
 #### minimum nutrient concentrations ####
 
 # values for low nutrient supply
-q_nb_vals <- q_pb_vals <- 10^seq(-6, -2, length.out = 5)
+q_nb_vals <- q_pb_vals <- sort(c(10^seq(-6, -2, length.out = 20),
+                                 as.numeric(params_def2["q_nb"]),
+                                 as.numeric(params_def2["q_pb"])))[c(1:10, 12:17, 19:22)]
 
 # data frame
 q_b_in <- tibble(param_foc1 = "q_nb",
@@ -142,20 +145,81 @@ pav_2nd_q <- q_b_in %>%
   unnest(cols = c(sim_out))
 dev.off()
 
-#### start here ####
-# make below into figure for paper
+write_csv(pav_2nd_q, "output/sensitivity_analysis_pav_2nd_q.csv")
 
 # figure
 pav_2nd_q %>%
   filter(variable2 == "PAV_conc") %>%
-  mutate(growth_sign = ifelse(growth <= 0, "<= 0", "> 0")) %>%
-  ggplot(aes(x = param_val1, y = param_val2, color = growth, shape = growth_sign)) +
-  geom_point(size = 10) +
+  ggplot(aes(x = param_val1, y = param_val2, color = growth)) +
+  geom_point(size = 10, shape = 15) +
   facet_wrap(~ nutrient) +
   scale_color_viridis_c(name = "Growth rate", direction = -1) +
   scale_x_log10() +
   scale_y_log10() +
   labs(x = "Min N conc.", y = "Min P conc.")
+
+# N and P datasets
+pav_2nd_qn <- pav_2nd_q %>%
+  filter(variable2 == "PAV_conc" & param_val2 == min(param_val2))
+pav_2nd_qp <- pav_2nd_q %>%
+  filter(variable2 == "PAV_conc" & param_val1 == min(param_val1))
+
+# plant min labels
+Qmin_n_lab <- tibble(param_val1 = as.numeric(params_def2["Qmin_n"]), 
+                     growth = max(pav_2nd_qn$growth), 
+                     label = "Q['min,N']")
+
+Qmin_p_lab <- tibble(param_val2 = as.numeric(params_def2["Qmin_p"]), 
+                     growth = max(pav_2nd_qp$growth), 
+                     label = "Q['min,P']")
+
+# make e values exponents
+scientific_10 <- function(x) {
+  parse(text=gsub("1e", "10^", scales::scientific_format()(x)))
+}
+
+# figure
+pav_2nd_qn_fig <- ggplot(pav_2nd_qn, aes(x = param_val1, y = growth)) +
+  geom_hline(yintercept = 0) +
+  geom_vline(xintercept = as.numeric(params_def2["Qmin_n"]), 
+             color = "black", linetype = "dotted") +
+  geom_line(aes(color = nutrient, linetype = nutrient)) +
+  geom_text(data = Qmin_n_lab, aes(label = label), 
+            hjust = 0, vjust = 0.4, parse = T,
+            color = "black", size = 3) +
+  scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
+  scale_linetype(name = "Nutrient\nsupply") +
+  scale_x_log10(labels = scientific_10) +
+  labs(x = "Min. N conc. for\nvirus replication",
+       y = "Growth rate when rare") +
+  fig_theme +
+  theme(legend.position = "none")
+
+pav_2nd_qp_fig <- ggplot(pav_2nd_qp, aes(x = param_val2, y = growth)) +
+  geom_hline(yintercept = 0) +
+  geom_vline(xintercept = as.numeric(params_def2["Qmin_p"]), 
+             color = "black", linetype = "dotted") +
+  geom_line(aes(color = nutrient, linetype = nutrient)) +
+  geom_text(data = Qmin_p_lab, aes(label = label), 
+            hjust = 0, vjust = 0.4, parse = T,
+            color = "black", size = 3) +
+  scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
+  scale_linetype(name = "Nutrient\nsupply") +
+  scale_x_log10(labels = scientific_10) +
+  labs(x = "Min. P conc. for\nvirus replication",
+       y = "Growth rate when rare") +
+  fig_theme +
+  theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank())
+
+pav_2nd_fig <- pav_2nd_qn_fig + pav_2nd_qp_fig
+
+ggsave("output/pav_growth_rate_q.pdf", pav_2nd_fig,
+       width = 5.5, height = 2.5, units = "in")
+
+
+#### start here ####
+# repeat above for RPV (supp figure)
 
 
 #### minimum nutrient concentration (q_n)/nutrient content of virus (z_n) ####
