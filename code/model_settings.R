@@ -645,7 +645,7 @@ plant_fig_fun <- function(mod_dat, params, q_adj_n, q_adj_p){
   plant_H_fig <- filter(mod_dat, variable2 == "H") %>%
     ggplot(aes(time, value, linetype = nutrient, color = nutrient)) +
     geom_line(aes(size = lim_nut_H)) +
-    scale_color_viridis_d(end = 0.7, name = "Nutrient\nsupply") +
+    scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
     scale_linetype(name = "Nutrient\nsupply") +
     scale_size_manual(values = c(1.2, 0.6), guide= "none") +
     labs(x = "Time (days)", y = "Plant biomass (g)", title = "(A)") +
@@ -657,7 +657,7 @@ plant_fig_fun <- function(mod_dat, params, q_adj_n, q_adj_p){
   plant_lim_fig <- filter(mod_dat, variable2 == "Qlim") %>%
     ggplot(aes(time, value, linetype = nutrient, color = nutrient)) +
     geom_line(aes(size = lim_nut_H)) +
-    scale_color_viridis_d(end = 0.7, guide = "none") +
+    scale_color_viridis_d(direction = -1, guide = "none") +
     scale_linetype(guide = "none") +
     scale_size_manual(values = c(1.2, 0.6), name = "Limiting\nnutrient",
                       labels = c("N", "P")) +
@@ -670,7 +670,7 @@ plant_fig_fun <- function(mod_dat, params, q_adj_n, q_adj_p){
   plant_Rn_fig <- filter(mod_dat, variable2 == "R_n") %>%
     ggplot(aes(time, value, linetype = nutrient, color = nutrient)) +
     geom_line(aes(size = lim_nut_H)) +
-    scale_color_viridis_d(end = 0.7) +
+    scale_color_viridis_d(direction = -1) +
     scale_size_manual(values = c(1.2, 0.6)) +
     labs(x = "Time (days)", y = "Environment N (g)", title = "(C)") +
     fig_theme +
@@ -681,7 +681,7 @@ plant_fig_fun <- function(mod_dat, params, q_adj_n, q_adj_p){
   plant_Rp_fig <- filter(mod_dat, variable2 == "R_p") %>%
     ggplot(aes(time, value, linetype = nutrient, color = nutrient)) +
     geom_line(aes(size = lim_nut_H)) +
-    scale_color_viridis_d(end = 0.7) +
+    scale_color_viridis_d(direction = -1) +
     scale_size_manual(values = c(1.2, 0.6)) +
     labs(x = "", y = "Environment P (g)", title = "(D)") +
     fig_theme +
@@ -696,7 +696,7 @@ plant_fig_fun <- function(mod_dat, params, q_adj_n, q_adj_p){
     # geom_text(data = Qmax_n_lab, aes(label = label), parse = T, color = "black", fontface = "italic",
     #           size = 3, hjust = 0, vjust = 1) +
     geom_line(aes(linetype = nutrient, color = nutrient, size = lim_nut_H)) +
-    scale_color_viridis_d(end = 0.7) +
+    scale_color_viridis_d(direction = -1) +
     scale_size_manual(values = c(1.2, 0.6)) +
     labs(x = "Time (days)", y = "Plant N concentration", title = "(E)") +
     fig_theme +
@@ -711,7 +711,7 @@ plant_fig_fun <- function(mod_dat, params, q_adj_n, q_adj_p){
     # geom_text(data = Qmax_p_lab, aes(label = label), parse = T, color = "black", fontface = "italic",
     #           size = 3, hjust = 0, vjust = 1) +
     geom_line(aes(linetype = nutrient, color = nutrient, size = lim_nut_H)) +
-    scale_color_viridis_d(end = 0.7) +
+    scale_color_viridis_d(direction = -1) +
     scale_size_manual(values = c(1.2, 0.6)) +
     labs(x = "", y = "Plant P concentration", title = "(F)") +
     fig_theme +
@@ -741,6 +741,7 @@ plant_fig_fun <- function(mod_dat, params, q_adj_n, q_adj_p){
 
 #### figure settings ####
 
+# theme
 fig_theme <- theme_bw() +
   theme(panel.background = element_blank(),
         panel.grid.major = element_blank(),
@@ -759,4 +760,10 @@ fig_theme <- theme_bw() +
         strip.background = element_blank(),
         strip.text = element_text(size = 8, hjust = 0.5),
         strip.placement = "outside",
-        plot.title = element_text(size = 8, vjust = 0, face = "bold"))
+        plot.title = element_text(size = 8, vjust = 0, face = "bold"),
+        plot.subtitle = element_text(size = 8, hjust = 0.5))
+
+# make e values exponents
+scientific_10 <- function(x) {
+  parse(text=gsub("1e", "10^", scales::scientific_format()(x)))
+}

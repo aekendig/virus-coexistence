@@ -13,6 +13,7 @@ library(cowplot)
 library(lemon)
 library(janitor)
 library(ggpattern)
+library(patchwork)
 
 # load model and settings
 source("code/model_settings.R")
@@ -160,7 +161,7 @@ ggplot(filter(virus_sim, abund_type == "con"),
                  labeller = label_parsed,
                  switch = "y",
                  scales = "free_y") +
-  scale_color_viridis_d(end = 0.7, name = "Nutrient\nsupply") +
+  scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
   scale_linetype(name = "Nutrient\nsupply") +
   scale_size_manual(values = c(1.2, 0.6), name = "Limiting\nnutrient",
                     labels = c("N", "P")) +
@@ -179,7 +180,7 @@ ggplot(filter(virus_sim, abund_type == "pop"),
                  labeller = label_parsed,
                  switch = "y",
                  scales = "free_y") +
-  scale_color_viridis_d(end = 0.7, name = "Nutrient\nsupply") +
+  scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
   scale_linetype(name = "Nutrient\nsupply") +
   scale_size_manual(values = c(1.2, 0.6), name = "Limiting\nnutrient",
                     labels = c("N", "P")) +
@@ -214,55 +215,70 @@ dev.off()
 pav_inv_gr <- pav_inv_sim %>%
   virus2_growth_rate("RPV", plant_days, res_days) %>%
   mutate(virus = str_sub(variable2, 1, 3),
-         DPP = if_else(virus == "PAV", plant_days + res_days, plant_days))
+         DPP = if_else(virus == "PAV", plant_days + res_days, plant_days),
+         role = if_else(DPP == 11, "resident", "invader") %>%
+           fct_relevel("resident"))
 
 rpv_inv_gr <- rpv_inv_sim %>%
   virus2_growth_rate("PAV", plant_days, res_days) %>%
   mutate(virus = str_sub(variable2, 1, 3),
-         DPP = if_else(virus == "RPV", plant_days + res_days, plant_days))
+         DPP = if_else(virus == "RPV", plant_days + res_days, plant_days),
+         role = if_else(DPP == 11, "resident", "invader") %>%
+           fct_relevel("resident"))
 
 pav_second_gr <- pav_second_sim %>%
   virus2_growth_rate("RPV", plant_days, res_days) %>%
   mutate(virus = str_sub(variable2, 1, 3),
-         DPP = plant_days + res_days) %>%
+         DPP = plant_days + res_days,
+         role = if_else(DPP == 11, "resident", "invader") %>%
+           fct_relevel("resident")) %>%
   filter(virus == "PAV")
 
 rpv_second_gr <- rpv_second_sim %>%
   virus2_growth_rate("PAV", plant_days, res_days) %>%
   mutate(virus = str_sub(variable2, 1, 3),
-         DPP = plant_days + res_days) %>%
+         DPP = plant_days + res_days,
+         role = if_else(DPP == 11, "resident", "invader") %>%
+           fct_relevel("resident")) %>%
   filter(virus == "RPV")
 
 pav_first_gr <- pav_first_sim %>%
   virus2_growth_rate("PAV", plant_days, res_days) %>%
   mutate(virus = str_sub(variable2, 1, 3),
-         DPP = plant_days) %>%
+         DPP = plant_days,
+         role = if_else(DPP == 11, "resident", "invader") %>%
+           fct_relevel("resident")) %>%
   filter(virus == "PAV")
 
 rpv_first_gr <- rpv_first_sim %>%
   virus2_growth_rate("RPV", plant_days, res_days) %>%
   mutate(virus = str_sub(variable2, 1, 3),
-         DPP = plant_days) %>%
+         DPP = plant_days,
+         role = if_else(DPP == 11, "resident", "invader") %>%
+           fct_relevel("resident")) %>%
   filter(virus == "RPV")
 
 # combine
-inv_gr <- pav_inv_gr %>%
-  full_join(rpv_inv_gr) %>%
-  mutate(role = if_else(DPP == 11, "resident", "invader") %>%
-           fct_relevel("resident"))
+pav_inv_dat <- pav_inv_gr %>%
+  filter(role == "invader") %>%
+  full_join(rpv_inv_gr %>%
+              filter(role == "resident"))
 
-alone_gr <- pav_first_gr %>%
-  full_join(rpv_first_gr) %>%
-  full_join(pav_second_gr) %>%
-  full_join(rpv_second_gr) %>%
-  mutate(role = if_else(DPP == 11, "resident", "invader") %>%
-           fct_relevel("resident"))
+rpv_inv_dat <- rpv_inv_gr %>%
+  filter(role == "invader") %>%
+  full_join(pav_inv_gr %>%
+              filter(role == "resident"))
+
+pav_alone_dat <- pav_first_gr %>%
+  full_join(pav_second_gr)
+
+rpv_alone_dat <- rpv_first_gr %>%
+  full_join(rpv_second_gr)
 
 
 #### growth rate figures ####
 
-pdf("output/invasion_growth_rate_figure.pdf", width = 4.5, height = 2.5)
-ggplot(inv_gr, aes(x = DPP, y = growth)) +
+pav_inv_fig <- ggplot(pav_inv_dat, aes(x = DPP, y = growth)) +
   geom_hline(yintercept = 0, color = "black", size = 0.5) +
   geom_col_pattern(aes(pattern = role, fill = nutrient),
                    position = "dodge",
@@ -271,22 +287,17 @@ ggplot(inv_gr, aes(x = DPP, y = growth)) +
                    pattern_color = "black",
                    pattern_density = 0.1,
                    pattern_key_scale_factor = 0.6) +
-  facet_wrap(~ virus) +
-  annotate("segment", x = -Inf, xend = -Inf, y = -Inf, yend = Inf, size = 1) +
   scale_pattern_manual(values = c(resident = "none", invader = "stripe"),
                        name = "Virus\nrole") +
   scale_x_continuous(breaks = c(plant_days, plant_days + res_days)) +
-  scale_fill_viridis_d(end = 0.7, name = "Nutrient\nsupply") +
-  labs(y = "Growth rate when rare", x = "Days post planting") +
+  scale_y_continuous(lim = c(min(rpv_inv_dat$growth), max(rpv_inv_dat$growth))) +
+  scale_fill_viridis_d(direction = -1, name = "Nutrient\nsupply") +
+  labs(y = "Growth rate when rare", x = "Days post planting",
+       title = "(A)", subtitle = "PAV") +
   fig_theme + 
-  theme(panel.spacing.x = unit(1,"line"),
-        axis.line.y.left = element_blank()) +
-  guides(pattern = guide_legend(override.aes = list(fill = "white")),
-         fill = guide_legend(override.aes = list(pattern = "none")))
-dev.off()
+  theme(legend.position = "none")
 
-pdf("output/alone_growth_rate_figure.pdf", width = 4.5, height = 2.5)
-ggplot(alone_gr, aes(x = DPP, y = growth)) +
+rpv_inv_fig <- ggplot(rpv_inv_dat, aes(x = DPP, y = growth)) +
   geom_hline(yintercept = 0, color = "black", size = 0.5) +
   geom_col_pattern(aes(pattern = role, fill = nutrient),
                    position = "dodge",
@@ -295,15 +306,50 @@ ggplot(alone_gr, aes(x = DPP, y = growth)) +
                    pattern_color = "black",
                    pattern_density = 0.1,
                    pattern_key_scale_factor = 0.6) +
-  facet_wrap(~ virus) +
-  annotate("segment", x = -Inf, xend = -Inf, y = -Inf, yend = Inf, size = 1) +
-  scale_pattern_manual(values = c(resident = "none", invader = "none"),
-                       guide = "none") +
+  scale_pattern_manual(values = c(resident = "none", invader = "stripe"),
+                       name = "Virus\nrole") +
   scale_x_continuous(breaks = c(plant_days, plant_days + res_days)) +
-  scale_fill_viridis_d(end = 0.7, name = "Nutrient\nsupply") +
-  labs(y = "Growth rate when rare", x = "Days post planting") +
-  fig_theme +
-  theme(panel.spacing.x = unit(1,"line"),
-        axis.line.y.left = element_blank()) +
-  guides(fill = guide_legend(override.aes = list(pattern = "none")))
+  scale_y_continuous(lim = c(min(rpv_inv_dat$growth), max(rpv_inv_dat$growth))) +
+  scale_fill_viridis_d(direction = -1, name = "Nutrient\nsupply") +
+  labs(x = "Days post planting", title = "(B)", subtitle = "RPV") +
+  fig_theme + 
+  theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank()) +
+  guides(pattern = guide_legend(override.aes = list(fill = "white")),
+         fill = guide_legend(override.aes = list(pattern = "none")))
+
+pdf("output/invasion_growth_rate_figure.pdf", width = 4.5, height = 2.5)
+pav_inv_fig + rpv_inv_fig
+dev.off()
+
+pav_alone_fig <- ggplot(pav_alone_dat, aes(x = DPP, y = growth)) +
+  geom_hline(yintercept = 0, color = "black", size = 0.5) +
+  geom_col(aes(fill = nutrient),
+           position = "dodge",
+           color = "black") +
+  scale_x_continuous(breaks = c(plant_days, plant_days + res_days)) +
+  scale_y_continuous(lim = c(min(rpv_alone_dat$growth), max(rpv_alone_dat$growth))) +
+  scale_fill_viridis_d(direction = -1, name = "Nutrient\nsupply") +
+  labs(y = "Growth rate when rare", x = "Days post planting",
+       title = "(A)", subtitle = "PAV") +
+  fig_theme + 
+  theme(legend.position = "none")
+
+rpv_alone_fig <- ggplot(rpv_alone_dat, aes(x = DPP, y = growth)) +
+  geom_hline(yintercept = 0, color = "black", size = 0.5) +
+  geom_col(aes(fill = nutrient),
+           position = "dodge",
+           color = "black") +
+  scale_pattern_manual(values = c(resident = "none", invader = "stripe"),
+                       name = "Virus\nrole") +
+  scale_x_continuous(breaks = c(plant_days, plant_days + res_days)) +
+  scale_y_continuous(lim = c(min(rpv_alone_dat$growth), max(rpv_alone_dat$growth))) +
+  scale_fill_viridis_d(direction = -1, name = "Nutrient\nsupply") +
+  labs(x = "Days post planting", title = "(B)", subtitle = "RPV") +
+  fig_theme + 
+  theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank())
+
+pdf("output/alone_growth_rate_figure.pdf", width = 4.5, height = 2.5)
+pav_alone_fig + rpv_alone_fig
 dev.off()

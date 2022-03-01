@@ -503,7 +503,7 @@ ggplot(fig_pred_dat, aes(x = time, y = value, color = nutrient)) +
   geom_point(data = fig_raw_dat, alpha = 0.5) +
   facet_rep_grid(fitType ~ nutrient, labeller = label_parsed,
                  scales = "free_y", switch = "y") +
-  scale_color_viridis_d(end = 0.7, name = "Nutrient supply") +
+  scale_color_viridis_d(direction = -1, name = "Nutrient supply") +
   labs(x = "Time (days)") +
   fig_theme +
   theme(axis.title.y = element_blank(),

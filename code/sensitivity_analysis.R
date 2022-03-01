@@ -20,14 +20,28 @@ source("code/model_settings.R")
 #### model functions ####
 
 # change parameter value
-param_fun <- function(params_in, param_foc1, param_val1, param_foc2, param_val2,
+param_fun <- function(params_in, param_foc1, param_val1, 
+                      param_foc2 = NA_character_, param_val2 = NA_real_,
+                      param_foc3 = NA_character_, param_val3 = NA_real_, 
+                      param_foc4 = NA_character_, param_val4 = NA_real_,
                       first_virus, output_type = "last",
                       V0_b = V0, V0_c = V0, inits_in = init_def2,
                       plant_time = 11, res_time = 12, inv_time = 19){
   
   # update parameter value
   params_in[param_foc1] <- param_val1
-  params_in[param_foc2] <- param_val2
+  
+  if(!is.na(param_foc2)){
+    params_in[param_foc2] <- param_val2
+  }
+  
+  if(!is.na(param_foc3)){
+    params_in[param_foc3] <- param_val3
+  }
+
+  if(!is.na(param_foc4)){
+    params_in[param_foc4] <- param_val4
+  }
   
   # run model
   mod_out <- virus2_model_sim(params = params_in, first_virus = first_virus, 
@@ -77,19 +91,27 @@ virus2_model_sim(params_def2, "RPV", V0_b = V0, V0_c = V0,
   mutate(virus_conc = log10(value + 1))
 
 pdf("output/temp_sensitivity_analysis_fig.pdf")
-param_fun(params_def2, "q_nb", 1.1e-3, "q_pb", 7.4e-5, "RPV") %>%
+param_fun(params_def2, 
+          param_foc1 = "q_nb", param_val1 = 1.1e-3, 
+          param_foc2 = "q_pb", param_val2 = 7.4e-5, 
+          first_virus = "RPV") %>%
   filter(variable2 %in% c("PAV_conc", "PAV_pop"))
 dev.off()
 # output should match output of above
 
 pdf("output/temp_sensitivity_analysis_fig.pdf")
-param_fun(params_def2, "a_n_lo", 1.1e-10, "q_pb", 7.4e-5, "RPV") %>%
+param_fun(params_def2, 
+          param_foc1 = "a_n_lo", param_val1 = 1.1e-10, 
+          first_virus = "RPV") %>%
   filter(variable2 %in% c("PAV_conc", "PAV_pop"))
 dev.off()
 # output should match output of above unless N supply is low
 
 # growth rate when rare
-param_fun(params_def2, "q_nb", 1.1e-3, "q_pb", 7.4e-5, "RPV", "first")
+param_fun(params_def2, 
+          param_foc1 = "q_nb", param_val1 = 1.1e-3, 
+          param_foc2 = "q_pb", param_val2 = 7.4e-5, 
+          first_virus = "RPV", output_type = "first")
 
 
 #### resource supply rates ####
@@ -107,7 +129,7 @@ a_in <- tibble(param_foc1 = "a_n_lo",
 # PAV invades RPV
 pdf("output/sensitivity_analysis_pav_inv_a.pdf")
 pav_inv_a <- a_in %>%
-  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2) param_fun(params_def2, param_foc1, param_val1, param_foc2, param_val2, first_virus = "RPV", output_type = "first"))) %>%
+  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2) param_fun(params_def2, param_foc1 = param_foc1, param_val1 = param_val1, param_foc2 = param_foc2, param_val2 = param_val2, first_virus = "RPV", output_type = "first"))) %>%
   unnest(cols = c(sim_out))
 dev.off()
 
@@ -127,7 +149,7 @@ pav_inv_a %>%
 
 #### minimum nutrient concentrations ####
 
-# values for low nutrient supply
+# values
 q_nb_vals <- q_pb_vals <- sort(c(10^seq(-6, -2, length.out = 20),
                                  as.numeric(params_def2["q_nb"]),
                                  as.numeric(params_def2["q_pb"])))[c(1:10, 12:17, 19:22)]
@@ -138,14 +160,16 @@ q_b_in <- tibble(param_foc1 = "q_nb",
   expand_grid(tibble(param_foc2 = "q_pb",
                      param_val2 = q_pb_vals))
 
-# PAV invades RPV
+# PAV simulation
 pdf("output/sensitivity_analysis_pav_2nd_q.pdf")
 pav_2nd_q <- q_b_in %>%
-  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2) param_fun(params_def2, param_foc1, param_val1, param_foc2, param_val2, first_virus = "RPV", output_type = "first", V0_c = 0))) %>%
+  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2) param_fun(params_def2, param_foc1 = param_foc1, param_val1 = param_val1, param_foc2 = param_foc2, param_val2 = param_val2, first_virus = "RPV", output_type = "first", V0_c = 0))) %>%
   unnest(cols = c(sim_out))
 dev.off()
 
 write_csv(pav_2nd_q, "output/sensitivity_analysis_pav_2nd_q.csv")
+pav_2nd_q <- read_csv("output/sensitivity_analysis_pav_2nd_q.csv") %>%
+  mutate(nutrient = fct_relevel(nutrient, "low", "+N", "+P", "+N+P"))
 
 # figure
 pav_2nd_q %>%
@@ -173,11 +197,6 @@ Qmin_p_lab <- tibble(param_val2 = as.numeric(params_def2["Qmin_p"]),
                      growth = max(pav_2nd_qp$growth), 
                      label = "Q['min,P']")
 
-# make e values exponents
-scientific_10 <- function(x) {
-  parse(text=gsub("1e", "10^", scales::scientific_format()(x)))
-}
-
 # figure
 pav_2nd_qn_fig <- ggplot(pav_2nd_qn, aes(x = param_val1, y = growth)) +
   geom_hline(yintercept = 0) +
@@ -187,11 +206,12 @@ pav_2nd_qn_fig <- ggplot(pav_2nd_qn, aes(x = param_val1, y = growth)) +
   geom_text(data = Qmin_n_lab, aes(label = label), 
             hjust = 0, vjust = 0.4, parse = T,
             color = "black", size = 3) +
-  scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
+  scale_color_viridis_d(direction = -1) +
   scale_linetype(name = "Nutrient\nsupply") +
   scale_x_log10(labels = scientific_10) +
   labs(x = "Min. N conc. for\nvirus replication",
-       y = "Growth rate when rare") +
+       y = "Growth rate when rare",
+       title = "(A)") +
   fig_theme +
   theme(legend.position = "none")
 
@@ -207,7 +227,8 @@ pav_2nd_qp_fig <- ggplot(pav_2nd_qp, aes(x = param_val2, y = growth)) +
   scale_linetype(name = "Nutrient\nsupply") +
   scale_x_log10(labels = scientific_10) +
   labs(x = "Min. P conc. for\nvirus replication",
-       y = "Growth rate when rare") +
+       y = "Growth rate when rare",
+       title = "(B)") +
   fig_theme +
   theme(axis.title.y = element_blank(),
         axis.text.y = element_blank())
@@ -217,9 +238,206 @@ pav_2nd_fig <- pav_2nd_qn_fig + pav_2nd_qp_fig
 ggsave("output/pav_growth_rate_q.pdf", pav_2nd_fig,
        width = 5.5, height = 2.5, units = "in")
 
+# RPV data frame
+q_c_in <- tibble(param_foc1 = "q_nc",
+                 param_val1 = q_nb_vals) %>%
+  expand_grid(tibble(param_foc2 = "q_pc",
+                     param_val2 = q_pb_vals))
+
+# RPV simulation
+pdf("output/sensitivity_analysis_rpv_2nd_q.pdf")
+rpv_2nd_q <- q_c_in %>%
+  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2) param_fun(params_def2, param_foc1 = param_foc1, param_val1 = param_val1, param_foc2 = param_foc2, param_val2 = param_val2, first_virus = "PAV", output_type = "first", V0_b = 0))) %>%
+  unnest(cols = c(sim_out))
+dev.off()
+
+write_csv(rpv_2nd_q, "output/sensitivity_analysis_rpv_2nd_q.csv")
+rpv_2nd_q <- read_csv("output/sensitivity_analysis_rpv_2nd_q.csv") %>%
+  mutate(nutrient = fct_relevel(nutrient, "low", "+N", "+P", "+N+P"))
+
+# figure
+rpv_2nd_q %>%
+  filter(variable2 == "RPV_conc") %>%
+  ggplot(aes(x = param_val1, y = param_val2, color = growth)) +
+  geom_point(size = 10, shape = 15) +
+  facet_wrap(~ nutrient) +
+  scale_color_viridis_c(name = "Growth rate", direction = -1) +
+  scale_x_log10() +
+  scale_y_log10() +
+  labs(x = "Min N conc.", y = "Min P conc.")
+
+# N and P datasets
+rpv_2nd_qn <- rpv_2nd_q %>%
+  filter(variable2 == "RPV_conc" & param_val2 == min(param_val2))
+rpv_2nd_qp <- rpv_2nd_q %>%
+  filter(variable2 == "RPV_conc" & param_val1 == min(param_val1))
+
+# plant min labels
+Qmin_n_lab <- tibble(param_val1 = as.numeric(params_def2["Qmin_n"]), 
+                     growth = max(rpv_2nd_qn$growth), 
+                     label = "Q['min,N']")
+
+Qmin_p_lab <- tibble(param_val2 = as.numeric(params_def2["Qmin_p"]), 
+                     growth = max(rpv_2nd_qp$growth), 
+                     label = "Q['min,P']")
+
+# figure
+rpv_2nd_qn_fig <- ggplot(rpv_2nd_qn, aes(x = param_val1, y = growth)) +
+  geom_hline(yintercept = 0) +
+  geom_vline(xintercept = as.numeric(params_def2["Qmin_n"]), 
+             color = "black", linetype = "dotted") +
+  geom_line(aes(color = nutrient, linetype = nutrient)) +
+  geom_text(data = Qmin_n_lab, aes(label = label), 
+            hjust = 0, vjust = 0.4, parse = T,
+            color = "black", size = 3) +
+  scale_color_viridis_d(direction = -1) +
+  scale_linetype(name = "Nutrient\nsupply") +
+  scale_x_log10(labels = scientific_10) +
+  labs(x = "Min. N conc. for\nvirus replication",
+       y = "Growth rate when rare",
+       title = "(A)") +
+  fig_theme +
+  theme(legend.position = "none")
+
+rpv_2nd_qp_fig <- ggplot(rpv_2nd_qp, aes(x = param_val2, y = growth)) +
+  geom_hline(yintercept = 0) +
+  geom_vline(xintercept = as.numeric(params_def2["Qmin_p"]), 
+             color = "black", linetype = "dotted") +
+  geom_line(aes(color = nutrient, linetype = nutrient)) +
+  geom_text(data = Qmin_p_lab, aes(label = label), 
+            hjust = 0, vjust = 0.4, parse = T,
+            color = "black", size = 3) +
+  scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
+  scale_linetype(name = "Nutrient\nsupply") +
+  scale_x_log10(labels = scientific_10) +
+  labs(x = "Min. P conc. for\nvirus replication",
+       y = "Growth rate when rare",
+       title = "(B)") +
+  fig_theme +
+  theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank())
+
+rpv_2nd_fig <- rpv_2nd_qn_fig + rpv_2nd_qp_fig
+
+ggsave("output/rpv_growth_rate_q.pdf", rpv_2nd_fig,
+       width = 5.5, height = 2.5, units = "in")
+
+
+#### virus nutrient content ####
+
+# virus N:P
+np_z_ratio_vir <- as.numeric(params_def2["z_nb"]) / as.numeric(params_def2["z_pb"])
+
+# values
+z_pb_vals <- sort(c(10^seq(-17, -7, length.out = 5),
+                    as.numeric(params_def2["z_pb"])))
+# too high Z values make Q's go negative
+
+z_nb_vals <- z_pb_vals * np_z_ratio_vir
+
+# data frame
+z_b_in <- tibble(param_foc1 = "z_nb",
+                 param_val1 = z_nb_vals,
+                 param_foc2 = "z_pb",
+                 param_val2 = z_pb_vals)
+
+# PAV simulation
+pdf("output/sensitivity_analysis_pav_1st_z.pdf")
+pav_1st_z <- z_b_in %>%
+  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2) param_fun(params_def2, param_foc1 = param_foc1, param_val1 = param_val1, param_foc2 = param_foc2, param_val2 = param_val2, first_virus = "PAV", output_type = "last", V0_c = 0, inv_time = 0))) %>%
+  unnest(cols = c(sim_out))
+dev.off()
+
+write_csv(pav_1st_z, "output/sensitivity_analysis_pav_1st_z.csv")
+pav_1st_z <- read_csv("output/sensitivity_analysis_pav_1st_z.csv") %>%
+  mutate(nutrient = fct_relevel(nutrient, "low", "+N", "+P", "+N+P"))
+
+# figure
+pav_1st_z %>%
+  filter(variable2 == "Q_n") %>%
+  ggplot(aes(x = param_val1, y = value2)) +
+  geom_line() +
+  facet_wrap(~ nutrient) +
+  scale_x_log10() +
+  labs(x = "N content", y = "N conc.")
+
+
+#### minimum nutrient concentrations and virus nutrient content ####
+
+# virus N:P
+np_z_ratio_vir <- as.numeric(params_def2["z_nb"]) / as.numeric(params_def2["z_pb"])
+np_q_ratio_vir <- as.numeric(params_def2["q_nb"]) / as.numeric(params_def2["q_pb"])
+
+# values
+z_pb_vals2 <- sort(c(10^seq(-17, -7, length.out = 5),
+                     as.numeric(params_def2["z_pb"])))
+
+q_pb_vals2 <- sort(c(10^seq(-6, -2, length.out = 5),
+                     as.numeric(params_def2["q_pb"])))
+
+z_nb_vals2 <- z_pb_vals2 * np_z_ratio_vir
+q_nb_vals2 <- q_pb_vals2 * np_q_ratio_vir
+
+# data frame
+z_q_b_in <- tibble(param_foc1 = "z_nb",
+                   param_val1 = z_nb_vals2,
+                   param_foc3 = "z_pb",
+                   param_val3 = z_pb_vals2) %>%
+  expand_grid(tibble(param_foc2 = "q_nb",
+                     param_val2 = q_nb_vals2,
+                     param_foc4 = "q_pb",
+                     param_val4 = q_pb_vals2))
+
+# PAV simulation
+pdf("output/sensitivity_analysis_pav_1st_z_q.pdf")
+pav_1st_z_q <- z_q_b_in %>%
+  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2, param_foc3, param_val3, param_foc4, param_val4) param_fun(params_def2, param_foc1 = param_foc1, param_val1 = param_val1, param_foc2 = param_foc2, param_val2 = param_val2, param_foc3 = param_foc3, param_val3 = param_val3, param_foc4 = param_foc4, param_val4 = param_val4, first_virus = "PAV", V0_c = 0, inv_time = 0))) %>%
+  unnest(cols = c(sim_out))
+dev.off()
+
+write_csv(pav_1st_z_q, "output/sensitivity_analysis_pav_1st_z_q.csv")
+pav_1st_z_q <- read_csv("output/sensitivity_analysis_pav_1st_z_q.csv") %>%
+  mutate(nutrient = fct_relevel(nutrient, "low", "+N", "+P", "+N+P"))
+
+# figure
+pav_1st_z_q %>%
+  filter(variable2 == "Q_n") %>%
+  ggplot(aes(x = param_val1, y = param_val2, color = value2)) +
+  geom_point(size = 10, shape = 15) +
+  facet_wrap(~ nutrient) +
+  scale_color_viridis_c(name = "Plant N", direction = -1) +
+  scale_x_log10() +
+  scale_y_log10() +
+  labs(x = "N content", y = "Min N conc.")
+
+# RPV invasion simulation
+pdf("output/sensitivity_analysis_rpv_inv_z_q.pdf")
+rpv_inv_z_q <- z_q_b_in %>%
+  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2, param_foc3, param_val3, param_foc4, param_val4) param_fun(params_def2, param_foc1 = param_foc1, param_val1 = param_val1, param_foc2 = param_foc2, param_val2 = param_val2, param_foc3 = param_foc3, param_val3 = param_val3, param_foc4 = param_foc4, param_val4 = param_val4, first_virus = "PAV", output_type = "first"))) %>%
+  unnest(cols = c(sim_out))
+dev.off()
+
+write_csv(rpv_inv_z_q, "output/sensitivity_analysis_rpv_inv_z_q.csv")
+rpv_inv_z_q <- read_csv("output/sensitivity_analysis_rpv_inv_z_q.csv") %>%
+  mutate(nutrient = fct_relevel(nutrient, "low", "+N", "+P", "+N+P"))
+
+# figure
+rpv_inv_z_q %>%
+  filter(variable2 == "RPV_conc") %>%
+  ggplot(aes(x = param_val1, y = param_val2, color = growth)) +
+  geom_point(size = 10, shape = 15) +
+  facet_wrap(~ nutrient) +
+  scale_color_viridis_c(name = "Growth rate", direction = -1) +
+  scale_x_log10() +
+  scale_y_log10() +
+  labs(x = "N content", y = "Min N conc.")
 
 #### start here ####
-# repeat above for RPV (supp figure)
+# make above into figure panel and repeat for PAV
+
+
+
+
 
 
 #### minimum nutrient concentration (q_n)/nutrient content of virus (z_n) ####
