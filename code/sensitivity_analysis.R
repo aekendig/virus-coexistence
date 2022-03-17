@@ -82,6 +82,9 @@ param_fun <- function(params_in, param_foc1, param_val1,
 
 }
 
+
+#### test functions ####
+
 # test function
 virus2_model_sim(params_def2, "RPV", V0_b = V0, V0_c = V0,
                  plant_time = 11, res_time = 12, 
@@ -182,6 +185,39 @@ pav_2nd_q %>%
   scale_y_log10() +
   labs(x = "Min N conc.", y = "Min P conc.")
 
+# import default simulation
+pav_2nd_def <- read_csv("output/pav_second_simulation.csv") %>%
+  mutate(nutrient = fct_relevel(nutrient, "low", "+N", "+P", "+N+P"))
+
+#### start here ####
+
+# figure out why values cross x-axis just below thresholds
+# something off with calculations? look at limiting nutrient assumption
+# need to include threshold values in simulations?
+
+# plant nutrient content at time of invasion
+pav_2nd_plant_n <- pav_2nd_def %>%
+  filter(time == 11 + 12 & variable2 %in% c("Q_n", "Qlim")) %>%
+  select(-variable) %>%
+  pivot_wider(values_from = "value",
+              names_from = "variable2") %>%
+  mutate(q_thresh = Q_n * (1 - ((1-Qlim) * 
+                                  as.numeric(params_def2["g"]) + 
+                                  as.numeric(params_def2["c_b"])) /
+                             as.numeric(params_def2["r_b"])),
+         growth = 0)
+
+pav_2nd_plant_p <- pav_2nd_def %>%
+  filter(time == 11 + 12 & variable2 %in% c("Q_p", "Qlim")) %>%
+  select(-variable) %>%
+  pivot_wider(values_from = "value",
+              names_from = "variable2") %>%
+  mutate(q_thresh = Q_p * (1 - ((1-Qlim) * 
+                                  as.numeric(params_def2["g"]) + 
+                                  as.numeric(params_def2["c_b"])) /
+                             as.numeric(params_def2["r_b"])),
+         growth = 0)
+
 # N and P datasets
 pav_2nd_qn <- pav_2nd_q %>%
   filter(variable2 == "PAV_conc" & param_val2 == min(param_val2))
@@ -189,24 +225,24 @@ pav_2nd_qp <- pav_2nd_q %>%
   filter(variable2 == "PAV_conc" & param_val1 == min(param_val1))
 
 # plant min labels
-Qmin_n_lab <- tibble(param_val1 = as.numeric(params_def2["Qmin_n"]), 
-                     growth = max(pav_2nd_qn$growth), 
-                     label = "Q['min,N']")
-
-Qmin_p_lab <- tibble(param_val2 = as.numeric(params_def2["Qmin_p"]), 
-                     growth = max(pav_2nd_qp$growth), 
-                     label = "Q['min,P']")
+# Qmin_n_lab <- tibble(param_val1 = as.numeric(params_def2["Qmin_n"]), 
+#                      growth = max(pav_2nd_qn$growth), 
+#                      label = "Q['min,N']")
+# 
+# Qmin_p_lab <- tibble(param_val2 = as.numeric(params_def2["Qmin_p"]), 
+#                      growth = max(pav_2nd_qp$growth), 
+#                      label = "Q['min,P']")
 
 # figure
-pav_2nd_qn_fig <- ggplot(pav_2nd_qn, aes(x = param_val1, y = growth)) +
+#pav_2nd_qn_fig <- 
+ggplot(pav_2nd_qn, aes(x = param_val1, y = growth)) +
   geom_hline(yintercept = 0) +
-  geom_vline(xintercept = as.numeric(params_def2["Qmin_n"]), 
-             color = "black", linetype = "dotted") +
   geom_line(aes(color = nutrient, linetype = nutrient)) +
-  geom_text(data = Qmin_n_lab, aes(label = label), 
-            hjust = 0, vjust = 0.4, parse = T,
-            color = "black", size = 3) +
+  geom_point(data = pav_2nd_plant_n,
+             aes(x = q_thresh, fill = nutrient), 
+             shape = 21, color = "transparent", size = 2) +
   scale_color_viridis_d(direction = -1) +
+  scale_fill_viridis_d(direction = -1) +
   scale_linetype(name = "Nutrient\nsupply") +
   scale_x_log10(labels = scientific_10) +
   labs(x = "Min. N conc. for\nvirus replication",
@@ -215,15 +251,15 @@ pav_2nd_qn_fig <- ggplot(pav_2nd_qn, aes(x = param_val1, y = growth)) +
   fig_theme +
   theme(legend.position = "none")
 
-pav_2nd_qp_fig <- ggplot(pav_2nd_qp, aes(x = param_val2, y = growth)) +
+#pav_2nd_qp_fig <- 
+ggplot(pav_2nd_qp, aes(x = param_val2, y = growth)) +
   geom_hline(yintercept = 0) +
-  geom_vline(xintercept = as.numeric(params_def2["Qmin_p"]), 
-             color = "black", linetype = "dotted") +
   geom_line(aes(color = nutrient, linetype = nutrient)) +
-  geom_text(data = Qmin_p_lab, aes(label = label), 
-            hjust = 0, vjust = 0.4, parse = T,
-            color = "black", size = 3) +
+  geom_point(data = pav_2nd_plant_p,
+             aes(x = q_thresh, fill = nutrient), 
+             shape = 21, color = "transparent", size = 2) +
   scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
+  scale_fill_viridis_d(direction = -1) +
   scale_linetype(name = "Nutrient\nsupply") +
   scale_x_log10(labels = scientific_10) +
   labs(x = "Min. P conc. for\nvirus replication",
@@ -369,10 +405,10 @@ np_z_ratio_vir <- as.numeric(params_def2["z_nb"]) / as.numeric(params_def2["z_pb
 np_q_ratio_vir <- as.numeric(params_def2["q_nb"]) / as.numeric(params_def2["q_pb"])
 
 # values
-z_pb_vals2 <- sort(c(10^seq(-17, -7, length.out = 5),
+z_pb_vals2 <- sort(c(10^c(13, 12, 11, 10, 7),
                      as.numeric(params_def2["z_pb"])))
 
-q_pb_vals2 <- sort(c(10^seq(-6, -2, length.out = 5),
+q_pb_vals2 <- sort(c(10^seq(-6, -2, length.out = 9),
                      as.numeric(params_def2["q_pb"])))
 
 z_nb_vals2 <- z_pb_vals2 * np_z_ratio_vir
@@ -432,13 +468,36 @@ rpv_inv_z_q %>%
   scale_y_log10() +
   labs(x = "N content", y = "Min N conc.")
 
-#### start here ####
-# make above into figure panel and repeat for PAV
+rpv_inv_z_q %>%
+  filter(variable2 == "RPV_conc") %>%
+  ggplot(aes(x = param_val2, y = growth, color = as.factor(param_val1))) +
+  geom_line() +
+  facet_wrap(~ nutrient) +
+  scale_color_viridis_d(name = "Resident N content", direction = -1) +
+  scale_x_log10() +
+  labs(x = "Resident min. N conc.", y = "Invader growth rate when rare")
+
+rpv_inv_z_q %>%
+  filter(variable2 == "RPV_conc") %>%
+  ggplot(aes(x = param_val4, y = growth, color = as.factor(param_val3))) +
+  geom_line() +
+  facet_wrap(~ nutrient) +
+  scale_color_viridis_d(name = "Resident P content", direction = -1) +
+  scale_x_log10() +
+  labs(x = "Resident min. P conc.", y = "Invader growth rate when rare")
+
+rpv_inv_z_q %>%
+  filter(variable2 == "PAV_conc") %>%
+  ggplot(aes(x = param_val2, y = growth, color = as.factor(param_val1))) +
+  geom_line() +
+  facet_wrap(~ nutrient) +
+  scale_color_viridis_d(name = "Resident N content", direction = -1) +
+  scale_x_log10() +
+  labs(x = "Resident min. N conc.", y = "Resident growth rate when rare")
 
 
 
-
-
+#### older code #### 
 
 #### minimum nutrient concentration (q_n)/nutrient content of virus (z_n) ####
 

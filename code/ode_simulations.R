@@ -76,6 +76,10 @@ rpv_second_sim <- virus2_model_sim(params_def2, "PAV", V0_b = 0, V0_c = V0,
                                    inv_time = inv_days) %>%
   virus2_model_format(params_def2)
 
+# save for sensitivity analysis
+write_csv(pav_second_sim, "output/pav_second_simulation.csv")
+write_csv(rpv_second_sim, "output/rpv_second_simulation.csv")
+
 
 #### virus invasion simulations ####
 
