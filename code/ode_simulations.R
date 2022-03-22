@@ -21,7 +21,7 @@ source("code/model_settings.R")
 # settings for short-term simulations
 plant_days <- 11
 res_days <- 12
-inv_days <- 19
+inv_days <- 60-11-12
 
 
 #### long-term plant ####

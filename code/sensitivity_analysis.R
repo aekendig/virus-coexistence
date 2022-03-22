@@ -20,7 +20,8 @@ source("code/model_settings.R")
 #### model functions ####
 
 # change parameter value
-param_fun <- function(params_in, param_foc1, param_val1, 
+param_fun <- function(params_in, 
+                      param_foc1 = NA_character_, param_val1 = NA_real_, 
                       param_foc2 = NA_character_, param_val2 = NA_real_,
                       param_foc3 = NA_character_, param_val3 = NA_real_, 
                       param_foc4 = NA_character_, param_val4 = NA_real_,
@@ -29,7 +30,9 @@ param_fun <- function(params_in, param_foc1, param_val1,
                       plant_time = 11, res_time = 12, inv_time = 19){
   
   # update parameter value
-  params_in[param_foc1] <- param_val1
+  if(!is.na(param_foc1)){
+    params_in[param_foc1] <- param_val1
+  }
   
   if(!is.na(param_foc2)){
     params_in[param_foc2] <- param_val2
@@ -63,23 +66,22 @@ param_fun <- function(params_in, param_foc1, param_val1,
   
   # outputs
   if(output_type == "last"){
-    
+
     # extract last time point
     mod_out3 <- mod_out2 %>%
       filter(time == max(time))
-    
+
   } else {
-    
+
     # calculate virus growth rates
-    mod_out3 <- virus2_growth_rate(mod_out2, first_virus, 
+    mod_out3 <- virus2_growth_rate(mod_out2, first_virus,
                                    plant_time = plant_time, res_time = res_time)
-    
+
   }
   
   
   # return output
   return(mod_out3)
-
 }
 
 
@@ -117,6 +119,64 @@ param_fun(params_def2,
           first_virus = "RPV", output_type = "first")
 
 
+#### days post planting ####
+
+# day ranges
+dpp_in <- tibble(plant_days = 1:60) %>%
+  mutate(res_days = 1,
+         inv_days = 14)
+
+# PAV alone
+pdf("output/sensitivity_analysis_pav_1st_dpp.pdf")
+pav_1st_dpp <- dpp_in %>%
+  mutate(sim_out = pmap(., function(plant_days, res_days, inv_days) param_fun(params_in = params_def2, plant_time = plant_days, res_time = res_days, inv_time = inv_days, first_virus = "PAV", output_type = "first", V0_c = 0))) %>%
+  unnest(cols = c(sim_out))
+dev.off()
+
+# save dataset
+write_csv(pav_1st_dpp, "output/sensitivity_analysis_pav_1st_dpp.csv")
+pav_1st_dpp <- read_csv("output/sensitivity_analysis_pav_1st_dpp.csv") %>%
+  mutate(nutrient = fct_relevel(nutrient, "low", "+N", "+P", "+N+P"))
+
+# figure
+pav_1st_dpp %>%
+  filter(variable2 == "PAV_conc") %>%
+  ggplot(aes(x = plant_days, y = growth, color = nutrient, linetype = nutrient)) +
+  geom_hline(yintercept = 0, size = 0.25) +
+  geom_line() +
+  scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
+  scale_linetype(name = "Nutrient\nsupply") +
+  labs(x = "Invasion time (DPP)", y = "Growth rate") +
+  fig_theme
+
+# plant by itself
+short_term_plant <- virus2_model_sim(params_def2, "PAV", V0_b = 0, V0_c = 0, 
+                                     plant_time = 11, res_time = 12, 
+                                     inv_time = 60-11-12) %>%
+  virus2_model_format(params_def2)
+
+# combine grwr with limiting nutrient concentration
+# this doesn't quite work because time is a continuous variable in short_term_plant
+pav_1st_lim <- pav_1st_dpp %>%
+  filter(variable2 == "PAV_conc") %>%
+  left_join(short_term_plant %>%
+              filter(variable2 == "Qlim") %>%
+              rename(plant_days = time,
+                     Qlim = value) %>%
+              select(plant_days, nutrient, Qlim))
+
+pav_1st_lim %>%
+  ggplot(aes(x = Qlim, y = growth, color = nutrient, linetype = nutrient)) +
+  geom_hline(yintercept = 0, size = 0.25) +
+  geom_line() +
+  scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
+  scale_linetype(name = "Nutrient\nsupply") +
+  labs(x = expression(paste("Limiting nutrient ratio (", Q[min], "/Q)", sep = "")), 
+       y = "Growth rate") +
+  fig_theme
+# this makes sense because this is the virus's growth rate too
+
+
 #### resource supply rates ####
 
 # values for low nutrient supply
@@ -152,48 +212,9 @@ pav_inv_a %>%
 
 #### minimum nutrient concentrations ####
 
-# values
-q_nb_vals <- q_pb_vals <- sort(c(10^seq(-6, -2, length.out = 20),
-                                 as.numeric(params_def2["q_nb"]),
-                                 as.numeric(params_def2["q_pb"])))[c(1:10, 12:17, 19:22)]
-
-# data frame
-q_b_in <- tibble(param_foc1 = "q_nb",
-                 param_val1 = q_nb_vals) %>%
-  expand_grid(tibble(param_foc2 = "q_pb",
-                     param_val2 = q_pb_vals))
-
-# PAV simulation
-pdf("output/sensitivity_analysis_pav_2nd_q.pdf")
-pav_2nd_q <- q_b_in %>%
-  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2) param_fun(params_def2, param_foc1 = param_foc1, param_val1 = param_val1, param_foc2 = param_foc2, param_val2 = param_val2, first_virus = "RPV", output_type = "first", V0_c = 0))) %>%
-  unnest(cols = c(sim_out))
-dev.off()
-
-write_csv(pav_2nd_q, "output/sensitivity_analysis_pav_2nd_q.csv")
-pav_2nd_q <- read_csv("output/sensitivity_analysis_pav_2nd_q.csv") %>%
-  mutate(nutrient = fct_relevel(nutrient, "low", "+N", "+P", "+N+P"))
-
-# figure
-pav_2nd_q %>%
-  filter(variable2 == "PAV_conc") %>%
-  ggplot(aes(x = param_val1, y = param_val2, color = growth)) +
-  geom_point(size = 10, shape = 15) +
-  facet_wrap(~ nutrient) +
-  scale_color_viridis_c(name = "Growth rate", direction = -1) +
-  scale_x_log10() +
-  scale_y_log10() +
-  labs(x = "Min N conc.", y = "Min P conc.")
-
 # import default simulation
 pav_2nd_def <- read_csv("output/pav_second_simulation.csv") %>%
   mutate(nutrient = fct_relevel(nutrient, "low", "+N", "+P", "+N+P"))
-
-#### start here ####
-
-# figure out why values cross x-axis just below thresholds
-# something off with calculations? look at limiting nutrient assumption
-# need to include threshold values in simulations?
 
 # plant nutrient content at time of invasion
 pav_2nd_plant_n <- pav_2nd_def %>%
@@ -218,51 +239,89 @@ pav_2nd_plant_p <- pav_2nd_def %>%
                              as.numeric(params_def2["r_b"])),
          growth = 0)
 
+# thresholds calculated under the assumption the focal
+# nutrient is limiting virus replication
+pav_2nd_plant_n %>%
+  rename(q_n_thresh = q_thresh) %>%
+  full_join(pav_2nd_plant_p %>%
+              rename(q_p_thresh = q_thresh)) %>%
+  mutate(Q_n_lim = if_else(q_n_thresh/Q_n > 1e-6/Q_p, "yes", "no"),
+         Q_p_lim = if_else(q_p_thresh/Q_p > 1e-6/Q_n, "yes", "no"))
+# all are "yes"
+
+# values (simplified)
+q_nb_vals <- q_pb_vals <- sort(c(as.numeric(params_def2["q_nb"]),
+                                 as.numeric(params_def2["q_pb"]),
+                                 unique(pav_2nd_plant_n$q_thresh),
+                                 unique(pav_2nd_plant_p$q_thresh),
+                                 1e-6, 5e-6, 1e-5, 2.5e-5, 5e-5, 3e-4, 5e-4, 7e-4, 3e-3, 5e-3, 7e-3, 1e-2))
+
+# data frame
+q_b_in <- tibble(param_foc1 = "q_nb",
+                 param_val1 = q_nb_vals,
+                 param_foc2 = "q_pb",
+                 param_val2 = 1e-6) %>%
+  full_join(tibble(param_foc2 = "q_pb",
+                   param_val2 = q_pb_vals,
+                   param_foc1 = "q_nb",
+                   param_val1 = 1e-6))
+
+# PAV simulation
+pdf("output/sensitivity_analysis_pav_2nd_q.pdf")
+pav_2nd_q <- q_b_in %>%
+  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2) param_fun(params_def2, param_foc1 = param_foc1, param_val1 = param_val1, param_foc2 = param_foc2, param_val2 = param_val2, first_virus = "RPV", output_type = "first", V0_c = 0))) %>%
+  unnest(cols = c(sim_out))
+dev.off()
+
+write_csv(pav_2nd_q, "output/sensitivity_analysis_pav_2nd_q.csv")
+pav_2nd_q <- read_csv("output/sensitivity_analysis_pav_2nd_q.csv") %>%
+  mutate(nutrient = fct_relevel(nutrient, "low", "+N", "+P", "+N+P"))
+
+# figure
+pav_2nd_q %>%
+  filter(variable2 == "PAV_conc") %>%
+  ggplot(aes(x = param_val1, y = param_val2, color = growth)) +
+  geom_point(size = 10, shape = 15) +
+  facet_wrap(~ nutrient) +
+  scale_color_viridis_c(name = "Growth rate", direction = -1) +
+  scale_x_log10() +
+  scale_y_log10() +
+  labs(x = "Min N conc.", y = "Min P conc.")
+
 # N and P datasets
 pav_2nd_qn <- pav_2nd_q %>%
   filter(variable2 == "PAV_conc" & param_val2 == min(param_val2))
 pav_2nd_qp <- pav_2nd_q %>%
   filter(variable2 == "PAV_conc" & param_val1 == min(param_val1))
 
-# plant min labels
-# Qmin_n_lab <- tibble(param_val1 = as.numeric(params_def2["Qmin_n"]), 
-#                      growth = max(pav_2nd_qn$growth), 
-#                      label = "Q['min,N']")
-# 
-# Qmin_p_lab <- tibble(param_val2 = as.numeric(params_def2["Qmin_p"]), 
-#                      growth = max(pav_2nd_qp$growth), 
-#                      label = "Q['min,P']")
-
 # figure
-#pav_2nd_qn_fig <- 
-ggplot(pav_2nd_qn, aes(x = param_val1, y = growth)) +
+pav_2nd_qn_fig <- ggplot(pav_2nd_qn, aes(x = param_val1, y = growth)) +
   geom_hline(yintercept = 0) +
   geom_line(aes(color = nutrient, linetype = nutrient)) +
   geom_point(data = pav_2nd_plant_n,
-             aes(x = q_thresh, fill = nutrient), 
+             aes(x = q_thresh, fill = nutrient),
              shape = 21, color = "transparent", size = 2) +
   scale_color_viridis_d(direction = -1) +
   scale_fill_viridis_d(direction = -1) +
   scale_linetype(name = "Nutrient\nsupply") +
   scale_x_log10(labels = scientific_10) +
-  labs(x = "Min. N conc. for\nvirus replication",
+  labs(x = "Min. N conc. for virus replication",
        y = "Growth rate when rare",
        title = "(A)") +
   fig_theme +
   theme(legend.position = "none")
 
-#pav_2nd_qp_fig <- 
-ggplot(pav_2nd_qp, aes(x = param_val2, y = growth)) +
+pav_2nd_qp_fig <- ggplot(pav_2nd_qp, aes(x = param_val2, y = growth)) +
   geom_hline(yintercept = 0) +
   geom_line(aes(color = nutrient, linetype = nutrient)) +
   geom_point(data = pav_2nd_plant_p,
              aes(x = q_thresh, fill = nutrient), 
              shape = 21, color = "transparent", size = 2) +
   scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
-  scale_fill_viridis_d(direction = -1) +
+  scale_fill_viridis_d(direction = -1, name = "Nutrient\nsupply") +
   scale_linetype(name = "Nutrient\nsupply") +
   scale_x_log10(labels = scientific_10) +
-  labs(x = "Min. P conc. for\nvirus replication",
+  labs(x = "Min. P conc. for virus replication",
        y = "Growth rate when rare",
        title = "(B)") +
   fig_theme +
