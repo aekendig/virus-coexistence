@@ -27,7 +27,7 @@ param_fun <- function(params_in,
                       param_foc4 = NA_character_, param_val4 = NA_real_,
                       first_virus, output_type = "last",
                       V0_b = V0, V0_c = V0, inits_in = init_def2,
-                      plant_time = 11, res_time = 12, inv_time = 19){
+                      plant_time = 11, res_time = 12, inv_time = 37){
   
   # update parameter value
   if(!is.na(param_foc1)){
@@ -146,7 +146,7 @@ pav_1st_dpp %>%
   geom_line() +
   scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
   scale_linetype(name = "Nutrient\nsupply") +
-  labs(x = "Invasion time (DPP)", y = "Growth rate") +
+  labs(x = "Infection time (DPP)", y = "Growth rate") +
   fig_theme
 
 # plant by itself
@@ -175,6 +175,54 @@ pav_1st_lim %>%
        y = "Growth rate") +
   fig_theme
 # this makes sense because this is the virus's growth rate too
+
+
+#### virus nutrient content ####
+
+# virus N:P
+np_z_ratio_vir <- as.numeric(params_def2["z_nb"]) / as.numeric(params_def2["z_pb"])
+
+# values
+z_pb_vals <- sort(c(10^seq(-18, -7, length.out = 10),
+                    as.numeric(params_def2["z_pb"])))
+# too high Z values make Q's go negative
+
+z_nb_vals <- z_pb_vals * np_z_ratio_vir
+
+# data frame
+z_b_in <- tibble(param_foc1 = "z_nb",
+                 param_val1 = z_nb_vals,
+                 param_foc2 = "z_pb",
+                 param_val2 = z_pb_vals)
+
+# PAV simulation
+pdf("output/sensitivity_analysis_pav_1st_z.pdf")
+pav_1st_z <- z_b_in %>%
+  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2) param_fun(params_def2, param_foc1 = param_foc1, param_val1 = param_val1, param_foc2 = param_foc2, param_val2 = param_val2, first_virus = "PAV", output_type = "last", V0_c = 0))) %>%
+  unnest(cols = c(sim_out))
+dev.off()
+
+write_csv(pav_1st_z, "output/sensitivity_analysis_pav_1st_z.csv")
+pav_1st_z <- read_csv("output/sensitivity_analysis_pav_1st_z.csv") %>%
+  mutate(nutrient = fct_relevel(nutrient, "low", "+N", "+P", "+N+P"))
+
+# figure
+pav_1st_z %>%
+  filter(variable2 == "Q_n") %>%
+  ggplot(aes(x = param_val1, y = value2)) +
+  geom_line() +
+  facet_wrap(~ nutrient) +
+  scale_x_log10() +
+  labs(x = "N content", y = "N conc.")
+
+pav_1st_z %>%
+  filter(variable2 == "Q_p") %>%
+  ggplot(aes(x = param_val2, y = value2)) +
+  geom_line() +
+  facet_wrap(~ nutrient) +
+  scale_x_log10() +
+  labs(x = "P content", y = "P conc.")
+
 
 
 #### resource supply rates ####
@@ -418,43 +466,6 @@ ggsave("output/rpv_growth_rate_q.pdf", rpv_2nd_fig,
        width = 5.5, height = 2.5, units = "in")
 
 
-#### virus nutrient content ####
-
-# virus N:P
-np_z_ratio_vir <- as.numeric(params_def2["z_nb"]) / as.numeric(params_def2["z_pb"])
-
-# values
-z_pb_vals <- sort(c(10^seq(-17, -7, length.out = 5),
-                    as.numeric(params_def2["z_pb"])))
-# too high Z values make Q's go negative
-
-z_nb_vals <- z_pb_vals * np_z_ratio_vir
-
-# data frame
-z_b_in <- tibble(param_foc1 = "z_nb",
-                 param_val1 = z_nb_vals,
-                 param_foc2 = "z_pb",
-                 param_val2 = z_pb_vals)
-
-# PAV simulation
-pdf("output/sensitivity_analysis_pav_1st_z.pdf")
-pav_1st_z <- z_b_in %>%
-  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2) param_fun(params_def2, param_foc1 = param_foc1, param_val1 = param_val1, param_foc2 = param_foc2, param_val2 = param_val2, first_virus = "PAV", output_type = "last", V0_c = 0, inv_time = 0))) %>%
-  unnest(cols = c(sim_out))
-dev.off()
-
-write_csv(pav_1st_z, "output/sensitivity_analysis_pav_1st_z.csv")
-pav_1st_z <- read_csv("output/sensitivity_analysis_pav_1st_z.csv") %>%
-  mutate(nutrient = fct_relevel(nutrient, "low", "+N", "+P", "+N+P"))
-
-# figure
-pav_1st_z %>%
-  filter(variable2 == "Q_n") %>%
-  ggplot(aes(x = param_val1, y = value2)) +
-  geom_line() +
-  facet_wrap(~ nutrient) +
-  scale_x_log10() +
-  labs(x = "N content", y = "N conc.")
 
 
 #### minimum nutrient concentrations and virus nutrient content ####
