@@ -25,7 +25,7 @@ param_fun <- function(params_in,
                       param_foc2 = NA_character_, param_val2 = NA_real_,
                       param_foc3 = NA_character_, param_val3 = NA_real_, 
                       param_foc4 = NA_character_, param_val4 = NA_real_,
-                      first_virus, output_type = "last",
+                      first_virus, output_type = "growth",
                       V0_b = V0, V0_c = V0, inits_in = init_def2,
                       plant_time = 11, res_time = 12, inv_time = 37){
   
@@ -65,17 +65,17 @@ param_fun <- function(params_in,
           labs(title = paste0(param_foc1, " = ", param_val1, "; ", param_foc2, " = ", param_val2)))
   
   # outputs
-  if(output_type == "last"){
-
-    # extract last time point
-    mod_out3 <- mod_out2 %>%
-      filter(time == max(time))
-
-  } else {
-
+  if(output_type == "growth"){
+    
     # calculate virus growth rates
     mod_out3 <- virus2_growth_rate(mod_out2, first_virus,
                                    plant_time = plant_time, res_time = res_time)
+
+  } else {
+
+    # extract specified time point
+    mod_out3 <- mod_out2 %>%
+      filter(time == output_type)
 
   }
   
@@ -90,7 +90,7 @@ param_fun <- function(params_in,
 # test function
 virus2_model_sim(params_def2, "RPV", V0_b = V0, V0_c = V0,
                  plant_time = 11, res_time = 12, 
-                 inv_time = 19) %>%
+                 inv_time = 37) %>%
   virus2_model_format(params_def2) %>%
   filter(time == max(time) & variable2 %in% c("PAV_conc", "PAV_pop")) %>%
   mutate(virus_conc = log10(value + 1))
@@ -99,7 +99,7 @@ pdf("output/temp_sensitivity_analysis_fig.pdf")
 param_fun(params_def2, 
           param_foc1 = "q_nb", param_val1 = 1.1e-3, 
           param_foc2 = "q_pb", param_val2 = 7.4e-5, 
-          first_virus = "RPV") %>%
+          first_virus = "RPV", output_type = 60) %>%
   filter(variable2 %in% c("PAV_conc", "PAV_pop"))
 dev.off()
 # output should match output of above
@@ -107,7 +107,7 @@ dev.off()
 pdf("output/temp_sensitivity_analysis_fig.pdf")
 param_fun(params_def2, 
           param_foc1 = "a_n_lo", param_val1 = 1.1e-10, 
-          first_virus = "RPV") %>%
+          first_virus = "RPV", output_type = 60) %>%
   filter(variable2 %in% c("PAV_conc", "PAV_pop"))
 dev.off()
 # output should match output of above unless N supply is low
@@ -116,7 +116,7 @@ dev.off()
 param_fun(params_def2, 
           param_foc1 = "q_nb", param_val1 = 1.1e-3, 
           param_foc2 = "q_pb", param_val2 = 7.4e-5, 
-          first_virus = "RPV", output_type = "first")
+          first_virus = "RPV", output_type = "growth")
 
 
 #### days post planting ####
@@ -129,7 +129,7 @@ dpp_in <- tibble(plant_days = 1:60) %>%
 # PAV alone
 pdf("output/sensitivity_analysis_pav_1st_dpp.pdf")
 pav_1st_dpp <- dpp_in %>%
-  mutate(sim_out = pmap(., function(plant_days, res_days, inv_days) param_fun(params_in = params_def2, plant_time = plant_days, res_time = res_days, inv_time = inv_days, first_virus = "PAV", output_type = "first", V0_c = 0))) %>%
+  mutate(sim_out = pmap(., function(plant_days, res_days, inv_days) param_fun(params_in = params_def2, plant_time = plant_days, res_time = res_days, inv_time = inv_days, first_virus = "PAV", output_type = "growth", V0_c = 0))) %>%
   unnest(cols = c(sim_out))
 dev.off()
 
@@ -183,7 +183,7 @@ pav_1st_lim %>%
 np_z_ratio_vir <- as.numeric(params_def2["z_nb"]) / as.numeric(params_def2["z_pb"])
 
 # values
-z_pb_vals <- sort(c(10^seq(-18, -7, length.out = 10),
+z_pb_vals <- sort(c(10^seq(-18, -7, length.out = 20),
                     as.numeric(params_def2["z_pb"])))
 # too high Z values make Q's go negative
 
@@ -198,7 +198,7 @@ z_b_in <- tibble(param_foc1 = "z_nb",
 # PAV simulation
 pdf("output/sensitivity_analysis_pav_1st_z.pdf")
 pav_1st_z <- z_b_in %>%
-  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2) param_fun(params_def2, param_foc1 = param_foc1, param_val1 = param_val1, param_foc2 = param_foc2, param_val2 = param_val2, first_virus = "PAV", output_type = "last", V0_c = 0))) %>%
+  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2) param_fun(params_def2, param_foc1 = param_foc1, param_val1 = param_val1, param_foc2 = param_foc2, param_val2 = param_val2, first_virus = "PAV", output_type = 23, V0_c = 0))) %>%
   unnest(cols = c(sim_out))
 dev.off()
 
@@ -209,20 +209,17 @@ pav_1st_z <- read_csv("output/sensitivity_analysis_pav_1st_z.csv") %>%
 # figure
 pav_1st_z %>%
   filter(variable2 == "Q_n") %>%
-  ggplot(aes(x = param_val1, y = value2)) +
+  ggplot(aes(x = param_val1, y = value2, color = nutrient, linetype = nutrient)) +
   geom_line() +
-  facet_wrap(~ nutrient) +
   scale_x_log10() +
-  labs(x = "N content", y = "N conc.")
+  labs(x = "Virus N content", y = "Host N conc.")
 
 pav_1st_z %>%
   filter(variable2 == "Q_p") %>%
-  ggplot(aes(x = param_val2, y = value2)) +
+  ggplot(aes(x = param_val2, y = value2, color = nutrient, linetype = nutrient)) +
   geom_line() +
-  facet_wrap(~ nutrient) +
   scale_x_log10() +
-  labs(x = "P content", y = "P conc.")
-
+  labs(x = "Virus P content", y = "Host P conc.")
 
 
 #### resource supply rates ####
