@@ -646,7 +646,7 @@ plant_fig_fun <- function(mod_dat, params, q_adj_n, q_adj_p){
     scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
     scale_linetype(name = "Nutrient\nsupply") +
     scale_size_manual(values = c(1.2, 0.6), guide= "none") +
-    labs(x = "Time (days)", y = "Plant biomass (g)", title = "(A)") +
+    labs(y = "Plant biomass (g)", title = "(A)") +
     fig_theme +
     theme(axis.title.x = element_blank(),
           axis.text.x = element_blank()) +
@@ -659,31 +659,11 @@ plant_fig_fun <- function(mod_dat, params, q_adj_n, q_adj_p){
     scale_linetype(guide = "none") +
     scale_size_manual(values = c(1.2, 0.6), name = "Limiting\nnutrient",
                       labels = c("N", "P")) +
-    labs(x = "Time (days)", title = "(B)",
+    labs(title = "(B)",
          y = expression(paste("Limiting nutrient ratio (", Q[min], "/Q)", sep = ""))) +
     fig_theme +
     theme(axis.title.x = element_blank(),
           axis.text.x = element_blank())
-  
-  plant_Rn_fig <- filter(mod_dat, variable2 == "R_n") %>%
-    ggplot(aes(time, value, linetype = nutrient, color = nutrient)) +
-    geom_line(aes(size = lim_nut_H)) +
-    scale_color_viridis_d(direction = -1) +
-    scale_size_manual(values = c(1.2, 0.6)) +
-    labs(x = "Time (days)", y = "Environment N (g)", title = "(C)") +
-    fig_theme +
-    theme(legend.position = "none",
-          axis.title.x = element_blank(),
-          axis.text.x = element_blank())
-  
-  plant_Rp_fig <- filter(mod_dat, variable2 == "R_p") %>%
-    ggplot(aes(time, value, linetype = nutrient, color = nutrient)) +
-    geom_line(aes(size = lim_nut_H)) +
-    scale_color_viridis_d(direction = -1) +
-    scale_size_manual(values = c(1.2, 0.6)) +
-    labs(x = "", y = "Environment P (g)", title = "(D)") +
-    fig_theme +
-    theme(legend.position = "none")
   
   plant_Qn_fig <- filter(mod_dat, variable2 == "Q_n") %>%
     ggplot(aes(time, value)) +
@@ -696,9 +676,11 @@ plant_fig_fun <- function(mod_dat, params, q_adj_n, q_adj_p){
     geom_line(aes(linetype = nutrient, color = nutrient, size = lim_nut_H)) +
     scale_color_viridis_d(direction = -1) +
     scale_size_manual(values = c(1.2, 0.6)) +
-    labs(x = "Time (days)", y = "Plant N concentration", title = "(E)") +
+    labs(y = "Plant N concentration", title = "(C)") +
     fig_theme +
-    theme(legend.position = "none")
+    theme(legend.position = "none",
+          axis.title.x = element_blank(),
+          axis.text.x = element_blank())
   
   plant_Qp_fig <- filter(mod_dat, variable2 == "Q_p") %>%
     ggplot(aes(time, value)) +
@@ -711,7 +693,25 @@ plant_fig_fun <- function(mod_dat, params, q_adj_n, q_adj_p){
     geom_line(aes(linetype = nutrient, color = nutrient, size = lim_nut_H)) +
     scale_color_viridis_d(direction = -1) +
     scale_size_manual(values = c(1.2, 0.6)) +
-    labs(x = "", y = "Plant P concentration", title = "(F)") +
+    labs(x = "", y = "Plant P concentration", title = "(D)") +
+    fig_theme +
+    theme(legend.position = "none")
+  
+  plant_Rn_fig <- filter(mod_dat, variable2 == "R_n") %>%
+    ggplot(aes(time, value, linetype = nutrient, color = nutrient)) +
+    geom_line(aes(size = lim_nut_H)) +
+    scale_color_viridis_d(direction = -1) +
+    scale_size_manual(values = c(1.2, 0.6)) +
+    labs(x = "Days post planting", y = "Environment N (g)", title = "(E)") +
+    fig_theme +
+    theme(legend.position = "none")
+  
+  plant_Rp_fig <- filter(mod_dat, variable2 == "R_p") %>%
+    ggplot(aes(time, value, linetype = nutrient, color = nutrient)) +
+    geom_line(aes(size = lim_nut_H)) +
+    scale_color_viridis_d(direction = -1) +
+    scale_size_manual(values = c(1.2, 0.6)) +
+    labs(x = "", y = "Environment P (g)", title = "(F)") +
     fig_theme +
     theme(legend.position = "none")
   
@@ -720,20 +720,18 @@ plant_fig_fun <- function(mod_dat, params, q_adj_n, q_adj_p){
   lim_leg <- get_legend(plant_lim_fig)
   
   # combine figures
-  plant_top_fig <- plot_grid(plant_H_fig + theme(legend.position = "none"),
-                             plant_lim_fig + theme(legend.position = "none"),
-                             plant_Rn_fig,
-                             nut_leg,
-                             nrow = 1,
-                             rel_widths = c(1, 1, 1, 0.35))
-  plant_bot_fig <- plot_grid(plant_Rp_fig, plant_Qn_fig, plant_Qp_fig,
-                             lim_leg,
-                             nrow = 1,
-                             rel_widths = c(1, 1, 1, 0.35))
-  
+  plant_comb_fig <- plant_H_fig + theme(legend.position = "none") +
+    plant_lim_fig + theme(legend.position = "none") +
+    plant_Qn_fig + 
+    nut_leg +
+    plant_Qp_fig + 
+    plant_Rn_fig + 
+    plant_Rp_fig +
+    lim_leg +
+    plot_layout(ncol = 4, widths = c(1, 1, 1, 0.3))
+
   # output
-  return(plot_grid(plant_top_fig, plant_bot_fig,
-                   nrow = 2, rel_heights = c(0.85, 1)))
+  return(plant_comb_fig)
 }
 
 

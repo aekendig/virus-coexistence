@@ -122,9 +122,9 @@ param_fun(params_def2,
 #### days post planting ####
 
 # day ranges
-dpp_in <- tibble(plant_days = 1:60) %>%
-  mutate(res_days = 1,
-         inv_days = 14)
+dpp_in <- tibble(plant_days = 1:60) %>% # days before resident
+  mutate(res_days = 1, # days before invasion
+         inv_days = 1) # days after invasion
 
 # PAV alone
 pdf("output/sensitivity_analysis_pav_1st_dpp.pdf")
@@ -133,20 +133,44 @@ pav_1st_dpp <- dpp_in %>%
   unnest(cols = c(sim_out))
 dev.off()
 
-# save dataset
+# RPV alone
+pdf("output/sensitivity_analysis_rpv_1st_dpp.pdf")
+rpv_1st_dpp <- dpp_in %>%
+  mutate(sim_out = pmap(., function(plant_days, res_days, inv_days) param_fun(params_in = params_def2, plant_time = plant_days, res_time = res_days, inv_time = inv_days, first_virus = "RPV", output_type = "growth", V0_b = 0))) %>%
+  unnest(cols = c(sim_out))
+dev.off()
+
+# save datasets
 write_csv(pav_1st_dpp, "output/sensitivity_analysis_pav_1st_dpp.csv")
+write_csv(rpv_1st_dpp, "output/sensitivity_analysis_rpv_1st_dpp.csv")
+
+# re-import datasets
 pav_1st_dpp <- read_csv("output/sensitivity_analysis_pav_1st_dpp.csv") %>%
   mutate(nutrient = fct_relevel(nutrient, "low", "+N", "+P", "+N+P"))
+rpv_1st_dpp <- read_csv("output/sensitivity_analysis_rpv_1st_dpp.csv") %>%
+  mutate(nutrient = fct_relevel(nutrient, "low", "+N", "+P", "+N+P"))
 
-# figure
-pav_1st_dpp %>%
+# figures
+pav_dpp_fig <- pav_1st_dpp %>%
   filter(variable2 == "PAV_conc") %>%
   ggplot(aes(x = plant_days, y = growth, color = nutrient, linetype = nutrient)) +
   geom_hline(yintercept = 0, size = 0.25) +
-  geom_line() +
+  geom_line(size = 0.9) +
   scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
   scale_linetype(name = "Nutrient\nsupply") +
-  labs(x = "Infection time (DPP)", y = "Growth rate") +
+  labs(x = "Infection time (DPP)", y = "BYDV-PAV growth rate",
+       title = "(A)") +
+  fig_theme
+
+rpv_dpp_fig <- rpv_1st_dpp %>%
+  filter(variable2 == "RPV_conc") %>%
+  ggplot(aes(x = plant_days, y = growth, color = nutrient, linetype = nutrient)) +
+  geom_hline(yintercept = 0, size = 0.25) +
+  geom_line(size = 0.9) +
+  scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
+  scale_linetype(name = "Nutrient\nsupply") +
+  labs(x = "Infection time (DPP)", y = "CYDV-RPV growth rate",
+       title = "(B)") +
   fig_theme
 
 # plant by itself
@@ -180,14 +204,21 @@ pav_1st_lim %>%
 #### virus nutrient content ####
 
 # virus N:P
-np_z_ratio_vir <- as.numeric(params_def2["z_nb"]) / as.numeric(params_def2["z_pb"])
+np_zb_ratio_vir <- as.numeric(params_def2["z_nb"]) / as.numeric(params_def2["z_pb"])
+np_zc_ratio_vir <- as.numeric(params_def2["z_nc"]) / as.numeric(params_def2["z_pc"])
 
 # values
-z_pb_vals <- sort(c(10^seq(-18, -7, length.out = 20),
-                    as.numeric(params_def2["z_pb"])))
 # too high Z values make Q's go negative
+z_pb_vals <- sort(c(as.numeric(params_def2["z_pb"]),
+                  10^seq(-18, -12, length.out = 7),
+                  10^seq(-11, -7, length.out = 15)))
 
-z_nb_vals <- z_pb_vals * np_z_ratio_vir
+z_pc_vals <- sort(c(as.numeric(params_def2["z_pc"]),
+                    10^seq(-18, -12, length.out = 7),
+                    10^seq(-11, -7, length.out = 15)))
+
+z_nb_vals <- z_pb_vals * np_zb_ratio_vir
+z_nc_vals <- z_pc_vals * np_zc_ratio_vir
 
 # data frame
 z_b_in <- tibble(param_foc1 = "z_nb",
@@ -195,32 +226,429 @@ z_b_in <- tibble(param_foc1 = "z_nb",
                  param_foc2 = "z_pb",
                  param_val2 = z_pb_vals)
 
+z_c_in <- tibble(param_foc1 = "z_nc",
+                 param_val1 = z_nc_vals,
+                 param_foc2 = "z_pc",
+                 param_val2 = z_pc_vals)
+
 # PAV simulation
 pdf("output/sensitivity_analysis_pav_1st_z.pdf")
 pav_1st_z <- z_b_in %>%
-  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2) param_fun(params_def2, param_foc1 = param_foc1, param_val1 = param_val1, param_foc2 = param_foc2, param_val2 = param_val2, first_virus = "PAV", output_type = 23, V0_c = 0))) %>%
+  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2) param_fun(params_def2, param_foc1 = param_foc1, param_val1 = param_val1, param_foc2 = param_foc2, param_val2 = param_val2, first_virus = "PAV", output_type = 23, inv_time = 1, V0_c = 0))) %>%
   unnest(cols = c(sim_out))
 dev.off()
 
+# RPV simulation
+pdf("output/sensitivity_analysis_rpv_1st_z.pdf")
+rpv_1st_z <- z_c_in %>%
+  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2) param_fun(params_def2, param_foc1 = param_foc1, param_val1 = param_val1, param_foc2 = param_foc2, param_val2 = param_val2, first_virus = "RPV", output_type = 23, inv_time = 1, V0_b = 0))) %>%
+  unnest(cols = c(sim_out))
+dev.off()
+
+# save datasets
 write_csv(pav_1st_z, "output/sensitivity_analysis_pav_1st_z.csv")
+write_csv(rpv_1st_z, "output/sensitivity_analysis_rpv_1st_z.csv")
+
+# re-import datasets
 pav_1st_z <- read_csv("output/sensitivity_analysis_pav_1st_z.csv") %>%
   mutate(nutrient = fct_relevel(nutrient, "low", "+N", "+P", "+N+P"))
+rpv_1st_z <- read_csv("output/sensitivity_analysis_rpv_1st_z.csv") %>%
+  mutate(nutrient = fct_relevel(nutrient, "low", "+N", "+P", "+N+P"))
+
+# extract nutrient info
+pav_z_Q <- pav_1st_z %>%
+  filter(variable2 == "Q_n") %>%
+  select(param_val1, value2, nutrient) %>%
+  rename(virus_z = param_val1,
+         host_q = value2) %>%
+  mutate(internal_nutrient = "N") %>%
+  full_join(pav_1st_z %>%
+              filter(variable2 == "Q_p") %>%
+              select(param_val2, value2, nutrient) %>%
+              rename(virus_z = param_val2,
+                     host_q = value2) %>%
+              mutate(internal_nutrient = "P"))
+
+rpv_z_Q <- rpv_1st_z %>%
+  filter(variable2 == "Q_n") %>%
+  select(param_val1, value2, nutrient) %>%
+  rename(virus_z = param_val1,
+         host_q = value2) %>%
+  mutate(internal_nutrient = "N") %>%
+  full_join(rpv_1st_z %>%
+              filter(variable2 == "Q_p") %>%
+              select(param_val2, value2, nutrient) %>%
+              rename(virus_z = param_val2,
+                     host_q = value2) %>%
+              mutate(internal_nutrient = "P"))
 
 # figure
-pav_1st_z %>%
-  filter(variable2 == "Q_n") %>%
-  ggplot(aes(x = param_val1, y = value2, color = nutrient, linetype = nutrient)) +
+pav_z_fig <- ggplot(pav_z_Q, aes(x = virus_z, y = host_q, 
+                    color = nutrient, linetype = nutrient,
+                    size = internal_nutrient)) +
   geom_line() +
   scale_x_log10() +
-  labs(x = "Virus N content", y = "Host N conc.")
+  scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
+  scale_linetype(name = "Nutrient\nsupply") +
+  scale_size_manual(values = c(1.2, 0.6), name = "Internal\nnutrient")  +
+  labs(x = "BYDV-PAV nutrient content", 
+       y = "Plant nutrient concentration",
+       title = "(C)") +
+  fig_theme
 
-pav_1st_z %>%
-  filter(variable2 == "Q_p") %>%
-  ggplot(aes(x = param_val2, y = value2, color = nutrient, linetype = nutrient)) +
+rpv_z_fig <- ggplot(rpv_z_Q, aes(x = virus_z, y = host_q, 
+                    color = nutrient, linetype = nutrient,
+                    size = internal_nutrient)) +
   geom_line() +
   scale_x_log10() +
-  labs(x = "Virus P content", y = "Host P conc.")
+  scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
+  scale_linetype(name = "Nutrient\nsupply") +
+  scale_size_manual(values = c(1.2, 0.6), name = "Internal\nnutrient")  +
+  labs(x = "CYDV-RPV nutrient content", 
+       y = "Plant nutrient concentration",
+       title = "(D)") +
+  fig_theme
 
+# repeat simulations for virus growth rate
+# PAV simulation
+pdf("output/sensitivity_analysis_pav_growth_z.pdf")
+pav_growth_z <- z_b_in %>%
+  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2) param_fun(params_def2, param_foc1 = param_foc1, param_val1 = param_val1, param_foc2 = param_foc2, param_val2 = param_val2, first_virus = "PAV", output_type = "growth", inv_time = 1, V0_c = 0))) %>%
+  unnest(cols = c(sim_out))
+dev.off()
+
+# RPV simulation
+pdf("output/sensitivity_analysis_rpv_growth_z.pdf")
+rpv_growth_z <- z_c_in %>%
+  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2) param_fun(params_def2, param_foc1 = param_foc1, param_val1 = param_val1, param_foc2 = param_foc2, param_val2 = param_val2, first_virus = "RPV", output_type = "growth", inv_time = 1, V0_b = 0))) %>%
+  unnest(cols = c(sim_out))
+dev.off()
+
+# save datasets
+write_csv(pav_growth_z, "output/sensitivity_analysis_pav_growth_z.csv")
+write_csv(rpv_growth_z, "output/sensitivity_analysis_rpv_growth_z.csv")
+
+# re-import datasets
+pav_growth_z <- read_csv("output/sensitivity_analysis_pav_growth_z.csv") %>%
+  mutate(nutrient = fct_relevel(nutrient, "low", "+N", "+P", "+N+P"))
+rpv_growth_z <- read_csv("output/sensitivity_analysis_rpv_growth_z.csv") %>%
+  mutate(nutrient = fct_relevel(nutrient, "low", "+N", "+P", "+N+P"))
+
+# positive growth rates (for other simulation)
+pav_growth_pos <- pav_growth_z  %>%
+  filter(variable2 == "PAV_conc" & growth > 0)
+rpv_growth_pos <- rpv_growth_z  %>%
+  filter(variable2 == "RPV_conc" & growth > 0)
+
+# extract growth info
+pav_z_growth <- pav_growth_z %>%
+  filter(variable2 == "PAV_conc") %>%
+  select(param_val1, growth, nutrient) %>%
+  rename(virus_z = param_val1) %>%
+  mutate(internal_nutrient = "N") %>%
+  full_join(pav_growth_z %>%
+              filter(variable2 == "PAV_conc") %>%
+              select(param_val2, growth, nutrient) %>%
+              rename(virus_z = param_val2) %>%
+              mutate(internal_nutrient = "P"))
+
+rpv_z_growth <- rpv_growth_z %>%
+  filter(variable2 == "RPV_conc") %>%
+  select(param_val1, growth, nutrient) %>%
+  rename(virus_z = param_val1) %>%
+  mutate(internal_nutrient = "N") %>%
+  full_join(rpv_growth_z %>%
+              filter(variable2 == "RPV_conc") %>%
+              select(param_val2, growth, nutrient) %>%
+              rename(virus_z = param_val2) %>%
+              mutate(internal_nutrient = "P"))
+
+# figure
+pav_z_growth_fig <- ggplot(pav_z_growth, aes(x = virus_z, y = growth)) +
+  geom_hline(yintercept = 0, size = 0.25) +
+  geom_line(aes(color = nutrient, linetype = nutrient,
+                size = internal_nutrient)) +
+  scale_x_log10() +
+  scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
+  scale_linetype(name = "Nutrient\nsupply") +
+  scale_size_manual(values = c(1.2, 0.6), name = "Internal\nnutrient")  +
+  labs(x = "BYDV-PAV nutrient content", 
+       y = "BYDV-PAV growth rate",
+       title = "(A)") +
+  fig_theme
+
+rpv_z_growth_fig <- ggplot(rpv_z_growth, aes(x = virus_z, y = growth)) +
+  geom_hline(yintercept = 0, size = 0.25) +
+  geom_line(aes(color = nutrient, linetype = nutrient,
+                size = internal_nutrient)) +
+  scale_x_log10() +
+  scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
+  scale_linetype(name = "Nutrient\nsupply") +
+  scale_size_manual(values = c(1.2, 0.6), name = "Internal\nnutrient")  +
+  labs(x = "CYDV-RPV nutrient content", 
+       y = "CYDV-RPV growth rate",
+       title = "(B)") +
+  fig_theme
+
+z_growth_fig <- pav_z_growth_fig + theme(legend.position = "none") +
+  rpv_z_growth_fig + theme(legend.spacing.y = unit(0.01, "cm")) +
+  plot_layout(nrow = 1)
+
+ggsave("output/single_virus_z_growth_sensitivity_analysis.pdf", z_growth_fig,
+       width = 5, height = 2, units = "in")
+
+
+#### minimum nutrient concentrations ####
+
+# import default simulation
+plant_def <- read_csv("output/short_term_plant_simulation.csv") %>%
+  mutate(nutrient = fct_relevel(nutrient, "low", "+N", "+P", "+N+P"))
+
+# plant nutrient content at time of invasion
+q_thresh <- plant_def %>%
+  filter(time == 11 + 12 & variable2 %in% c("Q_n", "Q_p", "Qlim")) %>%
+  select(-variable) %>%
+  pivot_wider(values_from = "value",
+              names_from = "variable2") %>%
+  mutate(q_nb_thresh = Q_n * (1 - ((1-Qlim) * 
+                                  as.numeric(params_def2["g"]) + 
+                                  as.numeric(params_def2["c_b"])) /
+                             as.numeric(params_def2["r_b"])),
+         q_nc_thresh = Q_n * (1 - ((1-Qlim) * 
+                                   as.numeric(params_def2["g"]) + 
+                                   as.numeric(params_def2["c_c"])) /
+                              as.numeric(params_def2["r_c"])),
+         q_pb_thresh = Q_p * (1 - ((1-Qlim) * 
+                                   as.numeric(params_def2["g"]) + 
+                                   as.numeric(params_def2["c_b"])) /
+                              as.numeric(params_def2["r_b"])),
+         q_pc_thresh = Q_p * (1 - ((1-Qlim) * 
+                                   as.numeric(params_def2["g"]) + 
+                                   as.numeric(params_def2["c_c"])) /
+                              as.numeric(params_def2["r_c"])),
+         growth = 0)
+
+# thresholds calculated under the assumption the focal
+# nutrient is limiting virus replication
+q_thresh %>%
+  mutate(Q_nb_lim = if_else(q_nb_thresh/Q_n > 1e-6/Q_p, "yes", "no"),
+         Q_pb_lim = if_else(q_pb_thresh/Q_p > 1e-6/Q_n, "yes", "no"),
+         Q_nc_lim = if_else(q_nc_thresh/Q_n > 1e-6/Q_p, "yes", "no"),
+         Q_pc_lim = if_else(q_pc_thresh/Q_p > 1e-6/Q_n, "yes", "no"))
+# all are "yes"
+
+# values (simplified)
+q_nb_vals <- q_pb_vals <- sort(c(as.numeric(params_def2["q_nb"]),
+                                 as.numeric(params_def2["q_pb"]),
+                                 unique(q_thresh$q_nb_thresh),
+                                 unique(q_thresh$q_pb_thresh),
+                                 1e-6, 5e-6, 1e-5, 2.5e-5, 5e-5, 3e-4, 5e-4, 7e-4, 3e-3, 5e-3, 7e-3, 1e-2))
+
+q_nc_vals <- q_pc_vals <- sort(c(as.numeric(params_def2["q_nc"]),
+                                 as.numeric(params_def2["q_pc"]),
+                                 unique(q_thresh$q_nc_thresh),
+                                 unique(q_thresh$q_pc_thresh),
+                                 1e-6, 5e-6, 1e-5, 2.5e-5, 5e-5, 3e-4, 6e-4, 9e-4, 3e-3, 5e-3, 7e-3, 1e-2))
+
+# data frame
+q_b_in <- tibble(param_foc1 = "q_nb",
+                 param_val1 = q_nb_vals,
+                 param_foc2 = "q_pb",
+                 param_val2 = 1e-6) %>%
+  full_join(tibble(param_foc2 = "q_pb",
+                   param_val2 = q_pb_vals,
+                   param_foc1 = "q_nb",
+                   param_val1 = 1e-6))
+
+q_c_in <- tibble(param_foc1 = "q_nc",
+                 param_val1 = q_nc_vals,
+                 param_foc2 = "q_pc",
+                 param_val2 = 1e-6) %>%
+  full_join(tibble(param_foc2 = "q_pc",
+                   param_val2 = q_pc_vals,
+                   param_foc1 = "q_nc",
+                   param_val1 = 1e-6))
+
+# PAV simulation
+pdf("output/sensitivity_analysis_pav_2nd_q.pdf")
+pav_2nd_q <- q_b_in %>%
+  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2) param_fun(params_def2, param_foc1 = param_foc1, param_val1 = param_val1, param_foc2 = param_foc2, param_val2 = param_val2, first_virus = "RPV", output_type = "growth", V0_c = 0))) %>%
+  unnest(cols = c(sim_out))
+dev.off()
+
+pdf("output/sensitivity_analysis_rpv_2nd_q.pdf")
+rpv_2nd_q <- q_c_in %>%
+  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2) param_fun(params_def2, param_foc1 = param_foc1, param_val1 = param_val1, param_foc2 = param_foc2, param_val2 = param_val2, first_virus = "PAV", output_type = "growth", V0_b = 0))) %>%
+  unnest(cols = c(sim_out))
+dev.off()
+
+# save datasets
+write_csv(pav_2nd_q, "output/sensitivity_analysis_pav_2nd_q.csv")
+write_csv(rpv_2nd_q, "output/sensitivity_analysis_rpv_2nd_q.csv")
+
+# re-import datasets
+pav_2nd_q <- read_csv("output/sensitivity_analysis_pav_2nd_q.csv") %>%
+  mutate(nutrient = fct_relevel(nutrient, "low", "+N", "+P", "+N+P"))
+rpv_2nd_q <- read_csv("output/sensitivity_analysis_rpv_2nd_q.csv") %>%
+  mutate(nutrient = fct_relevel(nutrient, "low", "+N", "+P", "+N+P"))
+
+# preliminary figure
+pav_2nd_q %>%
+  filter(variable2 == "PAV_conc") %>%
+  ggplot(aes(x = param_val1, y = param_val2, color = growth)) +
+  geom_point(size = 10, shape = 15) +
+  facet_wrap(~ nutrient) +
+  scale_color_viridis_c(name = "Growth rate", direction = -1) +
+  scale_x_log10() +
+  scale_y_log10() +
+  labs(x = "Min N conc.", y = "Min P conc.")
+
+rpv_2nd_q %>%
+  filter(variable2 == "RPV_conc") %>%
+  ggplot(aes(x = param_val1, y = param_val2, color = growth)) +
+  geom_point(size = 10, shape = 15) +
+  facet_wrap(~ nutrient) +
+  scale_color_viridis_c(name = "Growth rate", direction = -1) +
+  scale_x_log10() +
+  scale_y_log10() +
+  labs(x = "Min N conc.", y = "Min P conc.")
+
+# extract growth info
+pav_q_growth <- pav_2nd_q %>%
+  filter(variable2 == "PAV_conc" & param_val2 == min(param_val2)) %>%
+  select(param_val1, growth, nutrient) %>%
+  rename(virus_q = param_val1) %>%
+  mutate(internal_nutrient = "N") %>%
+  full_join(pav_2nd_q %>%
+              filter(variable2 == "PAV_conc" & param_val1 == min(param_val1)) %>%
+              select(param_val2, growth, nutrient) %>%
+              rename(virus_q = param_val2) %>%
+              mutate(internal_nutrient = "P"))
+
+rpv_q_growth <- rpv_2nd_q %>%
+  filter(variable2 == "RPV_conc" & param_val2 == min(param_val2)) %>%
+  select(param_val1, growth, nutrient) %>%
+  rename(virus_q = param_val1) %>%
+  mutate(internal_nutrient = "N") %>%
+  full_join(rpv_2nd_q %>%
+              filter(variable2 == "RPV_conc" & param_val1 == min(param_val1)) %>%
+              select(param_val2, growth, nutrient) %>%
+              rename(virus_q = param_val2) %>%
+              mutate(internal_nutrient = "P"))
+
+# make q_thresh long
+q_thresh2 <- q_thresh %>%
+  pivot_longer(cols = q_nb_thresh:q_pc_thresh,
+               names_to = c("internal_nutrient", "virus"),
+               names_pattern = "q_(.)(.)_thresh",
+               values_to = "q_thresh") %>%
+  mutate(internal_nutrient = toupper(internal_nutrient))
+
+pav_q_thresh <- q_thresh2 %>%
+  filter(virus == "b")
+
+rpv_q_thresh <- q_thresh2 %>%
+  filter(virus == "c")
+
+
+# figure
+pav_q_fig <- ggplot(pav_q_growth, aes(x = virus_q, y = growth)) +
+  geom_hline(yintercept = 0, size = 0.25) +
+  geom_line(aes(color = nutrient, linetype = nutrient,
+                size = internal_nutrient)) +
+  geom_point(data = pav_q_thresh,
+             aes(x = q_thresh, color = nutrient, shape = internal_nutrient),
+             size = 2) +
+  scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
+  scale_fill_viridis_d(direction = -1, name = "Nutrient\nsupply") +
+  scale_linetype(name = "Nutrient\nsupply") +
+  scale_size_manual(values = c(1.2, 0.6), name = "Internal\nnutrient")  +
+  scale_shape_manual(values = c(19, 15), name = "Internal\nnutrient")  +
+  scale_x_log10(labels = scientific_10) +
+  labs(x = "Min. nutrient conc. for replication",
+       y = "BYDV-PAV growth rate",
+       title = "(E)") +
+  fig_theme +
+  guides(shape = guide_legend(override.aes = list(color = "black")),
+         color = guide_legend(override.aes = list(shape = NA)))
+
+rpv_q_fig <- ggplot(rpv_q_growth, aes(x = virus_q, y = growth)) +
+  geom_hline(yintercept = 0, size = 0.25) +
+  geom_line(aes(color = nutrient, linetype = nutrient,
+                size = internal_nutrient)) +
+  geom_point(data = rpv_q_thresh,
+             aes(x = q_thresh, color = nutrient, shape = internal_nutrient),
+             size = 2) +
+  scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
+  scale_fill_viridis_d(direction = -1, name = "Nutrient\nsupply") +
+  scale_linetype(name = "Nutrient\nsupply") +
+  scale_size_manual(values = c(1.2, 0.6), name = "Internal\nnutrient")  +
+  scale_shape_manual(values = c(19, 15), name = "Internal\nnutrient")  +
+  scale_x_log10(labels = scientific_10) +
+  labs(x = "Min. nutrient conc. for replication",
+       y = "CYDV-RPV growth rate",
+       title = "(F)") +
+  fig_theme +
+  guides(shape = guide_legend(override.aes = list(color = "black")),
+         color = guide_legend(override.aes = list(shape = NA)))
+
+
+#### combine figures ####
+
+# get legend
+leg1 <- get_legend(pav_dpp_fig)
+leg2 <- get_legend(pav_z_fig +
+                     guides(color = "none",
+                            fill = "none",
+                            linetype = "none"))
+leg3 <- get_legend(pav_q_fig +
+                     guides(color = "none",
+                            fill = "none",
+                            linetype = "none",
+                            size = "none"))
+
+# remove legends
+pav_dpp_fig2 <- pav_dpp_fig + theme(legend.position = "none")
+rpv_dpp_fig2 <- rpv_dpp_fig + theme(legend.position = "none")
+pav_z_fig2 <- pav_z_fig + theme(legend.position = "none")
+rpv_z_fig2 <- rpv_z_fig + theme(legend.position = "none")
+pav_q_fig2 <- pav_q_fig + theme(legend.position = "none")
+rpv_q_fig2 <- rpv_q_fig + theme(legend.position = "none")
+
+comb_fig <- pav_dpp_fig2 + rpv_dpp_fig2 + leg1 + 
+  pav_z_fig2 + rpv_z_fig2 + leg2 + 
+  pav_q_fig2 + rpv_q_fig2 + leg3 +
+  plot_layout(ncol = 3, widths = c(1, 1, 0.2))
+
+ggsave("output/single_virus_sensitivity_analysis.pdf", comb_fig,
+       width = 6, height = 6.5, units = "in")
+
+
+#### virus nutrient content and minimum nutrient concentrations ####
+
+#### start here: check that values below, try to trim ####
+
+# extract z values
+z_q_b_in <- pav_growth_pos %>%
+  select(param_foc1, param_val1, param_foc2, param_val2) %>%
+  unique() %>%
+  expand_grid(q_b_in %>%
+                rename(param_foc3 = param_foc1,
+                       param_val3 = param_val1,
+                       param_foc4 = param_foc2,
+                       param_val4 = param_val2))
+
+
+q_b_in <- tibble(param_foc1 = "q_nb",
+                 param_val1 = q_nb_vals,
+                 param_foc2 = "q_pb",
+                 param_val2 = 1e-6) %>%
+  full_join(tibble(param_foc2 = "q_pb",
+                   param_val2 = q_pb_vals,
+                   param_foc1 = "q_nb",
+                   param_val1 = 1e-6))
+
+#### older code ####
 
 #### resource supply rates ####
 
@@ -253,216 +681,6 @@ pav_inv_a %>%
   scale_y_log10() +
   labs(x = "N supply", y = "P supply")
 # growth rate increases with N, but not P
-
-
-#### minimum nutrient concentrations ####
-
-# import default simulation
-pav_2nd_def <- read_csv("output/pav_second_simulation.csv") %>%
-  mutate(nutrient = fct_relevel(nutrient, "low", "+N", "+P", "+N+P"))
-
-# plant nutrient content at time of invasion
-pav_2nd_plant_n <- pav_2nd_def %>%
-  filter(time == 11 + 12 & variable2 %in% c("Q_n", "Qlim")) %>%
-  select(-variable) %>%
-  pivot_wider(values_from = "value",
-              names_from = "variable2") %>%
-  mutate(q_thresh = Q_n * (1 - ((1-Qlim) * 
-                                  as.numeric(params_def2["g"]) + 
-                                  as.numeric(params_def2["c_b"])) /
-                             as.numeric(params_def2["r_b"])),
-         growth = 0)
-
-pav_2nd_plant_p <- pav_2nd_def %>%
-  filter(time == 11 + 12 & variable2 %in% c("Q_p", "Qlim")) %>%
-  select(-variable) %>%
-  pivot_wider(values_from = "value",
-              names_from = "variable2") %>%
-  mutate(q_thresh = Q_p * (1 - ((1-Qlim) * 
-                                  as.numeric(params_def2["g"]) + 
-                                  as.numeric(params_def2["c_b"])) /
-                             as.numeric(params_def2["r_b"])),
-         growth = 0)
-
-# thresholds calculated under the assumption the focal
-# nutrient is limiting virus replication
-pav_2nd_plant_n %>%
-  rename(q_n_thresh = q_thresh) %>%
-  full_join(pav_2nd_plant_p %>%
-              rename(q_p_thresh = q_thresh)) %>%
-  mutate(Q_n_lim = if_else(q_n_thresh/Q_n > 1e-6/Q_p, "yes", "no"),
-         Q_p_lim = if_else(q_p_thresh/Q_p > 1e-6/Q_n, "yes", "no"))
-# all are "yes"
-
-# values (simplified)
-q_nb_vals <- q_pb_vals <- sort(c(as.numeric(params_def2["q_nb"]),
-                                 as.numeric(params_def2["q_pb"]),
-                                 unique(pav_2nd_plant_n$q_thresh),
-                                 unique(pav_2nd_plant_p$q_thresh),
-                                 1e-6, 5e-6, 1e-5, 2.5e-5, 5e-5, 3e-4, 5e-4, 7e-4, 3e-3, 5e-3, 7e-3, 1e-2))
-
-# data frame
-q_b_in <- tibble(param_foc1 = "q_nb",
-                 param_val1 = q_nb_vals,
-                 param_foc2 = "q_pb",
-                 param_val2 = 1e-6) %>%
-  full_join(tibble(param_foc2 = "q_pb",
-                   param_val2 = q_pb_vals,
-                   param_foc1 = "q_nb",
-                   param_val1 = 1e-6))
-
-# PAV simulation
-pdf("output/sensitivity_analysis_pav_2nd_q.pdf")
-pav_2nd_q <- q_b_in %>%
-  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2) param_fun(params_def2, param_foc1 = param_foc1, param_val1 = param_val1, param_foc2 = param_foc2, param_val2 = param_val2, first_virus = "RPV", output_type = "first", V0_c = 0))) %>%
-  unnest(cols = c(sim_out))
-dev.off()
-
-write_csv(pav_2nd_q, "output/sensitivity_analysis_pav_2nd_q.csv")
-pav_2nd_q <- read_csv("output/sensitivity_analysis_pav_2nd_q.csv") %>%
-  mutate(nutrient = fct_relevel(nutrient, "low", "+N", "+P", "+N+P"))
-
-# figure
-pav_2nd_q %>%
-  filter(variable2 == "PAV_conc") %>%
-  ggplot(aes(x = param_val1, y = param_val2, color = growth)) +
-  geom_point(size = 10, shape = 15) +
-  facet_wrap(~ nutrient) +
-  scale_color_viridis_c(name = "Growth rate", direction = -1) +
-  scale_x_log10() +
-  scale_y_log10() +
-  labs(x = "Min N conc.", y = "Min P conc.")
-
-# N and P datasets
-pav_2nd_qn <- pav_2nd_q %>%
-  filter(variable2 == "PAV_conc" & param_val2 == min(param_val2))
-pav_2nd_qp <- pav_2nd_q %>%
-  filter(variable2 == "PAV_conc" & param_val1 == min(param_val1))
-
-# figure
-pav_2nd_qn_fig <- ggplot(pav_2nd_qn, aes(x = param_val1, y = growth)) +
-  geom_hline(yintercept = 0) +
-  geom_line(aes(color = nutrient, linetype = nutrient)) +
-  geom_point(data = pav_2nd_plant_n,
-             aes(x = q_thresh, fill = nutrient),
-             shape = 21, color = "transparent", size = 2) +
-  scale_color_viridis_d(direction = -1) +
-  scale_fill_viridis_d(direction = -1) +
-  scale_linetype(name = "Nutrient\nsupply") +
-  scale_x_log10(labels = scientific_10) +
-  labs(x = "Min. N conc. for virus replication",
-       y = "Growth rate when rare",
-       title = "(A)") +
-  fig_theme +
-  theme(legend.position = "none")
-
-pav_2nd_qp_fig <- ggplot(pav_2nd_qp, aes(x = param_val2, y = growth)) +
-  geom_hline(yintercept = 0) +
-  geom_line(aes(color = nutrient, linetype = nutrient)) +
-  geom_point(data = pav_2nd_plant_p,
-             aes(x = q_thresh, fill = nutrient), 
-             shape = 21, color = "transparent", size = 2) +
-  scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
-  scale_fill_viridis_d(direction = -1, name = "Nutrient\nsupply") +
-  scale_linetype(name = "Nutrient\nsupply") +
-  scale_x_log10(labels = scientific_10) +
-  labs(x = "Min. P conc. for virus replication",
-       y = "Growth rate when rare",
-       title = "(B)") +
-  fig_theme +
-  theme(axis.title.y = element_blank(),
-        axis.text.y = element_blank())
-
-pav_2nd_fig <- pav_2nd_qn_fig + pav_2nd_qp_fig
-
-ggsave("output/pav_growth_rate_q.pdf", pav_2nd_fig,
-       width = 5.5, height = 2.5, units = "in")
-
-# RPV data frame
-q_c_in <- tibble(param_foc1 = "q_nc",
-                 param_val1 = q_nb_vals) %>%
-  expand_grid(tibble(param_foc2 = "q_pc",
-                     param_val2 = q_pb_vals))
-
-# RPV simulation
-pdf("output/sensitivity_analysis_rpv_2nd_q.pdf")
-rpv_2nd_q <- q_c_in %>%
-  mutate(sim_out = pmap(., function(param_foc1, param_val1, param_foc2, param_val2) param_fun(params_def2, param_foc1 = param_foc1, param_val1 = param_val1, param_foc2 = param_foc2, param_val2 = param_val2, first_virus = "PAV", output_type = "first", V0_b = 0))) %>%
-  unnest(cols = c(sim_out))
-dev.off()
-
-write_csv(rpv_2nd_q, "output/sensitivity_analysis_rpv_2nd_q.csv")
-rpv_2nd_q <- read_csv("output/sensitivity_analysis_rpv_2nd_q.csv") %>%
-  mutate(nutrient = fct_relevel(nutrient, "low", "+N", "+P", "+N+P"))
-
-# figure
-rpv_2nd_q %>%
-  filter(variable2 == "RPV_conc") %>%
-  ggplot(aes(x = param_val1, y = param_val2, color = growth)) +
-  geom_point(size = 10, shape = 15) +
-  facet_wrap(~ nutrient) +
-  scale_color_viridis_c(name = "Growth rate", direction = -1) +
-  scale_x_log10() +
-  scale_y_log10() +
-  labs(x = "Min N conc.", y = "Min P conc.")
-
-# N and P datasets
-rpv_2nd_qn <- rpv_2nd_q %>%
-  filter(variable2 == "RPV_conc" & param_val2 == min(param_val2))
-rpv_2nd_qp <- rpv_2nd_q %>%
-  filter(variable2 == "RPV_conc" & param_val1 == min(param_val1))
-
-# plant min labels
-Qmin_n_lab <- tibble(param_val1 = as.numeric(params_def2["Qmin_n"]), 
-                     growth = max(rpv_2nd_qn$growth), 
-                     label = "Q['min,N']")
-
-Qmin_p_lab <- tibble(param_val2 = as.numeric(params_def2["Qmin_p"]), 
-                     growth = max(rpv_2nd_qp$growth), 
-                     label = "Q['min,P']")
-
-# figure
-rpv_2nd_qn_fig <- ggplot(rpv_2nd_qn, aes(x = param_val1, y = growth)) +
-  geom_hline(yintercept = 0) +
-  geom_vline(xintercept = as.numeric(params_def2["Qmin_n"]), 
-             color = "black", linetype = "dotted") +
-  geom_line(aes(color = nutrient, linetype = nutrient)) +
-  geom_text(data = Qmin_n_lab, aes(label = label), 
-            hjust = 0, vjust = 0.4, parse = T,
-            color = "black", size = 3) +
-  scale_color_viridis_d(direction = -1) +
-  scale_linetype(name = "Nutrient\nsupply") +
-  scale_x_log10(labels = scientific_10) +
-  labs(x = "Min. N conc. for\nvirus replication",
-       y = "Growth rate when rare",
-       title = "(A)") +
-  fig_theme +
-  theme(legend.position = "none")
-
-rpv_2nd_qp_fig <- ggplot(rpv_2nd_qp, aes(x = param_val2, y = growth)) +
-  geom_hline(yintercept = 0) +
-  geom_vline(xintercept = as.numeric(params_def2["Qmin_p"]), 
-             color = "black", linetype = "dotted") +
-  geom_line(aes(color = nutrient, linetype = nutrient)) +
-  geom_text(data = Qmin_p_lab, aes(label = label), 
-            hjust = 0, vjust = 0.4, parse = T,
-            color = "black", size = 3) +
-  scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
-  scale_linetype(name = "Nutrient\nsupply") +
-  scale_x_log10(labels = scientific_10) +
-  labs(x = "Min. P conc. for\nvirus replication",
-       y = "Growth rate when rare",
-       title = "(B)") +
-  fig_theme +
-  theme(axis.title.y = element_blank(),
-        axis.text.y = element_blank())
-
-rpv_2nd_fig <- rpv_2nd_qn_fig + rpv_2nd_qp_fig
-
-ggsave("output/rpv_growth_rate_q.pdf", rpv_2nd_fig,
-       width = 5.5, height = 2.5, units = "in")
-
-
 
 
 #### minimum nutrient concentrations and virus nutrient content ####
@@ -562,9 +780,6 @@ rpv_inv_z_q %>%
   scale_x_log10() +
   labs(x = "Resident min. N conc.", y = "Resident growth rate when rare")
 
-
-
-#### older code #### 
 
 #### minimum nutrient concentration (q_n)/nutrient content of virus (z_n) ####
 

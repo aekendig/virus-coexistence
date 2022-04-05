@@ -51,6 +51,12 @@ pdf("output/short_term_plant_simulation_figure.pdf", width = 6.5, height = 3.75)
 plant_fig_fun(short_term_plant, params_def2, -7e-4, -4e-4)
 dev.off()
 
+# save simulation
+write_csv(short_term_plant, "output/short_term_plant_simulation.csv")
+
+
+#### note: haven't run any of the below with 60 dpp ####
+
 
 #### single virus simulations ####
 
