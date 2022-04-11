@@ -471,8 +471,9 @@ unique(samp2$PAVmax)
 
 # time and dpi conversion
 times = tibble(time = c(1,2,3,4,5),
-               dpiR = c(17,20,24,28,31),
-               dpiI = c(5,8,12,16,19))
+               dpiI = c(5,8,12,16,19)) %>%
+  mutate(dpiR = dpiI + 12,
+         dpp = dpiR + 11,)
 
 # clean data for analyses
 samp3 <- samp2 %>%

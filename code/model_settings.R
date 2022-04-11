@@ -646,7 +646,7 @@ plant_fig_fun <- function(mod_dat, params, q_adj_n, q_adj_p){
     scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
     scale_linetype(name = "Nutrient\nsupply") +
     scale_size_manual(values = c(1.2, 0.6), guide= "none") +
-    labs(y = "Plant biomass (g)", title = "(A)") +
+    labs(y = "Plant biomass (g)") +
     fig_theme +
     theme(axis.title.x = element_blank(),
           axis.text.x = element_blank()) +
@@ -659,8 +659,7 @@ plant_fig_fun <- function(mod_dat, params, q_adj_n, q_adj_p){
     scale_linetype(guide = "none") +
     scale_size_manual(values = c(1.2, 0.6), name = "Limiting\nnutrient",
                       labels = c("N", "P")) +
-    labs(title = "(B)",
-         y = expression(paste("Limiting nutrient ratio (", Q[min], "/Q)", sep = ""))) +
+    labs(y = expression(paste("Limiting nutrient ratio (", Q[min], "/Q)", sep = ""))) +
     fig_theme +
     theme(axis.title.x = element_blank(),
           axis.text.x = element_blank())
@@ -676,7 +675,7 @@ plant_fig_fun <- function(mod_dat, params, q_adj_n, q_adj_p){
     geom_line(aes(linetype = nutrient, color = nutrient, size = lim_nut_H)) +
     scale_color_viridis_d(direction = -1) +
     scale_size_manual(values = c(1.2, 0.6)) +
-    labs(y = "Plant N concentration", title = "(C)") +
+    labs(y = "Plant N concentration") +
     fig_theme +
     theme(legend.position = "none",
           axis.title.x = element_blank(),
@@ -693,7 +692,7 @@ plant_fig_fun <- function(mod_dat, params, q_adj_n, q_adj_p){
     geom_line(aes(linetype = nutrient, color = nutrient, size = lim_nut_H)) +
     scale_color_viridis_d(direction = -1) +
     scale_size_manual(values = c(1.2, 0.6)) +
-    labs(x = "", y = "Plant P concentration", title = "(D)") +
+    labs(x = "", y = "Plant P concentration") +
     fig_theme +
     theme(legend.position = "none")
   
@@ -702,7 +701,7 @@ plant_fig_fun <- function(mod_dat, params, q_adj_n, q_adj_p){
     geom_line(aes(size = lim_nut_H)) +
     scale_color_viridis_d(direction = -1) +
     scale_size_manual(values = c(1.2, 0.6)) +
-    labs(x = "Days post planting", y = "Environment N (g)", title = "(E)") +
+    labs(x = "Days post planting", y = "Environment N (g)") +
     fig_theme +
     theme(legend.position = "none")
   
@@ -711,7 +710,7 @@ plant_fig_fun <- function(mod_dat, params, q_adj_n, q_adj_p){
     geom_line(aes(size = lim_nut_H)) +
     scale_color_viridis_d(direction = -1) +
     scale_size_manual(values = c(1.2, 0.6)) +
-    labs(x = "", y = "Environment P (g)", title = "(F)") +
+    labs(x = "", y = "Environment P (g)") +
     fig_theme +
     theme(legend.position = "none")
   
@@ -728,7 +727,9 @@ plant_fig_fun <- function(mod_dat, params, q_adj_n, q_adj_p){
     plant_Rn_fig + 
     plant_Rp_fig +
     lim_leg +
-    plot_layout(ncol = 4, widths = c(1, 1, 1, 0.3))
+    plot_layout(ncol = 4, widths = c(1, 1, 1, 0.3), tag_level = 'new') + 
+    plot_annotation(tag_levels = list(c("A", "B", "C", "", "D", "E", "F", ""))) & 
+    theme(plot.tag = element_text(size = 8, face = "bold"))
 
   # output
   return(plant_comb_fig)

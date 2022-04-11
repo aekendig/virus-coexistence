@@ -159,8 +159,7 @@ pav_dpp_fig <- pav_1st_dpp %>%
   geom_line(size = 0.9) +
   scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
   scale_linetype(name = "Nutrient\nsupply") +
-  labs(x = "Infection time (DPP)", y = "BYDV-PAV growth rate",
-       title = "(A)") +
+  labs(x = "Infection time (DPP)", y = "BYDV-PAV growth rate") +
   fig_theme
 
 rpv_dpp_fig <- rpv_1st_dpp %>%
@@ -170,8 +169,7 @@ rpv_dpp_fig <- rpv_1st_dpp %>%
   geom_line(size = 0.9) +
   scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
   scale_linetype(name = "Nutrient\nsupply") +
-  labs(x = "Infection time (DPP)", y = "CYDV-RPV growth rate",
-       title = "(B)") +
+  labs(x = "Infection time (DPP)", y = "CYDV-RPV growth rate") +
   fig_theme
 
 # plant by itself
@@ -293,8 +291,7 @@ pav_z_fig <- ggplot(pav_z_Q, aes(x = virus_z, y = host_q,
   scale_linetype(name = "Nutrient\nsupply") +
   scale_size_manual(values = c(1.2, 0.6), name = "Internal\nnutrient")  +
   labs(x = "BYDV-PAV N content", 
-       y = "Plant nutrient concentration",
-       title = "(C)") +
+       y = "Plant nutrient concentration") +
   fig_theme
 
 rpv_z_fig <- ggplot(rpv_z_Q, aes(x = virus_z, y = host_q, 
@@ -306,8 +303,7 @@ rpv_z_fig <- ggplot(rpv_z_Q, aes(x = virus_z, y = host_q,
   scale_linetype(name = "Nutrient\nsupply") +
   scale_size_manual(values = c(1.2, 0.6), name = "Internal\nnutrient")  +
   labs(x = "CYDV-RPV N content", 
-       y = "Plant nutrient concentration",
-       title = "(D)") +
+       y = "Plant nutrient concentration") +
   fig_theme
 
 # repeat simulations for virus growth rate
@@ -345,55 +341,43 @@ rpv_growth_pos <- rpv_growth_z  %>%
 pav_z_growth <- pav_growth_z %>%
   filter(variable2 == "PAV_conc") %>%
   select(param_val1, growth, nutrient) %>%
-  rename(virus_z = param_val1) %>%
-  mutate(internal_nutrient = "N") %>%
-  full_join(pav_growth_z %>%
-              filter(variable2 == "PAV_conc") %>%
-              select(param_val1, growth, nutrient) %>%
-              rename(virus_z = param_val1) %>%
-              mutate(internal_nutrient = "P"))
+  rename(virus_z = param_val1)
 
 rpv_z_growth <- rpv_growth_z %>%
   filter(variable2 == "RPV_conc") %>%
   select(param_val1, growth, nutrient) %>%
-  rename(virus_z = param_val1) %>%
-  mutate(internal_nutrient = "N") %>%
-  full_join(rpv_growth_z %>%
-              filter(variable2 == "RPV_conc") %>%
-              select(param_val1, growth, nutrient) %>%
-              rename(virus_z = param_val1) %>%
-              mutate(internal_nutrient = "P"))
+  rename(virus_z = param_val1)
 
 # figure
 pav_z_growth_fig <- ggplot(pav_z_growth, aes(x = virus_z, y = growth)) +
   geom_hline(yintercept = 0, size = 0.25) +
-  geom_line(aes(color = nutrient, linetype = nutrient,
-                size = internal_nutrient)) +
+  geom_line(aes(color = nutrient, linetype = nutrient),
+            size = 0.9) +
   scale_x_log10() +
   scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
   scale_linetype(name = "Nutrient\nsupply") +
   scale_size_manual(values = c(1.2, 0.6), name = "Internal\nnutrient")  +
   labs(x = "BYDV-PAV N content", 
-       y = "BYDV-PAV growth rate",
-       title = "(A)") +
+       y = "BYDV-PAV growth rate") +
   fig_theme
 
 rpv_z_growth_fig <- ggplot(rpv_z_growth, aes(x = virus_z, y = growth)) +
   geom_hline(yintercept = 0, size = 0.25) +
-  geom_line(aes(color = nutrient, linetype = nutrient,
-                size = internal_nutrient)) +
+  geom_line(aes(color = nutrient, linetype = nutrient),
+            size = 0.9) +
   scale_x_log10() +
   scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
   scale_linetype(name = "Nutrient\nsupply") +
   scale_size_manual(values = c(1.2, 0.6), name = "Internal\nnutrient")  +
   labs(x = "CYDV-RPV N content", 
-       y = "CYDV-RPV growth rate",
-       title = "(B)") +
+       y = "CYDV-RPV growth rate") +
   fig_theme
 
 z_growth_fig <- pav_z_growth_fig + theme(legend.position = "none") +
   rpv_z_growth_fig + theme(legend.spacing.y = unit(0.01, "cm")) +
-  plot_layout(nrow = 1)
+  plot_layout(nrow = 1) + 
+  plot_annotation(tag_levels = 'A') & 
+  theme(plot.tag = element_text(size = 8, face = "bold"))
 
 ggsave("output/single_virus_z_growth_sensitivity_analysis.pdf", z_growth_fig,
        width = 5, height = 2, units = "in")
@@ -567,8 +551,7 @@ pav_q_fig <- ggplot(pav_q_growth, aes(x = virus_q, y = growth)) +
   scale_shape_manual(values = c(19, 15), name = "Internal\nnutrient")  +
   scale_x_log10(labels = scientific_10) +
   labs(x = "Min. nutrient conc. for replication",
-       y = "BYDV-PAV growth rate",
-       title = "(E)") +
+       y = "BYDV-PAV growth rate") +
   fig_theme +
   guides(shape = guide_legend(override.aes = list(color = "black")),
          color = guide_legend(override.aes = list(shape = NA)))
@@ -587,8 +570,7 @@ rpv_q_fig <- ggplot(rpv_q_growth, aes(x = virus_q, y = growth)) +
   scale_shape_manual(values = c(19, 15), name = "Internal\nnutrient")  +
   scale_x_log10(labels = scientific_10) +
   labs(x = "Min. nutrient conc. for replication",
-       y = "CYDV-RPV growth rate",
-       title = "(F)") +
+       y = "CYDV-RPV growth rate") +
   fig_theme +
   guides(shape = guide_legend(override.aes = list(color = "black")),
          color = guide_legend(override.aes = list(shape = NA)))
@@ -619,7 +601,9 @@ rpv_q_fig2 <- rpv_q_fig + theme(legend.position = "none")
 comb_fig <- pav_dpp_fig2 + rpv_dpp_fig2 + leg1 + 
   pav_z_fig2 + rpv_z_fig2 + leg2 + 
   pav_q_fig2 + rpv_q_fig2 + leg3 +
-  plot_layout(ncol = 3, widths = c(1, 1, 0.2))
+  plot_layout(ncol = 3, widths = c(1, 1, 0.2), tag_level = 'new') + 
+  plot_annotation(tag_levels = list(c("A", "B", "", "C", "D", "", "E", "F", ""))) & 
+  theme(plot.tag = element_text(size = 8, face = "bold"))
 
 ggsave("output/single_virus_sensitivity_analysis.pdf", comb_fig,
        width = 6, height = 6.5, units = "in")
@@ -674,55 +658,136 @@ rpv_res_qz <- read_csv("output/sensitivity_analysis_rpv_res_q_z.csv") %>%
   mutate(nutrient = fct_relevel(nutrient, "low", "+N", "+P", "+N+P"))
 
 # subset for each q gradient
-pav_res_qz_n <- pav_res_qz %>%
-  filter(variable2 == "RPV_conc" & param_val4 == min(param_val4))
-pav_res_qz_p <- pav_res_qz %>%
-  filter(variable2 == "RPV_conc" & param_val3 == min(param_val3))
-rpv_res_qz_n <- rpv_res_qz %>%
-  filter(variable2 == "PAV_conc" & param_val4 == min(param_val4))
-rpv_res_qz_p <- rpv_res_qz %>%
-  filter(variable2 == "PAV_conc" & param_val3 == min(param_val3))
+pav_res_qz_n_low <- pav_res_qz %>%
+  filter(variable2 == "RPV_conc" & param_val4 == min(param_val4) & nutrient == "low")
+pav_res_qz_p_low <- pav_res_qz %>%
+  filter(variable2 == "RPV_conc" & param_val3 == min(param_val3) & nutrient == "low")
+rpv_res_qz_n_low <- rpv_res_qz %>%
+  filter(variable2 == "PAV_conc" & param_val4 == min(param_val4) & nutrient == "low")
+rpv_res_qz_p_low <- rpv_res_qz %>%
+  filter(variable2 == "PAV_conc" & param_val3 == min(param_val3) & nutrient == "low")
 
-# figure
-ggplot(pav_res_qz_n, aes(x = param_val1, y = param_val3, color = growth)) +
-  geom_point(size = 20, shape = 15) +
-  scale_color_gradientn(colours = coolwarm(100), limits = c(-0.7, 0.7),
+pav_res_qz_n_n <- pav_res_qz %>%
+  filter(variable2 == "RPV_conc" & param_val4 == min(param_val4) & nutrient == "+N")
+pav_res_qz_p_n <- pav_res_qz %>%
+  filter(variable2 == "RPV_conc" & param_val3 == min(param_val3) & nutrient == "+N")
+rpv_res_qz_n_n <- rpv_res_qz %>%
+  filter(variable2 == "PAV_conc" & param_val4 == min(param_val4) & nutrient == "+N")
+rpv_res_qz_p_n <- rpv_res_qz %>%
+  filter(variable2 == "PAV_conc" & param_val3 == min(param_val3) & nutrient == "+N")
+
+pav_res_qz_n_p <- pav_res_qz %>%
+  filter(variable2 == "RPV_conc" & param_val4 == min(param_val4) & nutrient == "+P")
+pav_res_qz_p_p <- pav_res_qz %>%
+  filter(variable2 == "RPV_conc" & param_val3 == min(param_val3) & nutrient == "+P")
+rpv_res_qz_n_p <- rpv_res_qz %>%
+  filter(variable2 == "PAV_conc" & param_val4 == min(param_val4) & nutrient == "+P")
+rpv_res_qz_p_p <- rpv_res_qz %>%
+  filter(variable2 == "PAV_conc" & param_val3 == min(param_val3) & nutrient == "+P")
+
+pav_res_qz_n_np <- pav_res_qz %>%
+  filter(variable2 == "RPV_conc" & param_val4 == min(param_val4) & nutrient == "+N+P")
+pav_res_qz_p_np <- pav_res_qz %>%
+  filter(variable2 == "RPV_conc" & param_val3 == min(param_val3) & nutrient == "+N+P")
+rpv_res_qz_n_np <- rpv_res_qz %>%
+  filter(variable2 == "PAV_conc" & param_val4 == min(param_val4) & nutrient == "+N+P")
+rpv_res_qz_p_np <- rpv_res_qz %>%
+  filter(variable2 == "PAV_conc" & param_val3 == min(param_val3) & nutrient == "+N+P")
+
+# figures
+rpv_inv_n_low_fig <- ggplot(pav_res_qz_n_low, aes(x = param_val1, y = param_val3, fill = growth)) +
+  geom_tile(width = 1, height = 1) +
+  scale_fill_gradientn(colours = coolwarm(100), limits = c(-0.7, 0.7),
                         name = "CYDV-RPV\ngrowth rate") +
   scale_x_log10() +
   scale_y_log10() +
   labs(x = "BYDV-PAV N content", y = "CYDV-RPV min. N conc.") +
   fig_theme
+
+rpv_inv_n_n_fig <- rpv_inv_n_low_fig %+% pav_res_qz_n_n
+rpv_inv_n_p_fig <- rpv_inv_n_low_fig %+% pav_res_qz_n_p
+rpv_inv_n_np_fig <- rpv_inv_n_low_fig %+% pav_res_qz_n_np
   
-ggplot(pav_res_qz_p, aes(x = param_val2, y = param_val4, color = growth)) +
-  geom_point(size = 20, shape = 15) +
-  scale_color_gradientn(colours = coolwarm(100), limits = c(-0.7, 0.7),
+rpv_inv_p_low_fig <- ggplot(pav_res_qz_p_low, aes(x = param_val2, y = param_val4, fill = growth)) +
+  geom_tile(width = 1, height = 1) +
+  scale_fill_gradientn(colours = coolwarm(100), limits = c(-0.7, 0.7),
                         name = "CYDV-RPV\ngrowth rate") +
   scale_x_log10() +
   scale_y_log10() +
   labs(x = "BYDV-PAV P content", y = "CYDV-RPV min. P conc.") +
   fig_theme
 
-ggplot(rpv_res_qz_n, aes(x = param_val1, y = param_val3, color = growth)) +
-  geom_point(size = 20, shape = 15) +
-  scale_color_gradientn(colours = coolwarm(100), limits = c(-0.7, 0.7),
+rpv_inv_p_n_fig <- rpv_inv_p_low_fig %+% pav_res_qz_p_n
+rpv_inv_p_p_fig <- rpv_inv_p_low_fig %+% pav_res_qz_p_p
+rpv_inv_p_np_fig <- rpv_inv_p_low_fig %+% pav_res_qz_p_np
+
+pav_inv_n_low_fig <- ggplot(rpv_res_qz_n_low, aes(x = param_val1, y = param_val3, fill = growth)) +
+  geom_tile(width = 1, height = 1) +
+  scale_fill_gradientn(colours = coolwarm(100), limits = c(-0.7, 0.7),
                         name = "BYDV-PAV\ngrowth rate") +
   scale_x_log10() +
   scale_y_log10() +
   labs(x = "CYDV-RPV N content", y = "BYDV-PAV min. N conc.") +
   fig_theme
 
-ggplot(rpv_res_qz_p, aes(x = param_val2, y = param_val4, color = growth)) +
-  geom_point(size = 20, shape = 15) +
-  scale_color_gradientn(colours = coolwarm(100), limits = c(-0.7, 0.7),
+pav_inv_n_n_fig <- pav_inv_n_low_fig %+% pav_res_qz_n_n
+pav_inv_n_p_fig <- pav_inv_n_low_fig %+% pav_res_qz_n_p
+pav_inv_n_np_fig <- pav_inv_n_low_fig %+% pav_res_qz_n_np
+
+pav_inv_p_low_fig <- ggplot(rpv_res_qz_p_low, aes(x = param_val2, y = param_val4, fill = growth)) +
+  geom_tile(width = 1, height = 1) +
+  scale_fill_gradientn(colours = coolwarm(100), limits = c(-0.7, 0.7),
                         name = "BYDV-PAV\ngrowth rate") +
   scale_x_log10() +
   scale_y_log10() +
   labs(x = "CYDV-RPV P content", y = "BYDV-PAV min. P conc.") +
   fig_theme
 
+pav_inv_p_n_fig <- pav_inv_p_low_fig %+% pav_res_qz_p_n
+pav_inv_p_p_fig <- pav_inv_p_low_fig %+% pav_res_qz_p_p
+pav_inv_p_np_fig <- pav_inv_p_low_fig %+% pav_res_qz_p_np
 
-#### start here ####
-# compile and format figure
+# combine figures
+qz_low_fig <- pav_inv_n_low_fig + theme(legend.position = "none") +
+  pav_inv_p_low_fig +
+  rpv_inv_n_low_fig + theme(legend.position = "none") +
+  rpv_inv_p_low_fig +
+  plot_layout(ncol = 2) + 
+  plot_annotation(tag_levels = 'A') & 
+  theme(plot.tag = element_text(size = 8, face = "bold"))
+
+qz_n_fig <- pav_inv_n_n_fig + theme(legend.position = "none") +
+  pav_inv_p_n_fig +
+  rpv_inv_n_n_fig + theme(legend.position = "none") +
+  rpv_inv_p_n_fig +
+  plot_layout(ncol = 2) + 
+  plot_annotation(tag_levels = 'A') & 
+  theme(plot.tag = element_text(size = 8, face = "bold"))
+
+qz_p_fig <- pav_inv_n_p_fig + theme(legend.position = "none") +
+  pav_inv_p_p_fig +
+  rpv_inv_n_p_fig + theme(legend.position = "none") +
+  rpv_inv_p_p_fig +
+  plot_layout(ncol = 2) + 
+  plot_annotation(tag_levels = 'A') & 
+  theme(plot.tag = element_text(size = 8, face = "bold"))
+
+qz_np_fig <- pav_inv_n_np_fig + theme(legend.position = "none") +
+  pav_inv_p_np_fig +
+  rpv_inv_n_np_fig + theme(legend.position = "none") +
+  rpv_inv_p_np_fig +
+  plot_layout(ncol = 2) + 
+  plot_annotation(tag_levels = 'A') & 
+  theme(plot.tag = element_text(size = 8, face = "bold"))
+
+ggsave("output/virus_invasion_low_sensitivity_analysis.pdf", qz_low_fig,
+       width = 6.5, height = 5, units = "in")
+ggsave("output/virus_invasion_n_sensitivity_analysis.pdf", qz_n_fig,
+       width = 6.5, height = 5, units = "in")
+ggsave("output/virus_invasion_p_sensitivity_analysis.pdf", qz_p_fig,
+       width = 6.5, height = 5, units = "in")
+ggsave("output/virus_invasion_np_sensitivity_analysis.pdf", qz_np_fig,
+       width = 6.5, height = 5, units = "in")
   
 
 

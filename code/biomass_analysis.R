@@ -1,5 +1,7 @@
 ## Goal: analyze plant growth data from exp2
 
+## moved this code to qPCR_analysis.R - don't need this script anymore
+
 
 #### set up ####
 
