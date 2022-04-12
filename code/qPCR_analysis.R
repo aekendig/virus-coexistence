@@ -227,18 +227,23 @@ RPVdat <- dat5 %>%
          quant.plant = quant.mg * shoot_mass.g,
          log_quant.plant = log(quant.plant + 1))
 
-# add inoculation treatment to biomass data
-biodat <- dat5 %>%
+# set for nutrients
+bioInvDat <- dat5 %>%
+  filter(invasion == "I") %>%
+  mutate(log_shoot_mass.g = log(shoot_mass.g))
+
+# set for residents
+bioResDat <- dat5 %>%
   mutate(inoculation = paste(invasion, first_inoculation, sep = "_"),
          log_shoot_mass.g = log(shoot_mass.g))
 
-ggplot(biodat, aes(x = dpp, y = shoot_mass.g, color = nutrient)) +
+ggplot(bioInvDat, aes(x = dpp, y = shoot_mass.g, color = nutrient)) +
   stat_summary(geom = "errorbar", width = 0, fun.data = "mean_se") +
   stat_summary(geom = "line", fun = "mean") +
   stat_summary(geom = "point", fun = "mean") +
-  facet_wrap(~ inoculation)
+  facet_wrap(~ first_inoculation)
 
-ggplot(biodat, aes(x = dpp, y = log_shoot_mass.g, color = nutrient)) +
+ggplot(bioResDat, aes(x = dpp, y = shoot_mass.g, color = nutrient)) +
   stat_summary(geom = "errorbar", width = 0, fun.data = "mean_se") +
   stat_summary(geom = "line", fun = "mean") +
   stat_summary(geom = "point", fun = "mean") +
@@ -247,9 +252,39 @@ ggplot(biodat, aes(x = dpp, y = log_shoot_mass.g, color = nutrient)) +
 
 #### biomass model ####
 
-bio_mod <- glmmTMB(log_shoot_mass.g ~ highN * highP * inoculation + (1|set) + (1|time), data = biodat)
-summary(bio_mod)
-mod_sum(bio_mod, "biomass_model")
+# nutrients, established virus
+bioInvMod <- glmmTMB(log_shoot_mass.g ~ highN * highP * first_inoculation + (1|time), data = bioInvDat)
+# model won't converge with set as a random effect
+summary(bioInvMod)
+mod_sum(bioInvMod, "invasion_biomass_model")
+
+bioResMod <- glmmTMB(log_shoot_mass.g ~ highN * highP * inoculation + (1|set) + (1|time), data = bioResDat)
+summary(bioResMod)
+mod_sum(bioResMod, "resident_biomass_model")
+
+# values for text
+
+# N effect
+noNBio <- exp(fixef(bioInvMod)$cond[1])
+NBio <- exp(fixef(bioInvMod)$cond[1] + fixef(bioInvMod)$cond[2])
+100 * (NBio - noNBio) / noNBio
+
+# P, inoculation interactions
+intcpt <- exp(fixef(bioResMod)$cond[1])
+PBio <- exp(fixef(bioResMod)$cond[1] + fixef(bioResMod)$cond[3])
+100 * (PBio - intcpt) / intcpt # increase
+
+noPRPVBio <- exp(fixef(bioResMod)$cond[1] + fixef(bioResMod)$cond[6])
+PRPVBio <- exp(fixef(bioResMod)$cond[1] + fixef(bioResMod)$cond[3] + fixef(bioResMod)$cond[6] + fixef(bioResMod)$cond[13])
+100 * (PRPVBio - noPRPVBio) / noPRPVBio # decrease
+
+noPPAVBio <- exp(fixef(bioResMod)$cond[1] + fixef(bioResMod)$cond[5])
+PPAVBio <- exp(fixef(bioResMod)$cond[1] + fixef(bioResMod)$cond[3] + fixef(bioResMod)$cond[5] + fixef(bioResMod)$cond[12])
+100 * (PPAVBio - noPPAVBio) / noPPAVBio # decrease
+
+noPInvBio <- exp(fixef(bioResMod)$cond[1] + fixef(bioResMod)$cond[4])
+PInvBio <- exp(fixef(bioResMod)$cond[1] + fixef(bioResMod)$cond[3] + fixef(bioResMod)$cond[4] + fixef(bioResMod)$cond[11])
+100 * (PInvBio - noPInvBio) / noPInvBio # smaller decrease
 
 
 #### estimate r and N0 parameters ####
