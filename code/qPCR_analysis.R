@@ -509,6 +509,32 @@ AIC(RPVURmod3, RPVURmod4) # polynomial
 mod_sum(PAVURmod4, "pav_established_per_plant_model")
 mod_sum(RPVURmod3, "rpv_established_per_plant_model")
 
+# effect sizes
+
+# function to exponentiate effects
+eff_exp_fun <- function(mod, coef1, coef2){
+  
+  titer1 <- exp(fixef(mod)$cond[coef1])
+  titer2 <- exp(fixef(mod)$cond[coef1] + fixef(mod)$cond[coef2])
+  return(100 * (titer2 - titer1) / titer1)
+  
+}
+
+# PAV establishment lower for single than resident
+# titer
+eff_exp_fun(PAVURmod2, 1, 4)
+
+# virions/plant
+eff_exp_fun(PAVURmod4, 1, 4)
+
+# N reduces RPV's squared term
+# titer
+100* fixef(RPVURmod1)$cond[11]/fixef(RPVURmod1)$cond[6]
+
+# PAV establishment declines with time
+# virions/plant
+eff_exp_fun(PAVURmod4, 1, 5)
+
 
 #### visualize ####
 
