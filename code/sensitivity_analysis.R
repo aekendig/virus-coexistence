@@ -701,7 +701,7 @@ rpv_inv_n_low_fig <- ggplot(pav_res_qz_n_low, aes(x = param_val1, y = param_val3
                         name = "CYDV-RPV\ngrowth rate") +
   scale_x_log10() +
   scale_y_log10() +
-  labs(x = "BYDV-PAV N content", y = "CYDV-RPV min. N conc.") +
+  labs(x = "BYDV-PAV N (resident) content", y = "CYDV-RPV (invader) min. N conc.") +
   fig_theme
 
 rpv_inv_n_n_fig <- rpv_inv_n_low_fig %+% pav_res_qz_n_n
@@ -714,7 +714,7 @@ rpv_inv_p_low_fig <- ggplot(pav_res_qz_p_low, aes(x = param_val2, y = param_val4
                         name = "CYDV-RPV\ngrowth rate") +
   scale_x_log10() +
   scale_y_log10() +
-  labs(x = "BYDV-PAV P content", y = "CYDV-RPV min. P conc.") +
+  labs(x = "BYDV-PAV (resident) P content", y = "CYDV-RPV (invader) min. P conc.") +
   fig_theme
 
 rpv_inv_p_n_fig <- rpv_inv_p_low_fig %+% pav_res_qz_p_n
@@ -727,7 +727,7 @@ pav_inv_n_low_fig <- ggplot(rpv_res_qz_n_low, aes(x = param_val1, y = param_val3
                         name = "BYDV-PAV\ngrowth rate") +
   scale_x_log10() +
   scale_y_log10() +
-  labs(x = "CYDV-RPV N content", y = "BYDV-PAV min. N conc.") +
+  labs(x = "CYDV-RPV (resident) N content", y = "BYDV-PAV (invader) min. N conc.") +
   fig_theme
 
 pav_inv_n_n_fig <- pav_inv_n_low_fig %+% pav_res_qz_n_n
@@ -740,7 +740,7 @@ pav_inv_p_low_fig <- ggplot(rpv_res_qz_p_low, aes(x = param_val2, y = param_val4
                         name = "BYDV-PAV\ngrowth rate") +
   scale_x_log10() +
   scale_y_log10() +
-  labs(x = "CYDV-RPV P content", y = "BYDV-PAV min. P conc.") +
+  labs(x = "CYDV-RPV (resident) P content", y = "BYDV-PAV (invader) min. P conc.") +
   fig_theme
 
 pav_inv_p_n_fig <- pav_inv_p_low_fig %+% pav_res_qz_p_n
@@ -787,6 +787,15 @@ ggsave("output/virus_invasion_n_sensitivity_analysis.pdf", qz_n_fig,
 ggsave("output/virus_invasion_p_sensitivity_analysis.pdf", qz_p_fig,
        width = 6.5, height = 5, units = "in")
 ggsave("output/virus_invasion_np_sensitivity_analysis.pdf", qz_np_fig,
+       width = 6.5, height = 5, units = "in")
+
+ggsave("output/virus_invasion_low_sensitivity_analysis.png", qz_low_fig,
+       width = 6.5, height = 5, units = "in")
+ggsave("output/virus_invasion_n_sensitivity_analysis.png", qz_n_fig,
+       width = 6.5, height = 5, units = "in")
+ggsave("output/virus_invasion_p_sensitivity_analysis.png", qz_p_fig,
+       width = 6.5, height = 5, units = "in")
+ggsave("output/virus_invasion_np_sensitivity_analysis.png", qz_np_fig,
        width = 6.5, height = 5, units = "in")
   
 
