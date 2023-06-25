@@ -78,11 +78,12 @@ dat2 %>%
 # 56 missing one of the viruses
 
 dat2 %>%
-  filter(invasion == "I" & resident_est == 0) 
+  filter(invasion == "I" & resident_est == 0) %>%
+  count(first_inoculation)
 # 32 failed establishments
 
 dat2 %>%
-  filter(invasion == "S" & single_cont == 1)
+  filter(single_cont == 1) 
 # 92 contaminated single infections out of 197
 
 dat2 %>%
@@ -96,6 +97,13 @@ dat2 %>%
   ggplot(aes(x = log10(PAV_quant.mg), color = as.factor(single_cont))) +
   geom_density()
 # no clear separation
+
+# save single inoculation contamination
+dat2 %>%
+  filter(single_cont == 1) %>%
+  count(first_inoculation, dpiR, nutrient) %>%
+  pivot_wider(names_from = dpiR, values_from = n) %>%
+  write_csv("output/single_inoculation_contamination.csv")
 
 # remove failed resident establishment
 # contaminated single inoculations
@@ -560,7 +568,7 @@ PAVIfig <- ggplot(PAVIdat, aes(x = dpiI, y = log_quant.mg, color = Nutrient, fil
                shape = 21, color = "black") +
   scale_color_viridis_d(direction = -1) +
   scale_fill_viridis_d(direction = -1) +
-  labs(y = "BYDV-PAV titer (log[x + 1])") +
+  labs(y = "BYDV-PAV titer (ln[x + 1])") +
   fig_theme +
   theme(legend.position = "none",
         axis.title.x = element_blank())
@@ -582,7 +590,7 @@ RPVIfig <- ggplot(RPVIdat, aes(x = dpiI, y = log_quant.mg, color = Nutrient, fil
                shape = 21, color = "black") +
   scale_color_viridis_d(direction = -1) +
   scale_fill_viridis_d(direction = -1) +
-  labs(x = "Days post invader inoculation", y = "CYDV-RPV titer (log[x + 1])") +
+  labs(x = "Days post invader inoculation", y = "CYDV-RPV titer (ln[x + 1])") +
   fig_theme +
   theme(legend.position = "none")
 

@@ -629,7 +629,7 @@ comb_fig <- pav_dpp_fig2 + rpv_dpp_fig2 + leg1 +
 ggsave("output/single_virus_sensitivity_analysis.pdf", comb_fig,
        width = 6, height = 6.5, units = "in")
 
-# one resident figure
+# one virus figure
 rpv_dpp_fig3 <- rpv_dpp_fig2 %+% labs(y = "Virus growth rate")
 rpv_z_fig3 <- rpv_z_fig2 %+% labs(x = "Virus N use")
 rpv_q_fig3 <- rpv_q_fig2 %+% labs(y = "Virus growth rate")
@@ -698,7 +698,8 @@ pav_res_qz_thresh <- pav_res_qz %>%
   left_join(q_thresh %>%
               select(nutrient, ends_with("_thresh"))) %>%
   mutate(thresh_q = if_else(variable2 == "RPV_inv_gr" & 
-                              (param_val3 == q_nc_thresh | param_val4 == q_pc_thresh),
+                              (round_half_up(param_val3, 6) == round_half_up(q_nc_thresh, 6) | 
+                                 round_half_up(param_val4, 6) == round_half_up(q_pc_thresh, 6)),
                             1, 0)) %>%
   filter(param_val1 >= 1e-13)
 
@@ -706,7 +707,8 @@ rpv_res_qz_thresh <- rpv_res_qz %>%
   left_join(q_thresh %>%
               select(nutrient, ends_with("_thresh"))) %>%
   mutate(thresh_q = if_else(variable2 == "PAV_inv_gr" &
-                              (param_val3 == q_nb_thresh | param_val4 == q_pb_thresh),
+                              (round_half_up(param_val3, 6) == round_half_up(q_nb_thresh, 6) | 
+                                 round_half_up(param_val4, 6) == round_half_up(q_pb_thresh, 6)),
                             1, 0)) %>%
   filter(param_val1 >= 1e-13)
 
@@ -784,53 +786,117 @@ ggsave("output/pav_invasion_n_sensitivity_analysis.pdf", pav_inv_n_fig,
 ggsave("output/pav_invasion_p_sensitivity_analysis.pdf", pav_inv_p_fig,
        width = 6.5, height = 5, units = "in")
 
-#### start here ####
-# four panel figure, plant nutrients on top, virus growth rate on bottom
-# one resident, one invader
-# other resident and invader in supplement
-# four figures above in supplement (provide trajectories when q != threshold q)
 # figure with plant nutrients
-rpv_inv_n_conc_fig <- pav_res_qz_thresh %>%
+rpv_inv_n_gr_fig <- pav_res_qz_thresh %>%
   filter(variable2 == "RPV_inv_gr" & thresh_q == 1 & 
            param_val4 == min(param_val4)) %>%
   ggplot(aes(x = param_val1, y = value2)) +
   geom_line(aes(color = nutrient,
-                linetype = nutrient)) +
+                linetype = nutrient),
+            linewidth = 0.9) +
   scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
   scale_linetype(name = "Nutrient\nsupply") +
   scale_x_log10() +
   labs(x = "BYDV-PAV (resident) N use", y = "CYDV-RPV (invader) growth rate") +
   fig_theme
 
-rpv_inv_n_plant_fig <- rpv_inv_n_conc_fig %+%
- filter(pav_res_qz_thresh, variable2 == "Q_n" & 
-  param_val4 == min(param_val4)) + # lots of reps by q_nc, but all the same
+rpv_inv_n_plant_fig <- rpv_inv_n_gr_fig %+%
+  distinct(filter(pav_res_qz_thresh, variable2 == "Q_n" & 
+                    param_val4 == min(param_val4)),
+           param_val1, value2, nutrient) +
   labs(y = "Plant N concentration") +
   fig_theme +
   theme(axis.text.x = element_blank(),
         axis.title.x = element_blank())
 
-pav_inv_n_conc_fig <- rpv_res_qz_thresh %>%
+rpv_inv_p_gr_fig <- pav_res_qz_thresh %>%
+  filter(variable2 == "RPV_inv_gr" & thresh_q == 1 & 
+           param_val3 == min(param_val3)) %>%
+  ggplot(aes(x = param_val2, y = value2)) +
+  geom_line(aes(color = nutrient,
+                linetype = nutrient),
+            linewidth = 0.9) +
+  scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
+  scale_linetype(name = "Nutrient\nsupply") +
+  scale_x_log10() +
+  labs(x = "BYDV-PAV (resident) P use", y = "CYDV-RPV (invader) growth rate") +
+  fig_theme
+
+rpv_inv_p_plant_fig <- rpv_inv_p_gr_fig %+%
+  distinct(filter(pav_res_qz_thresh, variable2 == "Q_p" & 
+                    param_val3 == min(param_val3)),
+           param_val2, value2, nutrient) +
+  labs(y = "Plant P concentration") +
+  fig_theme +
+  theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank())
+
+pav_inv_n_gr_fig <- rpv_res_qz_thresh %>%
   filter(variable2 == "PAV_inv_gr" & thresh_q == 1 & 
            param_val4 == min(param_val4)) %>%
   ggplot(aes(x = param_val1, y = value2)) +
   geom_line(aes(color = nutrient,
-                linetype = nutrient)) +
+                linetype = nutrient),
+            linewidth = 0.9) +
   scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
   scale_linetype(name = "Nutrient\nsupply") +
   scale_x_log10() +
   labs(x = "CYDV-RPV (resident) N use", y = "BYDV-PAV (invader) growth rate") +
   fig_theme
 
-pav_inv_n_plant_fig <- pav_inv_n_conc_fig %+%
-  filter(rpv_res_qz_thresh, variable2 == "Q_n" & 
-           param_val4 == min(param_val4)) + # lots of reps by q_nc, but all the same
+pav_inv_n_plant_fig <- pav_inv_n_gr_fig %+%
+  distinct(filter(rpv_res_qz_thresh, variable2 == "Q_n" & 
+           param_val4 == min(param_val4)),
+           param_val1, value2, nutrient) +
   labs(y = "Plant N concentration") +
   fig_theme +
   theme(axis.text.x = element_blank(),
         axis.title.x = element_blank())
 
+pav_inv_p_gr_fig <- rpv_res_qz_thresh %>%
+  filter(variable2 == "PAV_inv_gr" & thresh_q == 1 & 
+           param_val3 == min(param_val3)) %>%
+  ggplot(aes(x = param_val2, y = value2)) +
+  geom_line(aes(color = nutrient,
+                linetype = nutrient),
+            linewidth = 0.9) +
+  scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
+  scale_linetype(name = "Nutrient\nsupply") +
+  scale_x_log10() +
+  labs(x = "CYDV-RPV (resident) P use", y = "BYDV-PAV (invader) growth rate") +
+  fig_theme
 
+pav_inv_p_plant_fig <- pav_inv_p_gr_fig %+%
+  distinct(filter(rpv_res_qz_thresh, variable2 == "Q_p" & 
+                    param_val3 == min(param_val3)),
+           param_val2, value2, nutrient) +
+  labs(y = "Plant P concentration") +
+  fig_theme +
+  theme(axis.text.x = element_blank(),
+        axis.title.x = element_blank())
+
+# combine
+rpv_inv_fig <- rpv_inv_n_plant_fig +
+  rpv_inv_p_plant_fig +
+  rpv_inv_n_gr_fig +
+  rpv_inv_p_gr_fig +
+  plot_layout(ncol = 2, guides = "collect") + 
+  plot_annotation(tag_levels = "A") & 
+  theme(plot.tag = element_text(size = 8, face = "bold"))
+
+pav_inv_fig <- pav_inv_n_plant_fig +
+  pav_inv_p_plant_fig +
+  pav_inv_n_gr_fig +
+  pav_inv_p_gr_fig +
+  plot_layout(ncol = 2, guides = "collect") + 
+  plot_annotation(tag_levels = "A") & 
+  theme(plot.tag = element_text(size = 8, face = "bold"))
+
+# save
+ggsave("output/rpv_invasion_sensitivity_analysis.pdf", rpv_inv_fig,
+       width = 6.5, height = 5, units = "in")
+ggsave("output/pav_invasion_sensitivity_analysis.pdf", pav_inv_fig,
+       width = 6.5, height = 5, units = "in")
 
 #### older code ####
 
