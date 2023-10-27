@@ -48,7 +48,7 @@ short_term_plant <- virus2_model_sim(params_def2, "PAV", V0_b = 0, V0_c = 0,
 
 # figure
 pdf("output/short_term_plant_simulation_figure.pdf", width = 6.5, height = 3.75)
-plant_fig_fun(short_term_plant, params_def2, -7e-4, -4e-4)
+plant_fig_fun(short_term_plant, params_def2, -1e-5, -6e-4)
 dev.off()
 
 # save simulation

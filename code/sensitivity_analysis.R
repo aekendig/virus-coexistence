@@ -230,12 +230,10 @@ np_zc_ratio_vir <- as.numeric(params_def2["z_nc"]) / as.numeric(params_def2["z_p
 # values
 # too high Z values make Q's go negative
 z_pb_vals <- sort(c(as.numeric(params_def2["z_pb"]),
-                  10^seq(-18, -12, length.out = 7),
-                  10^seq(-11, -7, length.out = 15)))
+                  10^seq(-18, -7, length.out = 50)))
 
 z_pc_vals <- sort(c(as.numeric(params_def2["z_pc"]),
-                    10^seq(-18, -12, length.out = 7),
-                    10^seq(-11, -7, length.out = 15)))
+                    10^seq(-18, -7, length.out = 50)))
 
 z_nb_vals <- z_pb_vals * np_zb_ratio_vir
 z_nc_vals <- z_pc_vals * np_zc_ratio_vir
@@ -658,7 +656,8 @@ z_q_b_in <- pav_growth_pos %>%
                 rename(param_foc3 = param_foc1,
                        param_val3 = param_val1,
                        param_foc4 = param_foc2,
-                       param_val4 = param_val2))
+                       param_val4 = param_val2)) %>%
+  filter(param_val1 >= 1e-13)
 
 z_q_c_in <- rpv_growth_pos %>%
   select(param_foc1, param_val1, param_foc2, param_val2) %>%
@@ -667,7 +666,8 @@ z_q_c_in <- rpv_growth_pos %>%
                 rename(param_foc3 = param_foc1,
                        param_val3 = param_val1,
                        param_foc4 = param_foc2,
-                       param_val4 = param_val2))
+                       param_val4 = param_val2)) %>%
+  filter(param_val1 >= 1e-13)
 
 # PAV simulation
 pdf("output/sensitivity_analysis_pav_res_q_z.pdf")
@@ -700,8 +700,7 @@ pav_res_qz_thresh <- pav_res_qz %>%
   mutate(thresh_q = if_else(variable2 == "RPV_inv_gr" & 
                               (round_half_up(param_val3, 6) == round_half_up(q_nc_thresh, 6) | 
                                  round_half_up(param_val4, 6) == round_half_up(q_pc_thresh, 6)),
-                            1, 0)) %>%
-  filter(param_val1 >= 1e-13)
+                            1, 0))
 
 rpv_res_qz_thresh <- rpv_res_qz %>%
   left_join(q_thresh %>%
@@ -709,8 +708,7 @@ rpv_res_qz_thresh <- rpv_res_qz %>%
   mutate(thresh_q = if_else(variable2 == "PAV_inv_gr" &
                               (round_half_up(param_val3, 6) == round_half_up(q_nb_thresh, 6) | 
                                  round_half_up(param_val4, 6) == round_half_up(q_pb_thresh, 6)),
-                            1, 0)) %>%
-  filter(param_val1 >= 1e-13)
+                            1, 0))
 
 # figures
 rpv_inv_n_fig <- pav_res_qz_thresh %>%
@@ -884,9 +882,9 @@ rpv_inv_fig <- rpv_inv_n_plant_fig +
   plot_annotation(tag_levels = "A") & 
   theme(plot.tag = element_text(size = 8, face = "bold"))
 
-pav_inv_fig <- pav_inv_n_plant_fig +
+pav_inv_fig <- pav_inv_n_plant_fig + theme(axis.text.x = element_text(hjust = 0.7)) +
   pav_inv_p_plant_fig +
-  pav_inv_n_gr_fig +
+  pav_inv_n_gr_fig + theme(axis.text.x = element_text(hjust = 0.7)) +
   pav_inv_p_gr_fig +
   plot_layout(ncol = 2, guides = "collect") + 
   plot_annotation(tag_levels = "A") & 
@@ -897,6 +895,7 @@ ggsave("output/rpv_invasion_sensitivity_analysis.pdf", rpv_inv_fig,
        width = 6.5, height = 5, units = "in")
 ggsave("output/pav_invasion_sensitivity_analysis.pdf", pav_inv_fig,
        width = 6.5, height = 5, units = "in")
+
 
 #### older code ####
 
