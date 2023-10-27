@@ -46,7 +46,7 @@ mod_sum <- function(mod, filename){
 # make wide by target
 # for each invasion trial, determine whether resident established
 # for each single inoculation, determine whether there was contamination
-# identify samples missing one of the viruses
+# identify samples missing one of the viruses (not in dataset because of contamination, above standard curve, etc.)
 # make column for roles
 dat2 <- dat %>%
   select(-c(quant_adj, quant.ul)) %>% # remove other quantity calculations
@@ -162,6 +162,22 @@ dat2 %>%
             total = n())
 # no contamination
 
+# total uninoculated controls
+dat2 %>%
+  filter(PAV_role == "only" | RPV_role == "only")
+# 197
+
+# RPV with NA titer
+(init_RPV_NA <- filter(dat2, is.na(RPV_quant.mg)) %>% 
+  count(RPV_role, PAV_role))
+
+# RPV with NA titer after lowering the threshold
+filter(dat2, is.na(RPV_quant.mg) | RPV_quant.mg < PAV_single_summary$maxRPV) %>% 
+  count(RPV_role, PAV_role) %>%
+  left_join(init_RPV_NA %>%
+              rename(n_init = n)) %>%
+  mutate(n_new = n - n_init)
+
 # replace contaminated single inoculations (use dat2)
 # remove missing quantities
 # make RPV quant NA below threshold
@@ -217,6 +233,11 @@ dat5 %>%
   stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0) +
   facet_wrap(~ nutrient)
 # invasions still visible
+
+# block-level replication
+dat5 %>%
+  distinct(set, tube_label) %>%
+  count(set)
 
 # divide datasets by virus
 PAVdat <- dat5 %>%
@@ -568,10 +589,12 @@ PAVIfig <- ggplot(PAVIdat, aes(x = dpiI, y = log_quant.mg, color = Nutrient, fil
                shape = 21, color = "black") +
   scale_color_viridis_d(direction = -1) +
   scale_fill_viridis_d(direction = -1) +
-  labs(y = "BYDV-PAV titer (ln[x + 1])") +
+  scale_y_continuous(limits  = c(-1, 9)) +
+  labs(y = "BYDV-PAV titer (ln[x + 1])", title = "Invading virus") +
   fig_theme +
   theme(legend.position = "none",
-        axis.title.x = element_blank())
+        axis.title.x = element_blank(),
+        plot.title = element_text(hjust = 0.5))
 
 RPVISimFig <- RPVIdat %>%
   select(role, dpiI, Nutrient, highN, highP) %>%
@@ -590,6 +613,7 @@ RPVIfig <- ggplot(RPVIdat, aes(x = dpiI, y = log_quant.mg, color = Nutrient, fil
                shape = 21, color = "black") +
   scale_color_viridis_d(direction = -1) +
   scale_fill_viridis_d(direction = -1) +
+  scale_y_continuous(limits  = c(12, 17)) +
   labs(x = "Days post invader inoculation", y = "CYDV-RPV titer (ln[x + 1])") +
   fig_theme +
   theme(legend.position = "none")
@@ -617,10 +641,12 @@ PAVRfig <- PAVdat %>%
   scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
   scale_fill_viridis_d(direction = -1, name = "Nutrient\nsupply") +
   scale_linetype(name = "Nutrient\nsupply") +
-  scale_y_continuous(breaks = c(6, 7, 8)) +
+  scale_y_continuous(limits  = c(-1, 9)) +
+  labs(title = "Resident virus") +
   fig_theme +
   theme(axis.title = element_blank(),
-        legend.key.width = unit(1, "cm"))
+        legend.key.width = unit(1, "cm"),
+        plot.title = element_text(hjust = 0.5))
 
 RPVRSimFig <- tibble(dpiR = seq(min(RPVURdat$dpiR), max(RPVURdat$dpiR), length.out = 50),
                      dpiUR = seq(min(RPVURdat$dpiUR), max(RPVURdat$dpiUR), length.out = 50),
@@ -645,14 +671,17 @@ RPVRfig <- RPVdat %>%
                shape = 21, color = "black") +
   scale_color_viridis_d(direction = -1) +
   scale_fill_viridis_d(direction = -1) +
-  scale_y_continuous(breaks = c(14, 15, 16)) +
+  scale_y_continuous(limits  = c(12, 17)) +
   labs(x = "Days post resident inoculation") +
   fig_theme +
   theme(legend.position = "none",
         axis.title.y = element_blank())
 
 # combine figures
-comb_fig <- PAVIfig + PAVRfig + RPVIfig + RPVRfig +
+comb_fig <- PAVIfig + theme(axis.text.x = element_blank()) + 
+  PAVRfig + theme(axis.text.x = element_blank(),
+                  axis.text.y = element_blank()) + 
+  RPVIfig + RPVRfig + theme(axis.text.y = element_blank()) +
   plot_annotation(tag_levels = "A") & 
   theme(plot.tag = element_text(size = 8, face = "bold"))
 

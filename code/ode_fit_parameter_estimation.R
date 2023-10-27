@@ -21,7 +21,7 @@ library(FME)
 library(manipulate)
 library(minpack.lm)
 library(cowplot)
-library(lemon)
+library(ggh4x)
 
 # import data
 sdat <- read_csv("./edi.411.2/data/sample_exp_molc_data.csv")
@@ -190,17 +190,19 @@ plant_wrapper <- function(m, g){
 manipulate(plot(1:5, cex=size), size = slider(0.5,10,step=0.5))
 
 # time 
-times <- seq(0, max(dat5$dpp)*2, length.out = 100)
+times <- seq(0, max(dat5$dpp), length.out = 100)
 
 manipulate(plant_wrapper(m, g), m = slider(0, 0.1), g = slider(0, 1))
-# g ~ 0.2
-# m ~ 0.002
+# +N
+# g ~ 0.15
+# m ~ 0.001
 
 
 #### compare plant model to observations ####
 
 # data
 mock_fit <- mock %>%
+  filter(nutrient == "low") %>%
   rename("name" = "variable") %>%
   select(name, time, value) %>%
   data.frame()
@@ -231,8 +233,8 @@ plant_cost <- function(P){
 #### estimate plant parameters ####
 
 # fit model
-# fit_plant <- modFit(plant_cost, c(0.2, 0.002), lower = c(0))
-fit_plant <- modFit(plant_cost, c(0.2), lower = c(0))
+# fit_plant <- modFit(plant_cost, c(0.14, 0.001), lower = c(0)) # super low m
+fit_plant <- modFit(plant_cost, c(0.15), lower = c(0))
 summary(fit_plant)
 deviance(fit_plant)
 fit_plant$ssr # sum of squared residuals
@@ -346,25 +348,29 @@ times <- seq(0, max(dat5$dpi), length.out = 100)
 # times <- seq(0, 100, length.out = 100) # check to see if virus crashes long-term
 
 # PAV
-manipulate(virus_wrapper(c, r, species = "PAV"), c = slider(0, 1), r = slider(0, 1))
-# r ~ 0.66
-# c ~ 0.24
+manipulate(virus_wrapper(c, r, species = "PAV"), c = slider(0, 1), r = slider(0, 2.1))
+# low:
+# r ~ 0.6
+# c ~ 0.3
 
 # RPV
 manipulate(virus_wrapper(c, r, species = "RPV"), c = slider(0, 1), r = slider(0, 2.1))
-# r ~ 0.80
-# c ~ 0.22
+# +P:
+# r ~ 0.7
+# c ~ 0.2
 
 
 #### compare virus model to observations ####
 
 # data
 pav_fit <- pav %>%
+  filter(nutrient == "low") %>%
   rename("name" = "variable") %>%
   select(name, time, value) %>%
   data.frame()
 
 rpv_fit <- rpv %>%
+  filter(nutrient == "low") %>%
   rename("name" = "variable") %>%
   select(name, time, value) %>%
   data.frame()
@@ -378,8 +384,7 @@ pav_cost <- function(P){
   # update parameter value
   params_in["r"] <- P[1]
   params_in["c"] <- P[2] 
-  # params_in["c"] <- 0.005
-  
+
   # fit model
   out = ode(y = init_virus1, times = times_pav, func = virus1_model, parms = params_in)
   
@@ -396,7 +401,6 @@ rpv_cost <- function(P){
   # update parameter value
   params_in["r"] <- P[1]
   params_in["c"] <- P[2]
-  # params_in["c"] <- 0.005
   
   # fit model
   out = ode(y = init_virus1, times = times_rpv, func = virus1_model, parms = params_in)
@@ -414,16 +418,14 @@ times_pav <- seq(0, max(pav_fit$time), length.out = 100)
 times_rpv <- seq(0, max(rpv_fit$time), length.out = 100)
 
 # fit PAV model
-fit_pav <- modFit(pav_cost, c(0.66, 0.24), lower = c(0))
-# fit_pav <- modFit(pav_cost, c(0.35), lower = c(0))
+fit_pav <- modFit(pav_cost, c(0.6, 0.3), lower = c(0))
 summary(fit_pav)
 deviance(fit_pav)
 fit_pav$ssr # sum of squared residuals
 fit_pav$ms # mean squared residuals
 
 # fit RPV model
-fit_rpv <- modFit(rpv_cost, c(0.8, 0.22), lower = c(0))
-# fit_rpv <- modFit(rpv_cost, c(0.5), lower = c(0))
+fit_rpv <- modFit(rpv_cost, c(0.7, 0.2), lower = c(0))
 summary(fit_rpv)
 deviance(fit_rpv)
 fit_rpv$ssr # sum of squared residuals
@@ -436,12 +438,10 @@ fit_rpv$ms # mean squared residuals
 params_pav <- params_def1
 params_pav["r"] <- fit_pav$par[1]
 params_pav["c"] <- fit_pav$par[2]
-# params_pav["c"] <- 0.005
 
 params_rpv <- params_def1
 params_rpv["r"] <- fit_rpv$par[1]
 params_rpv["c"] <- fit_rpv$par[2]
-# params_rpv["c"] <- 0.005
 
 # virus times
 times <- seq(0, max(dat5$dpi), length.out = 100)
@@ -480,34 +480,51 @@ fig_pred_dat <- plant_pred_dat %>%
   full_join(rpv_pred_dat %>%
               mutate(fitType = "CYDV-RPV~conc.~(g^-1)",
                      time = time + plant_days)) %>%
-  mutate(fitType = fct_relevel(fitType, "Plant~biomass~(g)"))
+  mutate(fitType = fct_relevel(fitType, "Plant~biomass~(g)"),
+         nutrient_fit = case_when(nutrient == "low" ~ "'parameter\nestimation: low'",
+                                  nutrient == "+P" ~ "'predictions:\n+P'",
+                                  nutrient == "+N" ~ "'\n+N'",
+                                  nutrient == "+N+P" ~ "'\n+N+P'") %>%
+           fct_relevel("'parameter\nestimation: low'",
+                       "'\n+N'",
+                       "'predictions:\n+P'"))
 
-fig_raw_dat <- mock_fit %>%
+fig_raw_dat <- mock %>%
+  select(variable, time, nutrient, value) %>%
   mutate(fitType = "Plant~biomass~(g)") %>%
-  full_join(pav_fit %>%
+  full_join(pav %>%
+              select(variable, time, nutrient, value) %>%
               mutate(fitType = "BYDV-PAV~conc.~(g^-1)",
                      time = time + plant_days)) %>%
-  full_join(rpv_fit %>%
+  full_join(rpv %>%
+              select(variable, time, nutrient, value) %>%
               mutate(fitType = "CYDV-RPV~conc.~(g^-1)",
                      time = time + plant_days)) %>%
-  mutate(nutrient = case_when(str_ends(name, "low") == T ~ "low",
-                              str_ends(name, "np") == T ~ "+N+P",
-                              str_ends(name, "n") == T ~ "+N",
-                              str_ends(name, "p") == T ~ "+P") %>%
-           fct_relevel("low", "+N", "+P"),
-         fitType = fct_relevel(fitType, "Plant~biomass~(g)"))
+  mutate(fitType = fct_relevel(fitType, "Plant~biomass~(g)"),
+         nutrient_fit = case_when(nutrient == "low" ~ "'parameter\nestimation: low'",
+                                  nutrient == "+P" ~ "'predictions:\n+P'",
+                                  nutrient == "+N" ~ "'\n+N'",
+                                  nutrient == "+N+P" ~ "'\n+N+P'") %>%
+           fct_relevel("'parameter\nestimation: low'",
+                       "'\n+N'",
+                       "'predictions:\n+P'"))
 
 pdf("output/growth_rate_fit_figure.pdf", width = 6.5, height = 5)
 ggplot(fig_pred_dat, aes(x = time, y = value, color = nutrient)) +
-  geom_line(size = 1.2) +
-  geom_point(data = fig_raw_dat, alpha = 0.5) +
-  facet_rep_grid(fitType ~ nutrient, labeller = label_parsed,
-                 scales = "free_y", switch = "y") +
+  geom_line() +
+  stat_summary(data = fig_raw_dat, geom = "errorbar", fun.data = "mean_se",
+               width = 0) +
+  stat_summary(data = fig_raw_dat, geom = "point", fun = "mean") +
+  facet_grid2(fitType ~ nutrient_fit, labeller = label_parsed, axes = "all",
+                 scales = "free_y", switch = "y", independent = "y",
+              remove_labels = "x") +
   scale_color_viridis_d(direction = -1, name = "Nutrient supply") +
+  scale_y_continuous(labels = function(x) ifelse(x > 1e4, format(x, scientific = TRUE), x)) +
   labs(x = "Time (days)") +
   fig_theme +
   theme(axis.title.y = element_blank(),
-        legend.position = "none")
+        legend.position = "none",
+        strip.text.x = element_text(vjust = -1.1))
 dev.off()
 
 # parameters

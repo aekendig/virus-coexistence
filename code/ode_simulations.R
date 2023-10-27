@@ -55,9 +55,6 @@ dev.off()
 write_csv(short_term_plant, "output/short_term_plant_simulation.csv")
 
 
-#### note: haven't run any of the below with 60 dpp ####
-
-
 #### single virus simulations ####
 
 # PAV with plant
@@ -241,7 +238,7 @@ pav_second_gr <- pav_second_sim %>%
   mutate(virus = str_sub(variable2, 1, 3),
          DPP = plant_days + res_days,
          role = if_else(DPP == 11, "resident", "invader") %>%
-           fct_relevel("resident")) %>%
+           fct_relevel("resident")) %>% # ignore warning
   filter(virus == "PAV")
 
 rpv_second_gr <- rpv_second_sim %>%
@@ -249,7 +246,7 @@ rpv_second_gr <- rpv_second_sim %>%
   mutate(virus = str_sub(variable2, 1, 3),
          DPP = plant_days + res_days,
          role = if_else(DPP == 11, "resident", "invader") %>%
-           fct_relevel("resident")) %>%
+           fct_relevel("resident")) %>% # ignore warning
   filter(virus == "RPV")
 
 pav_first_gr <- pav_first_sim %>%
@@ -300,7 +297,7 @@ pav_inv_fig <- ggplot(pav_inv_dat, aes(x = DPP, y = growth)) +
   scale_pattern_manual(values = c(resident = "none", invader = "stripe"),
                        name = "Virus\nrole") +
   scale_x_continuous(breaks = c(plant_days, plant_days + res_days)) +
-  scale_y_continuous(lim = c(min(rpv_inv_dat$growth), max(rpv_inv_dat$growth))) +
+  scale_y_continuous(lim = c(0, max(rpv_inv_dat$growth))) +
   scale_fill_viridis_d(direction = -1, name = "Nutrient\nsupply") +
   labs(y = "Growth rate when rare", x = "Days post planting",
        title = "(A)", subtitle = "PAV") +
@@ -319,7 +316,7 @@ rpv_inv_fig <- ggplot(rpv_inv_dat, aes(x = DPP, y = growth)) +
   scale_pattern_manual(values = c(resident = "none", invader = "stripe"),
                        name = "Virus\nrole") +
   scale_x_continuous(breaks = c(plant_days, plant_days + res_days)) +
-  scale_y_continuous(lim = c(min(rpv_inv_dat$growth), max(rpv_inv_dat$growth))) +
+  scale_y_continuous(lim = c(0, max(rpv_inv_dat$growth))) +
   scale_fill_viridis_d(direction = -1, name = "Nutrient\nsupply") +
   labs(x = "Days post planting", title = "(B)", subtitle = "RPV") +
   fig_theme + 
@@ -338,7 +335,7 @@ pav_alone_fig <- ggplot(pav_alone_dat, aes(x = DPP, y = growth)) +
            position = "dodge",
            color = "black") +
   scale_x_continuous(breaks = c(plant_days, plant_days + res_days)) +
-  scale_y_continuous(lim = c(min(rpv_alone_dat$growth), max(rpv_alone_dat$growth))) +
+  scale_y_continuous(lim = c(0, max(rpv_alone_dat$growth))) +
   scale_fill_viridis_d(direction = -1, name = "Nutrient\nsupply") +
   labs(y = "Growth rate when rare", x = "Days post planting",
        title = "(A)", subtitle = "PAV") +
@@ -353,7 +350,7 @@ rpv_alone_fig <- ggplot(rpv_alone_dat, aes(x = DPP, y = growth)) +
   scale_pattern_manual(values = c(resident = "none", invader = "stripe"),
                        name = "Virus\nrole") +
   scale_x_continuous(breaks = c(plant_days, plant_days + res_days)) +
-  scale_y_continuous(lim = c(min(rpv_alone_dat$growth), max(rpv_alone_dat$growth))) +
+  scale_y_continuous(lim = c(0, max(rpv_alone_dat$growth))) +
   scale_fill_viridis_d(direction = -1, name = "Nutrient\nsupply") +
   labs(x = "Days post planting", title = "(B)", subtitle = "RPV") +
   fig_theme + 

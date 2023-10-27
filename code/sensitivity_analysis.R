@@ -176,8 +176,8 @@ rpv_1st_dpp <- read_csv("output/sensitivity_analysis_rpv_1st_dpp.csv") %>%
 pav_dpp_fig <- pav_1st_dpp %>%
   filter(variable2 == "PAV_conc") %>%
   ggplot(aes(x = plant_days, y = growth, color = nutrient, linetype = nutrient)) +
-  geom_hline(yintercept = 0, size = 0.25) +
-  geom_line(size = 0.9) +
+  geom_hline(yintercept = 0, linewidth = 0.25) +
+  geom_line(linewidth = 0.9) +
   scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
   scale_linetype(name = "Nutrient\nsupply") +
   labs(x = "Infection time (DPP)", y = "BYDV-PAV growth rate") +
@@ -186,8 +186,8 @@ pav_dpp_fig <- pav_1st_dpp %>%
 rpv_dpp_fig <- rpv_1st_dpp %>%
   filter(variable2 == "RPV_conc") %>%
   ggplot(aes(x = plant_days, y = growth, color = nutrient, linetype = nutrient)) +
-  geom_hline(yintercept = 0, size = 0.25) +
-  geom_line(size = 0.9) +
+  geom_hline(yintercept = 0, linewidth = 0.25) +
+  geom_line(linewidth = 0.9) +
   scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
   scale_linetype(name = "Nutrient\nsupply") +
   labs(x = "Infection time (DPP)", y = "CYDV-RPV growth rate") +
@@ -401,7 +401,7 @@ z_growth_fig <- pav_z_growth_fig + theme(legend.position = "none") +
   theme(plot.tag = element_text(size = 8, face = "bold"))
 
 ggsave("output/single_virus_z_growth_sensitivity_analysis.pdf", z_growth_fig,
-       width = 5, height = 2, units = "in")
+       width = 6, height = 2.5, units = "in")
 
 
 #### minimum nutrient concentrations ####
@@ -683,7 +683,7 @@ rpv_res_qz <- z_q_c_in %>%
   unnest(cols = c(sim_out))
 dev.off()
 
-# save datasets -- DO THIS
+# save datasets
 write_csv(pav_res_qz, "output/sensitivity_analysis_pav_res_q_z.csv")
 write_csv(rpv_res_qz, "output/sensitivity_analysis_rpv_res_q_z.csv")
 
