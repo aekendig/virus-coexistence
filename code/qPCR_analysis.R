@@ -1,6 +1,5 @@
 ## Goal: analyze qPCR data
 
-
 #### set up ####
 
 # clear all existing data
@@ -10,6 +9,7 @@ rm(list=ls())
 library(tidyverse)
 library(patchwork)
 library(glmmTMB)
+library(DHARMa)
 
 # import data
 dat <- read_csv("intermediate-data/qPCR_expt_data_cleaned.csv")
@@ -286,38 +286,29 @@ ggplot(bioResDat, aes(x = dpp, y = shoot_mass.g, color = nutrient)) +
 #### biomass model ####
 
 # nutrients, established virus
-bioInvMod <- glmmTMB(log_shoot_mass.g ~ highN * highP * first_inoculation + (1|time), data = bioInvDat)
-# model won't converge with set as a random effect
+bioInvMod <- glmmTMB(shoot_mass.g ~ highN * highP * first_inoculation + (1|set) + (1|time), 
+                     data = bioInvDat)
 summary(bioInvMod)
-mod_sum(bioInvMod, "invasion_biomass_model")
+bioInvResid <- simulateResiduals(bioInvMod, n = 1000)
+plot(bioInvResid)
 
-bioResMod <- glmmTMB(log_shoot_mass.g ~ highN * highP * inoculation + (1|set) + (1|time), data = bioResDat)
+bioResMod <- glmmTMB(shoot_mass.g ~ highN * highP * inoculation + (1|set) + (1|time), 
+                     data = bioResDat)
 summary(bioResMod)
+bioResResid <- simulateResiduals(bioResMod, n = 1000)
+plot(bioResResid)
+
+# save
+mod_sum(bioInvMod, "invasion_biomass_model")
 mod_sum(bioResMod, "resident_biomass_model")
+
 
 # values for text
 
 # N effect
-noNBio <- exp(fixef(bioInvMod)$cond[1])
-NBio <- exp(fixef(bioInvMod)$cond[1] + fixef(bioInvMod)$cond[2])
+noNBio <- fixef(bioInvMod)$cond[1]
+NBio <- fixef(bioInvMod)$cond[1] + fixef(bioInvMod)$cond[2]
 100 * (NBio - noNBio) / noNBio
-
-# P, inoculation interactions
-intcpt <- exp(fixef(bioResMod)$cond[1])
-PBio <- exp(fixef(bioResMod)$cond[1] + fixef(bioResMod)$cond[3])
-100 * (PBio - intcpt) / intcpt # increase
-
-noPRPVBio <- exp(fixef(bioResMod)$cond[1] + fixef(bioResMod)$cond[6])
-PRPVBio <- exp(fixef(bioResMod)$cond[1] + fixef(bioResMod)$cond[3] + fixef(bioResMod)$cond[6] + fixef(bioResMod)$cond[13])
-100 * (PRPVBio - noPRPVBio) / noPRPVBio # decrease
-
-noPPAVBio <- exp(fixef(bioResMod)$cond[1] + fixef(bioResMod)$cond[5])
-PPAVBio <- exp(fixef(bioResMod)$cond[1] + fixef(bioResMod)$cond[3] + fixef(bioResMod)$cond[5] + fixef(bioResMod)$cond[12])
-100 * (PPAVBio - noPPAVBio) / noPPAVBio # decrease
-
-noPInvBio <- exp(fixef(bioResMod)$cond[1] + fixef(bioResMod)$cond[4])
-PInvBio <- exp(fixef(bioResMod)$cond[1] + fixef(bioResMod)$cond[3] + fixef(bioResMod)$cond[4] + fixef(bioResMod)$cond[11])
-100 * (PInvBio - noPInvBio) / noPInvBio # smaller decrease
 
 
 #### estimate r and N0 parameters ####
@@ -329,61 +320,61 @@ PAVIdat <- PAVdat %>%
 RPVIdat <- RPVdat %>%
   filter(role == "invader")
 
-# simulated data/starting values
-PAVIsim <- PAVIdat %>%
-  select(dpiI) %>%
-  unique() %>%
-  mutate(log_N0 = log(1),
-         r = 0.3,
-         log_quant.mg = log_N0 + r * dpiI)
-
-# visualize
-ggplot(PAVIdat, aes(dpiI, log_quant.mg)) +
-  geom_point() +
-  geom_line(data = PAVIsim) +
-  facet_wrap(~nutrient)
-
-ggplot(PAVIdat, aes(dpiI, log_quant.plant)) +
-  geom_point() +
-  facet_wrap(~nutrient)
-
-# simulated data/starting values
-RPVIsim <- RPVIdat %>%
-  select(dpiI) %>%
-  unique() %>%
-  mutate(log_N0 = 10,
-         r = 0.3,
-         log_quant.mg = log_N0 + r * dpiI)
-
-# visualize
-ggplot(RPVIdat, aes(dpiI, log_quant.mg)) +
-  geom_point() +
-  geom_line(data = RPVIsim) +
-  facet_wrap(~nutrient)
-
-ggplot(RPVIdat, aes(dpiI, log_quant.plant)) +
-  geom_point() +
-  facet_wrap(~nutrient)
-
 # model with titer concentration
-PAVImod <- glmmTMB(log_quant.mg ~ dpiI + highN:dpiI + highP:dpiI + highN:highP:dpiI + (1|set), data = PAVIdat)
+PAVImod <- glmmTMB(log_quant.mg ~ dpiI + highN:dpiI + highP:dpiI + highN:highP:dpiI + (1|set), 
+                    data = PAVIdat)
 summary(PAVImod)
-RPVImod <- glmmTMB(log_quant.mg ~ dpiI + highN:dpiI + highP:dpiI + highN:highP:dpiI + (1|set), data = RPVIdat)
+PAVIResid <- simulateResiduals(PAVImod, n = 1000)
+plot(PAVIResid)
+testZeroInflation(PAVIResid)
+
+PAVImodb <- glmmTMB(quant.mg ~ dpiI + highN:dpiI + highP:dpiI + highN:highP:dpiI + (1|set), 
+                    data = PAVIdat, family = "tweedie")
+summary(PAVImodb)
+PAVIResidb <- simulateResiduals(PAVImodb, n = 1000)
+plot(PAVIResidb)
+
+RPVImod <- glmmTMB(log_quant.mg ~ dpiI + highN:dpiI + highP:dpiI + highN:highP:dpiI + (1|set), 
+                   data = RPVIdat)
 summary(RPVImod)
+RPVIResid <- simulateResiduals(RPVImod, n = 1000)
+plot(RPVIResid)
+
+RPVImodb <- glmmTMB(quant.mg ~ dpiI + highN:dpiI + highP:dpiI + highN:highP:dpiI + (1|set), 
+                    data = RPVIdat, family = "lognormal")
+summary(RPVImodb)
+RPVIResidb <- simulateResiduals(RPVImodb, n = 1000)
+plot(RPVIResidb)
+plotResiduals(RPVIResidb, RPVIdat$dpiI)
+plotResiduals(RPVIResidb, as.factor(RPVIdat$nutrient))
+plotResiduals(RPVIResidb, as.factor(paste(RPVIdat$dpiI, RPVIdat$nutrient)))
+plotResiduals(RPVIResidb, as.factor(RPVIdat$set))
+
+# use log-link models
+PAVImod <- PAVImodb
+RPVImod <- RPVImodb
 
 # model with plant-scale titer
-PAVImod2 <- glmmTMB(log_quant.plant ~ dpiI + highN:dpiI + highP:dpiI + highN:highP:dpiI + (1|set), data = PAVIdat)
+PAVImod2 <- glmmTMB(quant.plant ~ dpiI + highN:dpiI + highP:dpiI + highN:highP:dpiI + (1|set), 
+                    data = PAVIdat, family = "tweedie")
 summary(PAVImod2)
-RPVImod2 <- glmmTMB(log_quant.plant ~ dpiI + highN:dpiI + highP:dpiI + highN:highP:dpiI + (1|set), data = RPVIdat)
+PAVIResid2 <- simulateResiduals(PAVImod2, n = 1000)
+plot(PAVIResid2)
+
+
+RPVImod2 <- glmmTMB(quant.plant ~ dpiI + highN:dpiI + highP:dpiI + highN:highP:dpiI + (1|set), 
+                    data = RPVIdat, family = "lognormal")
 summary(RPVImod2)
+RPVIResid2 <- simulateResiduals(RPVImod2, n = 1000)
+plot(RPVIResid2)
 
 # visualize model 1
 PAVIsim1 <- PAVIdat %>%
   select(nutrient, highN, highP, dpiI) %>%
   unique() %>%
   mutate(set = NA) %>%
-  mutate(log_quant.mg = predict(PAVImod, newdata = ., re.form = NA),
-         quant.mg = exp(log_quant.mg))
+  mutate(quant.mg = predict(PAVImod, newdata = ., re.form = NA, type = "response"),
+         log_quant.mg = predict(PAVImod, newdata = ., re.form = NA))
 
 ggplot(PAVIdat, aes(dpiI, quant.mg)) +
   geom_point() +
@@ -399,9 +390,15 @@ RPVIsim1 <- RPVIdat %>%
   select(nutrient, highN, highP, dpiI) %>%
   unique() %>%
   mutate(set = NA) %>%
-  mutate(quant.mg = exp(predict(RPVImod, newdata = ., re.form = NA)))
+  mutate(quant.mg = predict(RPVImod, newdata = ., re.form = NA, type = "response"),
+         log_quant.mg = predict(RPVImod, newdata = ., re.form = NA))
 
 ggplot(RPVIdat, aes(dpiI, quant.mg)) +
+  geom_point() +
+  geom_line(data = RPVIsim1) +
+  facet_wrap(~nutrient)
+
+ggplot(RPVIdat, aes(dpiI, log_quant.mg)) +
   geom_point() +
   geom_line(data = RPVIsim1) +
   facet_wrap(~nutrient)
@@ -411,8 +408,8 @@ PAVIsim2 <- PAVIdat %>%
   select(nutrient, highN, highP, dpiI) %>%
   unique() %>%
   mutate(set = NA) %>%
-  mutate(log_quant.plant = predict(PAVImod2, newdata = ., re.form = NA),
-         quant.plant = exp(log_quant.plant))
+  mutate(quant.plant = predict(PAVImod2, newdata = ., re.form = NA, type = "response"),
+         log_quant.plant = predict(PAVImod2, newdata = ., re.form = NA))
 
 ggplot(PAVIdat, aes(dpiI, quant.plant)) +
   geom_point() +
@@ -428,9 +425,15 @@ RPVIsim2 <- RPVIdat %>%
   select(nutrient, highN, highP, dpiI) %>%
   unique() %>%
   mutate(set = NA) %>%
-  mutate(quant.plant = exp(predict(RPVImod2, newdata = ., re.form = NA)))
+  mutate(quant.plant = predict(RPVImod2, newdata = ., re.form = NA, type = "response"),
+         log_quant.plant = predict(RPVImod2, newdata = ., re.form = NA))
 
 ggplot(RPVIdat, aes(dpiI, quant.plant)) +
+  geom_point() +
+  geom_line(data = RPVIsim2) +
+  facet_wrap(~nutrient)
+
+ggplot(RPVIdat, aes(dpiI, log_quant.plant)) +
   geom_point() +
   geom_line(data = RPVIsim2) +
   facet_wrap(~nutrient)
@@ -442,10 +445,6 @@ fixef(RPVImod)$cond[2]
 # N0 values
 exp(fixef(PAVImod)$cond[1])
 exp(fixef(RPVImod)$cond[1])
-
-# marginal N effect
-dpiN_RPV <- fixef(RPVImod2)$cond[2] + fixef(RPVImod2)$cond[3]
-(dpiN_RPV - fixef(RPVImod2)$cond[2]) / fixef(RPVImod2)$cond[2]
 
 # save
 mod_sum(PAVImod, "pav_invasion_model")
@@ -460,7 +459,11 @@ mod_sum(RPVImod2, "rpv_invasion_per_plant_model")
 PAVURdat <- PAVdat %>%
   filter(role %in% c("only", "resident")) %>%
   mutate(dpiUR = dpiR - min(dpiR),
-         role = fct_relevel(role, "resident"))
+         role = fct_relevel(role, "resident"),
+         quant1.mg = quant.mg + 1e-6,
+         quant1.plant = quant.plant + 1e-6) # can't fit log-normal with quant = 0
+filter(PAVURdat, quant.mg < 100) %>% select(quant.mg) # only one quant = 0
+filter(PAVURdat, quant.plant < 100) %>% select(quant.plant) 
 
 RPVURdat <- RPVdat %>%
   filter(role %in% c("only", "resident")) %>%
@@ -495,23 +498,41 @@ ggplot(RPVURdat, aes(dpiUR, log_quant.plant, color = nutrient)) +
   facet_wrap(~ role)
 
 # polynomial model
-PAVURmod1 <- glmmTMB(log_quant.mg ~ highN * highP * role  * (dpiUR + I(dpiUR^2)) + (1|set), data = PAVURdat)
+PAVURmod1 <- glmmTMB(quant1.mg ~ highN * highP * role  * (dpiUR + I(dpiUR^2)) + (1|set), 
+                     data = PAVURdat, family = "lognormal")
+# warning okay if no convergence warning
 summary(PAVURmod1)
-RPVURmod1 <- glmmTMB(log_quant.mg ~ highN * highP * role  * (dpiUR + I(dpiUR^2)) + (1|set), data = RPVURdat)
+PAVURResid1 <- simulateResiduals(PAVURmod1, n = 1000)
+plot(PAVURResid1)
+
+RPVURmod1 <- glmmTMB(quant.mg ~ highN * highP * role  * (dpiUR + I(dpiUR^2)) + (1|set), 
+                     data = RPVURdat, family = "lognormal")
+# warning okay if no convergence warning
 summary(RPVURmod1)
+RPVURResid1 <- simulateResiduals(RPVURmod1, n = 1000)
+plot(RPVURResid1)
 
 # linear model
-PAVURmod2 <- glmmTMB(log_quant.mg ~ highN * highP * role  * dpiUR + (1|set), data = PAVURdat)
+PAVURmod2 <- glmmTMB(quant1.mg ~ highN * highP * role  * dpiUR + (1|set), 
+                     data = PAVURdat, family = "lognormal")
 summary(PAVURmod2)
-RPVURmod2 <- glmmTMB(log_quant.mg ~ highN * highP * role  * dpiUR + (1|set), data = RPVURdat)
+PAVURResid2 <- simulateResiduals(PAVURmod2, n = 1000)
+plot(PAVURResid2)
+
+RPVURmod2 <- glmmTMB(quant.mg ~ highN * highP * role  * dpiUR + (1|set), 
+                     data = RPVURdat, family = "lognormal")
 summary(RPVURmod2)
+RPVURResid2 <- simulateResiduals(RPVURmod2, n = 1000)
+plot(RPVURResid2)
 
 # compare models
-AIC(PAVURmod1, PAVURmod2) # linear
+AIC(PAVURmod1, PAVURmod2) # polynomial
+AIC(PAVURmod1) - AIC(PAVURmod2)
 AIC(RPVURmod1, RPVURmod2) # polynomial
+AIC(RPVURmod1) - AIC(RPVURmod2)
 
 # save model
-PAVURmod <- PAVURmod2
+PAVURmod <- PAVURmod1
 RPVURmod <- RPVURmod1
 
 # export
@@ -519,50 +540,40 @@ mod_sum(PAVURmod, "pav_established_model")
 mod_sum(RPVURmod, "rpv_established_model")
 
 # polynomial model with total titer
-PAVURmod3 <- glmmTMB(log_quant.plant ~ highN * highP * role  * (dpiUR + I(dpiUR^2)) + (1|set), data = PAVURdat)
+PAVURmod3 <- glmmTMB(quant1.plant ~ highN * highP * role  * (dpiUR + I(dpiUR^2)) + (1|set), 
+                     data = PAVURdat, family = "lognormal")
 summary(PAVURmod3)
-RPVURmod3 <- glmmTMB(log_quant.plant ~ highN * highP * role  * (dpiUR + I(dpiUR^2)) + (1|set), data = RPVURdat)
+PAVURResid3 <- simulateResiduals(PAVURmod3, n = 1000)
+plot(PAVURResid3)
+
+RPVURmod3 <- glmmTMB(quant.plant ~ highN * highP * role  * (dpiUR + I(dpiUR^2)) + (1|set), 
+                     data = RPVURdat, family = "lognormal")
 summary(RPVURmod3)
+RPVURResid3 <- simulateResiduals(RPVURmod3, n = 1000)
+plot(RPVURResid3)
 
 # linear model
-PAVURmod4 <- glmmTMB(log_quant.plant ~ highN * highP * role  * dpiUR + (1|set), data = PAVURdat)
+PAVURmod4 <- glmmTMB(quant1.plant ~ highN * highP * role  * dpiUR + (1|set), 
+                     data = PAVURdat, family = "lognormal")
 summary(PAVURmod4)
-RPVURmod4 <- glmmTMB(log_quant.plant ~ highN * highP * role  * dpiUR + (1|set), data = RPVURdat)
+PAVURResid4 <- simulateResiduals(PAVURmod4, n = 1000)
+plot(PAVURResid4)
+
+RPVURmod4 <- glmmTMB(quant.plant ~ highN * highP * role  * dpiUR + (1|set), 
+                     data = RPVURdat, family = "lognormal")
 summary(RPVURmod4)
+RPVURResid4 <- simulateResiduals(RPVURmod4, n = 1000)
+plot(RPVURResid4)
 
 # compare models
-AIC(PAVURmod3, PAVURmod4) # linear (by 6)
+AIC(PAVURmod3, PAVURmod4) # polynomial
+AIC(PAVURmod3) - AIC(PAVURmod4)
 AIC(RPVURmod3, RPVURmod4) # polynomial
+AIC(RPVURmod3) - AIC(RPVURmod4)
 
 # export
-mod_sum(PAVURmod4, "pav_established_per_plant_model")
+mod_sum(PAVURmod3, "pav_established_per_plant_model")
 mod_sum(RPVURmod3, "rpv_established_per_plant_model")
-
-# effect sizes
-
-# function to exponentiate effects
-eff_exp_fun <- function(mod, coef1, coef2){
-  
-  titer1 <- exp(fixef(mod)$cond[coef1])
-  titer2 <- exp(fixef(mod)$cond[coef1] + fixef(mod)$cond[coef2])
-  return(100 * (titer2 - titer1) / titer1)
-  
-}
-
-# PAV establishment lower for single than resident
-# titer
-eff_exp_fun(PAVURmod2, 1, 4)
-
-# virions/plant
-eff_exp_fun(PAVURmod4, 1, 4)
-
-# N reduces RPV's squared term
-# titer
-100* fixef(RPVURmod1)$cond[11]/fixef(RPVURmod1)$cond[6]
-
-# PAV establishment declines with time
-# virions/plant
-eff_exp_fun(PAVURmod4, 1, 5)
 
 
 #### visualize ####
@@ -573,38 +584,42 @@ dodge_size = 2
 ### invasion figures ###
 
 PAVISimFig <- PAVIdat %>%
-  select(role, dpiI, Nutrient, highN, highP) %>%
-  unique() %>%
+  distinct(role, Nutrient, highN, highP) %>%
+  expand_grid(dpiI = min(PAVIdat$dpiI):max(PAVIdat$dpiI)) %>%
   mutate(set = NA) %>%
-  mutate(log_quant.mg = predict(PAVImod, newdata = ., re.form = NA),
-         log_quant.se = predict(PAVImod, newdata = ., se.fit = T, re.form = NA)$se.fit)
+  mutate(quant.mg = predict(PAVImod, newdata = ., re.form = NA, type = "response"),
+         quant.se = predict(PAVImod, newdata = ., se.fit = T, re.form = NA, type = "response")$se.fit)
 
-PAVIfig <- ggplot(PAVIdat, aes(x = dpiI, y = log_quant.mg, color = Nutrient, fill = Nutrient, linetype = Nutrient)) +
-  geom_ribbon(data = PAVISimFig, aes(ymin = log_quant.mg - log_quant.se, ymax = log_quant.mg + log_quant.se), 
-              color = NA, alpha = 0.1) +
+PAVIfig <- ggplot(PAVIdat, aes(x = dpiI, y = quant.mg, color = Nutrient, fill = Nutrient, linetype = Nutrient)) +
+  geom_ribbon(data = PAVISimFig, aes(ymin = quant.mg - quant.se, ymax = quant.mg + quant.se), 
+              color = NA, alpha = 0.1, show.legend = F) +
   geom_line(data = PAVISimFig) +
   stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0, alpha = 0.8, 
-               position = position_dodge(dodge_size), linetype = "solid") +
+               position = position_dodge(dodge_size), linetype = "solid", show.legend = F) +
   stat_summary(geom = "point", size = 2, fun = "mean", position = position_dodge(dodge_size),
                shape = 21, color = "black") +
-  scale_color_viridis_d(direction = -1) +
-  scale_fill_viridis_d(direction = -1) +
-  scale_y_continuous(limits  = c(-1, 9)) +
-  labs(y = "BYDV-PAV titer (ln[x + 1])", title = "Invading virus") +
+  scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
+  scale_fill_viridis_d(direction = -1, name = "Nutrient\nsupply") +
+  scale_linetype(name = "Nutrient\nsupply") +
+  scale_y_continuous(labels=function(x)x/1e3) +
+  labs(y = bquote("BYDV-PAV titer (thousands "~mg^-1~")"), title = "Invading virus") +
   fig_theme +
-  theme(legend.position = "none",
+  theme(legend.position = c(0.2, 0.6),
+        legend.key.width = unit(1, "cm"),
         axis.title.x = element_blank(),
         plot.title = element_text(hjust = 0.5))
 
 RPVISimFig <- RPVIdat %>%
-  select(role, dpiI, Nutrient, highN, highP) %>%
+  select(role, Nutrient, highN, highP) %>%
+  expand_grid(dpiI = min(RPVIdat$dpiI):max(RPVIdat$dpiI)) %>%
   unique() %>%
   mutate(set = NA) %>%
-  mutate(log_quant.mg = predict(RPVImod, newdata = ., re.form = NA),
-         log_quant.se = predict(RPVImod, newdata = ., se.fit = T, re.form = NA)$se.fit)
+  mutate(quant.mg = predict(RPVImod, newdata = ., re.form = NA, type = "response"),
+         quant.se = predict(RPVImod, newdata = ., se.fit = T, re.form = NA, type = "response")$se.fit)
 
-RPVIfig <- ggplot(RPVIdat, aes(x = dpiI, y = log_quant.mg, color = Nutrient, fill = Nutrient, linetype = Nutrient)) +
-  geom_ribbon(data = RPVISimFig, aes(ymin = log_quant.mg - log_quant.se, ymax = log_quant.mg + log_quant.se), 
+RPVIfig <- ggplot(RPVIdat, aes(x = dpiI, y = quant.mg, color = Nutrient, 
+                               fill = Nutrient, linetype = Nutrient)) +
+  geom_ribbon(data = RPVISimFig, aes(ymin = quant.mg - quant.se, ymax = quant.mg + quant.se), 
               color = NA, alpha = 0.1, show.legend = F) +
   geom_line(data = RPVISimFig) +
   stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0, alpha = 0.8, 
@@ -613,8 +628,9 @@ RPVIfig <- ggplot(RPVIdat, aes(x = dpiI, y = log_quant.mg, color = Nutrient, fil
                shape = 21, color = "black") +
   scale_color_viridis_d(direction = -1) +
   scale_fill_viridis_d(direction = -1) +
-  scale_y_continuous(limits  = c(12, 17)) +
-  labs(x = "Days post invader inoculation", y = "CYDV-RPV titer (ln[x + 1])") +
+  scale_y_continuous(labels=function(x)x/1e3) +
+  labs(x = "Days post invader inoculation", 
+       y = bquote("CYDV-RPV titer (thousands "~mg^-1~")")) +
   fig_theme +
   theme(legend.position = "none")
 
@@ -622,47 +638,47 @@ RPVIfig <- ggplot(RPVIdat, aes(x = dpiI, y = log_quant.mg, color = Nutrient, fil
 
 PAVRSimFig <- PAVURdat %>%
   filter(role == "resident") %>%
-  select(role, dpiR, dpiUR, Nutrient, highN, highP) %>%
+  select(role, Nutrient, highN, highP) %>%
+  expand_grid(tibble(dpiR = min(PAVURdat$dpiR):max(PAVURdat$dpiR),
+                     dpiUR = min(PAVURdat$dpiUR):max(PAVURdat$dpiUR))) %>%
   unique() %>%
   mutate(set = NA) %>%
-  mutate(log_quant.mg = predict(PAVURmod, newdata = ., re.form = NA),
-         log_quant.se = predict(PAVURmod, newdata = ., se.fit = T, re.form = NA)$se.fit)
+  mutate(quant.mg = predict(PAVURmod, newdata = ., re.form = NA, type = "response"),
+         quant.se = predict(PAVURmod, newdata = ., se.fit = T, re.form = NA, type = "response")$se.fit)
 
 PAVRfig <- PAVdat %>%
   filter(role == "resident") %>%
-  ggplot(aes(dpiR, log_quant.mg, color = Nutrient, fill = Nutrient, linetype = Nutrient)) +
-  geom_ribbon(data = PAVRSimFig, aes(ymin = log_quant.mg - log_quant.se, ymax = log_quant.mg + log_quant.se), 
-              color = NA, alpha= 0.1, show.legend = F) +
+  ggplot(aes(dpiR, quant.mg, color = Nutrient, fill = Nutrient, linetype = Nutrient)) +
+  geom_ribbon(data = PAVRSimFig, aes(ymin = quant.mg - quant.se, ymax = quant.mg + quant.se), 
+              color = NA, alpha= 0.1) +
   geom_line(data = PAVRSimFig,) +
   stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0, alpha = 0.8, 
-               position = position_dodge(dodge_size), linetype = "solid", show.legend = F) +
+               position = position_dodge(dodge_size), linetype = "solid") +
   stat_summary(geom = "point", size = 2, fun = "mean", position = position_dodge(dodge_size),
                shape = 21, color = "black") +
-  scale_color_viridis_d(direction = -1, name = "Nutrient\nsupply") +
-  scale_fill_viridis_d(direction = -1, name = "Nutrient\nsupply") +
-  scale_linetype(name = "Nutrient\nsupply") +
-  scale_y_continuous(limits  = c(-1, 9)) +
+  scale_color_viridis_d(direction = -1) +
+  scale_fill_viridis_d(direction = -1) +
+  scale_y_continuous(labels=function(x)x/1e3) +
   labs(title = "Resident virus") +
   fig_theme +
-  theme(axis.title = element_blank(),
-        legend.key.width = unit(1, "cm"),
+  theme(legend.position = "none",
+        axis.title = element_blank(),
         plot.title = element_text(hjust = 0.5))
 
-RPVRSimFig <- tibble(dpiR = seq(min(RPVURdat$dpiR), max(RPVURdat$dpiR), length.out = 50),
-                     dpiUR = seq(min(RPVURdat$dpiUR), max(RPVURdat$dpiUR), length.out = 50),
-                     role = "resident") %>%
-  expand_grid(tibble(highN = c(0, 1, 0, 1),
-                     highP = c(0, 0, 1, 1),
-                     Nutrient = c("low", "+N", "+P", "+N+P") %>%
-                       fct_relevel("low", "+N", "+P"))) %>%
+RPVRSimFig <- RPVURdat %>%
+  filter(role == "resident") %>%
+  select(role, Nutrient, highN, highP) %>%
+  expand_grid(tibble(dpiR = min(RPVURdat$dpiR):max(RPVURdat$dpiR),
+                     dpiUR = min(RPVURdat$dpiUR):max(RPVURdat$dpiUR))) %>%
+  unique() %>%
   mutate(set = NA) %>%
-  mutate(log_quant.mg = predict(RPVURmod, newdata = ., re.form = NA),
-         log_quant.se = predict(RPVURmod, newdata = ., se.fit = T, re.form = NA)$se.fit)
+  mutate(quant.mg = predict(RPVURmod, newdata = ., re.form = NA, type = "response"),
+         quant.se = predict(RPVURmod, newdata = ., se.fit = T, re.form = NA, type = "response")$se.fit)
 
 RPVRfig <- RPVdat %>%
   filter(role == "resident") %>%
-  ggplot(aes(dpiR, log_quant.mg, color = Nutrient, fill = Nutrient, linetype = Nutrient)) +
-  geom_ribbon(data = RPVRSimFig, aes(ymin = log_quant.mg - log_quant.se, ymax = log_quant.mg + log_quant.se), 
+  ggplot(aes(dpiR, quant.mg, color = Nutrient, fill = Nutrient, linetype = Nutrient)) +
+  geom_ribbon(data = RPVRSimFig, aes(ymin = quant.mg - quant.se, ymax = quant.mg + quant.se), 
               color = NA, alpha = 0.1, show.legend = F) +
   geom_line(data = RPVRSimFig) +
   stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0, alpha = 0.8, 
@@ -671,7 +687,7 @@ RPVRfig <- RPVdat %>%
                shape = 21, color = "black") +
   scale_color_viridis_d(direction = -1) +
   scale_fill_viridis_d(direction = -1) +
-  scale_y_continuous(limits  = c(12, 17)) +
+  scale_y_continuous(labels=function(x)x/1e3) +
   labs(x = "Days post resident inoculation") +
   fig_theme +
   theme(legend.position = "none",
@@ -679,9 +695,8 @@ RPVRfig <- RPVdat %>%
 
 # combine figures
 comb_fig <- PAVIfig + theme(axis.text.x = element_blank()) + 
-  PAVRfig + theme(axis.text.x = element_blank(),
-                  axis.text.y = element_blank()) + 
-  RPVIfig + RPVRfig + theme(axis.text.y = element_blank()) +
+  PAVRfig + theme(axis.text.x = element_blank()) + 
+  RPVIfig + RPVRfig + 
   plot_annotation(tag_levels = "A") & 
   theme(plot.tag = element_text(size = 8, face = "bold"))
 
@@ -694,3 +709,31 @@ filter(PAVdat, role == "only" & nutrient == "L" & time == 3) %>%
 # looked at raw data from qPCR_data_processing
 # one technical replicate was > 1000, the other two were not, their average was not
 # averages below 1000 (or minimum standard) were converted to zero
+
+# PAV alone
+PAVSSimFig <- PAVURdat %>%
+  filter(role == "only") %>%
+  select(role, Nutrient, highN, highP) %>%
+  expand_grid(tibble(dpiR = min(PAVURdat$dpiR):max(PAVURdat$dpiR),
+                     dpiUR = min(PAVURdat$dpiUR):max(PAVURdat$dpiUR))) %>%
+  unique() %>%
+  mutate(set = NA) %>%
+  mutate(quant.mg = predict(PAVURmod, newdata = ., re.form = NA, type = "response"),
+         quant.se = predict(PAVURmod, newdata = ., se.fit = T, re.form = NA, type = "response")$se.fit)
+
+PAVdat %>%
+  filter(role == "only") %>%
+  ggplot(aes(dpiR, quant.mg, color = Nutrient, fill = Nutrient, linetype = Nutrient)) +
+  geom_ribbon(data = PAVSSimFig, aes(ymin = quant.mg - quant.se, ymax = quant.mg + quant.se), 
+              color = NA, alpha= 0.1) +
+  geom_line(data = PAVSSimFig,) +
+  stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0, alpha = 0.8, 
+               position = position_dodge(dodge_size), linetype = "solid") +
+  stat_summary(geom = "point", size = 2, fun = "mean", position = position_dodge(dodge_size),
+               shape = 21, color = "black") +
+  scale_color_viridis_d(direction = -1) +
+  scale_fill_viridis_d(direction = -1) +
+  scale_y_continuous(labels=function(x)x/1e3) +
+  labs(title = "Single virus") +
+  fig_theme +
+  theme(plot.title = element_text(hjust = 0.5))
