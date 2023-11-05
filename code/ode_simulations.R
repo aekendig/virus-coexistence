@@ -34,7 +34,7 @@ long_term_plant <- virus2_model_sim(params_def2, "PAV", V0_b = 0, V0_c = 0,
 
 # figure
 pdf("output/long_term_plant_simulation_figure.pdf", width = 6.5, height = 3.75)
-plant_fig_fun(long_term_plant, params_def2, -8e-4, -5e-4)
+plant_fig_fun(long_term_plant, params_def2, -3e-3, -1e-3)
 dev.off()
 
 
