@@ -639,6 +639,7 @@ sing_comb_fig <- rpv_dpp_fig3 + leg1 +
   plot_annotation(tag_levels = list(c("A", "", "B", "", "C", ""))) & 
   theme(plot.tag = element_text(size = 8, face = "bold"))
 
+# figure 2
 ggsave("output/one_col_single_virus_sensitivity_analysis.pdf", sing_comb_fig,
        width = 3, height = 6.5, units = "in")
 
@@ -890,7 +891,7 @@ pav_inv_fig <- pav_inv_n_plant_fig + theme(axis.text.x = element_text(hjust = 0.
   plot_annotation(tag_levels = "A") & 
   theme(plot.tag = element_text(size = 8, face = "bold"))
 
-# save
+# figure 3
 ggsave("output/rpv_invasion_sensitivity_analysis.pdf", rpv_inv_fig,
        width = 6.5, height = 5, units = "in")
 ggsave("output/pav_invasion_sensitivity_analysis.pdf", pav_inv_fig,

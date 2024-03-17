@@ -1,0 +1,22 @@
+attributeName	code	definition
+auto_baseline	TRUE	automatic baseline used
+auto_baseline	NA	empty well
+auto_threshold	TRUE	automatic threhold used
+auto_threshold	NA	empty well
+exp_fail	N	no
+exp_fail	Y	yes
+high_sd	N	no
+high_sd	Y	yes
+no_amp	N	no
+no_amp	Y	yes
+outlier_rg	N	no
+outlier_rg	Y	yes
+quencher	NFQ-MGB	used for all probes
+reporter	FAM	probe reporter for BYDV-PAV
+reporter	VIC	probe reporter for CYDV-RPV
+target	PAV	well is set up to detect and quantify BYDV-PAV (primers and probes)
+target	RPV	well is set up to detect and quantify CYDV-RPV (primers and probes)
+task	NTC	no template control
+task	STANDARD	standard
+task	TEST	standard test
+task	UNKNOWN	no amplification control or sample

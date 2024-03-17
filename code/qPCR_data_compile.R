@@ -12,6 +12,9 @@ library(tidyverse)
 # make a list of the file names
 file_names <- list.files(path = "./data", pattern="[.]csv")
 
+# select qPCR data
+file_names <- file_names[str_detect(file_names, "Ex2_Group") == T]
+
 # import files
 for(i in 1:length(file_names)){
   
@@ -34,3 +37,8 @@ colnames(dat) = c("well",	"sample",	"target",	"task",	"reporter",	"quencher",	"c
 
 #### save data ####
 write_csv(dat, "./intermediate-data/qPCR_data_compiled.csv")
+
+
+#### re-save plant data with simpler name ####
+plant_dat <- read_csv("data/plant_data_071617.csv")
+write_csv(plant_dat, "intermediate-data/plant_data.csv")

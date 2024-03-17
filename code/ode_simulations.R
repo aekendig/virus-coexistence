@@ -1,19 +1,16 @@
-## Goal: simulate mutual invasions
-
-
 #### set up ####
 
 # clear all existing data
 rm(list=ls())
 
 # load packages
-library(tidyverse)
-library(deSolve)
-library(cowplot)
-library(lemon)
-library(janitor)
-library(ggpattern)
-library(patchwork)
+library(tidyverse) # version 2.0.0
+library(deSolve) # version 1.38
+library(cowplot) # version 1.1.1
+library(lemon) # version 0.4.6
+library(janitor) # version 2.2.0
+library(ggpattern) # version 1.0.1
+library(patchwork) # version 1.1.2
 
 # load model and settings
 source("code/model_settings.R")
@@ -32,10 +29,10 @@ long_term_plant <- virus2_model_sim(params_def2, "PAV", V0_b = 0, V0_c = 0,
                                     inv_time = 7500-250-12) %>%
   virus2_model_format(params_def2)
 
-# figure
-pdf("output/long_term_plant_simulation_figure.pdf", width = 6.5, height = 3.75)
-plant_fig_fun(long_term_plant, params_def2, -3e-3, -1e-3)
-dev.off()
+# Appendix S2: Figure S1
+ggsave("output/long_term_plant_simulation_figure.pdf", 
+       plant_fig_fun(long_term_plant, params_def2, -3e-3, -1e-3),
+       width = 18, height = 10.5, units = "cm")
 
 
 #### short-term plant ####
@@ -46,16 +43,17 @@ short_term_plant <- virus2_model_sim(params_def2, "PAV", V0_b = 0, V0_c = 0,
                                      inv_time = inv_days) %>%
   virus2_model_format(params_def2)
 
-# figure
-pdf("output/short_term_plant_simulation_figure.pdf", width = 6.5, height = 3.75)
-plant_fig_fun(short_term_plant, params_def2, -1e-5, -6e-4)
-dev.off()
+# figure 1
+ggsave("output/short_term_plant_simulation_figure.pdf",
+       plant_fig_fun(short_term_plant, params_def2, -1e-5, -6e-4),
+       width = 18, height = 10.5, units = "cm")
 
 # save simulation
 write_csv(short_term_plant, "output/short_term_plant_simulation.csv")
 
 
 #### single virus simulations ####
+# starting here, deleted for edi, but kept for records
 
 # PAV with plant
 pav_first_sim <- virus2_model_sim(params_def2, "PAV", V0_b = V0, V0_c = 0,

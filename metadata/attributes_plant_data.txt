@@ -1,0 +1,17 @@
+attributeName	attributeDefinition	class	unit	dateTimeFormatString	missingValueCode	missingValueCodeExplanation
+set	Experimental block	character			NA	not applicable
+sample	unique sample ID	character			NA	not applicable
+nutrient	nutrient treatlment	categorical			NA	not applicable
+inoculation	primary virus inoculation	categorical			NA	not applicable
+time	harvesting time interval (sequential)	numeric	dimensionless		NA	not applicable
+invasion	indicator variable of whether inoculation treatment included invasion	categorical			NA	not applicable
+replicate	replicate of nutrient-inoculation treatment	numeric	dimensionless		NA	not applicable
+expt_notes	notes about experiment	character			NA	not applicable
+no_analysis	indicator variable of whether sample should be omitted from analysis	numeric	dimensionless		NA	not applicable
+freezer_bag_ID	ID for freezer storage	character			NA	not applicable
+extraction_date	date of RNA extraction	Date		MM/DD/YY	NA	not applicable
+tube_label	unique sample ID for RNA sample tube	character			NA	not applicable
+extraction_mass.mg	mass of plant tissue used for RNA extraction	numeric	milligram		NA	not applicable
+shoot_mass.g	mass of aboveground plant tissue	numeric	gram		NA	not applicable
+extraction_notes	notes about RNA extraction	character			NA	not applicable
+planned_qPCR_group	planned group for qPCR	numeric	dimensionless		NA	not applicable

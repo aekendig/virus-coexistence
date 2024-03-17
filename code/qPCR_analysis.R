@@ -1,15 +1,13 @@
-## Goal: analyze qPCR data
-
 #### set up ####
 
 # clear all existing data
 rm(list=ls())
 
 # load packages
-library(tidyverse)
-library(patchwork)
-library(glmmTMB)
-library(DHARMa)
+library(tidyverse) # version 2.0.0
+library(patchwork) # version 1.1.2
+library(glmmTMB) # version 1.1.8
+library(DHARMa) # version 0.4.6
 
 # import data
 dat <- read_csv("intermediate-data/qPCR_expt_data_cleaned.csv")
@@ -83,14 +81,20 @@ dat2 %>%
 # 32 failed establishments
 
 dat2 %>%
-  filter(single_cont == 1) 
-# 92 contaminated single infections out of 197
+  filter(invasion == "S") %>%
+  count(first_inoculation)
+# 197 single infections, 100 PAV
+
+dat2 %>%
+  filter(single_cont == 1) %>%
+  count(first_inoculation)
+# 92 contaminated single infections, all in PAV
 
 dat2 %>%
   filter(invasion == "S") %>%
   ggplot(aes(x = log10(RPV_quant.mg), color = as.factor(single_cont))) +
   geom_density()
-# clear separation between contamination and inoculation
+# clear separation between contamination and intentional inoculation
 
 dat2 %>%
   filter(invasion == "S") %>%
@@ -113,14 +117,6 @@ dat3 <- dat2 %>%
            !(invasion == "S" & single_cont == 1) &
            missing_quant != 1)
 
-# sample sizes
-dat3 %>%
-  group_by(nutrient, first_inoculation, second_inoculation, time, invasion) %>%
-  count() %>%
-  ggplot(aes(x = n)) +
-  geom_histogram()
-# may need to remove some treatments for analyses
-
 # PAV quantities visualization
 dat3 %>%
   filter(!is.na(PAV_role)) %>%
@@ -129,21 +125,9 @@ dat3 %>%
   stat_summary(geom = "point", fun = "mean") +
   stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0) +
   facet_wrap(~ nutrient)
-# little single PAV data
-# PAV growth may be higher with N
+# not enough remaining single PAV across treatments
 
-# RPV quantities visualization
-dat3 %>%
-  filter(!is.na(RPV_role)) %>%
-  ggplot(aes(x = time, y = RPV_quant.mg, color = RPV_role)) +
-  stat_summary(geom = "line", fun = "mean") +
-  stat_summary(geom = "point", fun = "mean") +
-  stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0) +
-  facet_wrap(~ nutrient)
-# single and resident are very close
-# RPV growth may be higher with N
-
-# PAV single - why are they missing?
+# PAV single infections
 (PAV_single_summary <- dat2 %>%
   filter(PAV_role == "only") %>%
   summarise(missing = sum(missing_quant),
@@ -153,19 +137,6 @@ dat3 %>%
   mutate(log_maxRPV = log10(maxRPV)))
 # 92 out of 100 had some RPV
 # max RPV is 171937, consistent with density figure
-
-# same for RPV?
-dat2 %>%
-  filter(RPV_role == "only") %>%
-  summarise(missing = sum(missing_quant),
-            contaminated = sum(single_cont),
-            total = n())
-# no contamination
-
-# total uninoculated controls
-dat2 %>%
-  filter(PAV_role == "only" | RPV_role == "only")
-# 197
 
 # RPV with NA titer
 (init_RPV_NA <- filter(dat2, is.na(RPV_quant.mg)) %>% 
@@ -177,6 +148,7 @@ filter(dat2, is.na(RPV_quant.mg) | RPV_quant.mg < PAV_single_summary$maxRPV) %>%
   left_join(init_RPV_NA %>%
               rename(n_init = n)) %>%
   mutate(n_new = n - n_init)
+# 20 new added
 
 # replace contaminated single inoculations (use dat2)
 # remove missing quantities
@@ -197,7 +169,7 @@ dat2 %>%
 # new failed invasion count
 dat4 %>%
   filter(invasion == "I" & resident_est == 0) 
-# 6 (only added one additional)
+# 6
 
 # remove failed resident establishment
 # rename nutrient levels
@@ -205,7 +177,6 @@ dat5 <- dat4 %>%
   filter(!(invasion == "I" & resident_est == 0)) %>%
   mutate(Nutrient = fct_recode(nutrient, "low" = "L", "+N+P" = "NP", "+N" = "N", "+P" = "P") %>%
            fct_relevel("low", "+N", "+P"))
-# recovered almost 100 samples
 
 # sample sizes
 dat5 %>%
@@ -244,31 +215,30 @@ PAVdat <- dat5 %>%
   filter(!is.na(PAV_role) & !is.na(PAV_quant.mg)) %>%
   mutate(quant.mg = PAV_quant.mg,
          log_quant.mg = log(quant.mg + 1),
-         log10_quant.mg = log10(quant.mg + 1),
          role = PAV_role,
          quant.plant = quant.mg * shoot_mass.g,
-         log_quant.plant = log(quant.plant + 1),
-         log10_quant.plant = log10(quant.plant + 1))
+         log_quant.plant = log(quant.plant + 1))
 
 RPVdat <- dat5 %>%
   filter(!is.na(RPV_role) & !is.na(RPV_quant.mg)) %>%
   mutate(quant.mg = RPV_quant.mg,
          log_quant.mg = log(quant.mg + 1),
-         log10_quant.mg = log10(quant.mg + 1),
          role = RPV_role,
          quant.plant = quant.mg * shoot_mass.g,
-         log_quant.plant = log(quant.plant + 1),
-         log10_quant.plant = log10(quant.plant + 1))
+         log_quant.plant = log(quant.plant + 1))
 
-# set for nutrients
+# set for invasions
 bioInvDat <- dat5 %>%
   filter(invasion == "I") %>%
-  mutate(log_shoot_mass.g = log(shoot_mass.g))
+  inner_join(full_join(PAVdat, RPVdat) %>%
+               filter(invasion == "I") %>%
+               distinct(sample))
 
-# set for residents
+# set for residents of invasion & single infections
 bioResDat <- dat5 %>%
-  mutate(inoculation = paste(invasion, first_inoculation, sep = "_"),
-         log_shoot_mass.g = log(shoot_mass.g))
+  inner_join(full_join(PAVdat, RPVdat) %>%
+               distinct(sample)) %>%
+  mutate(inoculation = paste(invasion, first_inoculation, sep = "_"))
 
 ggplot(bioInvDat, aes(x = dpp, y = shoot_mass.g, color = nutrient)) +
   stat_summary(geom = "errorbar", width = 0, fun.data = "mean_se") +
@@ -283,7 +253,7 @@ ggplot(bioResDat, aes(x = dpp, y = shoot_mass.g, color = nutrient)) +
   facet_wrap(~ inoculation)
 
 
-#### biomass model ####
+#### biomass models ####
 
 # nutrients, established virus
 bioInvMod <- glmmTMB(shoot_mass.g ~ highN * highP * first_inoculation + (1|set) + (1|time), 
@@ -298,20 +268,20 @@ summary(bioResMod)
 bioResResid <- simulateResiduals(bioResMod, n = 1000)
 plot(bioResResid)
 
-# save
+# Table 4
 mod_sum(bioInvMod, "invasion_biomass_model")
+
+# Table S11
 mod_sum(bioResMod, "resident_biomass_model")
 
-
 # values for text
-
 # N effect
 noNBio <- fixef(bioInvMod)$cond[1]
 NBio <- fixef(bioInvMod)$cond[1] + fixef(bioInvMod)$cond[2]
 100 * (NBio - noNBio) / noNBio
 
 
-#### estimate r and N0 parameters ####
+#### invasion models ####
 
 # subset data
 PAVIdat <- PAVdat %>%
@@ -360,7 +330,6 @@ PAVImod2 <- glmmTMB(quant.plant ~ dpiI + highN:dpiI + highP:dpiI + highN:highP:d
 summary(PAVImod2)
 PAVIResid2 <- simulateResiduals(PAVImod2, n = 1000)
 plot(PAVIResid2)
-
 
 RPVImod2 <- glmmTMB(quant.plant ~ dpiI + highN:dpiI + highP:dpiI + highN:highP:dpiI + (1|set), 
                     data = RPVIdat, family = "lognormal")
@@ -438,32 +407,38 @@ ggplot(RPVIdat, aes(dpiI, log_quant.plant)) +
   geom_line(data = RPVIsim2) +
   facet_wrap(~nutrient)
 
-# r values
+# invasion growth rates
 fixef(PAVImod)$cond[2]
 fixef(RPVImod)$cond[2]
 
-# N0 values
+# initial titer values
 exp(fixef(PAVImod)$cond[1])
 exp(fixef(RPVImod)$cond[1])
 
-# save
+# Table 2
 mod_sum(PAVImod, "pav_invasion_model")
+
+# Table 3
 mod_sum(RPVImod, "rpv_invasion_model")
+
+# Table S7
 mod_sum(PAVImod2, "pav_invasion_per_plant_model")
+
+# Table S8
 mod_sum(RPVImod2, "rpv_invasion_per_plant_model")
 
 
 #### compare resident to single ####
 
 # select data
+filter(PAVdat, role %in% c("only", "resident") & quant.mg < 100) %>% select(quant.mg) # only one quant = 0
+filter(PAVdat, role %in% c("only", "resident") & quant.plant < 100) %>% select(quant.plant) 
+# can't fit log-normal with quant = 0 and choice of + # affects model fit
+
 PAVURdat <- PAVdat %>%
-  filter(role %in% c("only", "resident")) %>%
+  filter(role %in% c("only", "resident") & quant.mg > 0) %>%
   mutate(dpiUR = dpiR - min(dpiR),
-         role = fct_relevel(role, "resident"),
-         quant1.mg = quant.mg + 1e-6,
-         quant1.plant = quant.plant + 1e-6) # can't fit log-normal with quant = 0
-filter(PAVURdat, quant.mg < 100) %>% select(quant.mg) # only one quant = 0
-filter(PAVURdat, quant.plant < 100) %>% select(quant.plant) 
+         role = fct_relevel(role, "resident"))
 
 RPVURdat <- RPVdat %>%
   filter(role %in% c("only", "resident")) %>%
@@ -477,6 +452,12 @@ ggplot(PAVURdat, aes(dpiUR, log_quant.mg, color = nutrient)) +
   stat_summary(geom = "point", fun = "mean") +
   facet_wrap(~ role)
 # role affects intercept and linearity
+
+ggplot(PAVURdat, aes(dpiUR, quant.mg, color = nutrient)) +
+  stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0) +
+  stat_summary(geom = "line", fun = "mean") +
+  stat_summary(geom = "point", fun = "mean") +
+  facet_wrap(~ role)
 
 ggplot(PAVURdat, aes(dpiUR, log_quant.plant, color = nutrient)) +
   stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0) +
@@ -498,7 +479,7 @@ ggplot(RPVURdat, aes(dpiUR, log_quant.plant, color = nutrient)) +
   facet_wrap(~ role)
 
 # polynomial model
-PAVURmod1 <- glmmTMB(quant1.mg ~ highN * highP * role  * (dpiUR + I(dpiUR^2)) + (1|set), 
+PAVURmod1 <- glmmTMB(quant.mg ~ highN * highP * role  * (dpiUR + I(dpiUR^2)) + (1|set), 
                      data = PAVURdat, family = "lognormal")
 # warning okay if no convergence warning
 summary(PAVURmod1)
@@ -513,7 +494,7 @@ RPVURResid1 <- simulateResiduals(RPVURmod1, n = 1000)
 plot(RPVURResid1)
 
 # linear model
-PAVURmod2 <- glmmTMB(quant1.mg ~ highN * highP * role  * dpiUR + (1|set), 
+PAVURmod2 <- glmmTMB(quant.mg ~ highN * highP * role  * dpiUR + (1|set), 
                      data = PAVURdat, family = "lognormal")
 summary(PAVURmod2)
 PAVURResid2 <- simulateResiduals(PAVURmod2, n = 1000)
@@ -526,21 +507,42 @@ RPVURResid2 <- simulateResiduals(RPVURmod2, n = 1000)
 plot(RPVURResid2)
 
 # compare models
-AIC(PAVURmod1, PAVURmod2) # polynomial
+AIC(PAVURmod1, PAVURmod2) # linear
 AIC(PAVURmod1) - AIC(PAVURmod2)
 AIC(RPVURmod1, RPVURmod2) # polynomial
 AIC(RPVURmod1) - AIC(RPVURmod2)
 
+# check model fit
+PAVURdat %>%
+  select(role, Nutrient, highN, highP) %>%
+  expand_grid(tibble(dpiR = min(PAVURdat$dpiR):max(PAVURdat$dpiR),
+                     dpiUR = min(PAVURdat$dpiUR):max(PAVURdat$dpiUR))) %>%
+  unique() %>%
+  mutate(set = NA) %>%
+  mutate(quant.mg = predict(PAVURmod2, newdata = ., re.form = NA, type = "response"),
+         quant.se = predict(PAVURmod2, newdata = ., se.fit = T, re.form = NA, type = "response")$se.fit) %>%
+  ggplot(aes(dpiR, quant.mg, color = Nutrient, fill = Nutrient, linetype = Nutrient)) +
+  geom_ribbon(aes(ymin = quant.mg - quant.se, ymax = quant.mg + quant.se), 
+              color = NA, alpha= 0.1) +
+  geom_line() +
+  stat_summary(data = PAVURdat, geom = "errorbar", fun.data = "mean_se", width = 0, alpha = 0.8, 
+               position = position_dodge(dodge_size), linetype = "solid") +
+  stat_summary(data = PAVURdat, geom = "point", size = 2, fun = "mean", position = position_dodge(dodge_size),
+               shape = 21, color = "black") +
+  facet_wrap(~ role, scales = "free")
+
 # save model
-PAVURmod <- PAVURmod1
+PAVURmod <- PAVURmod2
 RPVURmod <- RPVURmod1
 
-# export
+# Table S5
 mod_sum(PAVURmod, "pav_established_model")
+
+# Table S6
 mod_sum(RPVURmod, "rpv_established_model")
 
 # polynomial model with total titer
-PAVURmod3 <- glmmTMB(quant1.plant ~ highN * highP * role  * (dpiUR + I(dpiUR^2)) + (1|set), 
+PAVURmod3 <- glmmTMB(quant.plant ~ highN * highP * role  * (dpiUR + I(dpiUR^2)) + (1|set), 
                      data = PAVURdat, family = "lognormal")
 summary(PAVURmod3)
 PAVURResid3 <- simulateResiduals(PAVURmod3, n = 1000)
@@ -553,7 +555,7 @@ RPVURResid3 <- simulateResiduals(RPVURmod3, n = 1000)
 plot(RPVURResid3)
 
 # linear model
-PAVURmod4 <- glmmTMB(quant1.plant ~ highN * highP * role  * dpiUR + (1|set), 
+PAVURmod4 <- glmmTMB(quant.plant ~ highN * highP * role  * dpiUR + (1|set), 
                      data = PAVURdat, family = "lognormal")
 summary(PAVURmod4)
 PAVURResid4 <- simulateResiduals(PAVURmod4, n = 1000)
@@ -566,13 +568,15 @@ RPVURResid4 <- simulateResiduals(RPVURmod4, n = 1000)
 plot(RPVURResid4)
 
 # compare models
-AIC(PAVURmod3, PAVURmod4) # polynomial
+AIC(PAVURmod3, PAVURmod4) # linear
 AIC(PAVURmod3) - AIC(PAVURmod4)
 AIC(RPVURmod3, RPVURmod4) # polynomial
 AIC(RPVURmod3) - AIC(RPVURmod4)
 
-# export
-mod_sum(PAVURmod3, "pav_established_per_plant_model")
+# Table S9
+mod_sum(PAVURmod4, "pav_established_per_plant_model")
+
+# Table S10
 mod_sum(RPVURmod3, "rpv_established_per_plant_model")
 
 
@@ -646,7 +650,7 @@ PAVRSimFig <- PAVURdat %>%
   mutate(quant.mg = predict(PAVURmod, newdata = ., re.form = NA, type = "response"),
          quant.se = predict(PAVURmod, newdata = ., se.fit = T, re.form = NA, type = "response")$se.fit)
 
-PAVRfig <- PAVdat %>%
+PAVRfig <- PAVURdat %>%
   filter(role == "resident") %>%
   ggplot(aes(dpiR, quant.mg, color = Nutrient, fill = Nutrient, linetype = Nutrient)) +
   geom_ribbon(data = PAVRSimFig, aes(ymin = quant.mg - quant.se, ymax = quant.mg + quant.se), 
@@ -697,43 +701,38 @@ RPVRfig <- RPVdat %>%
 comb_fig <- PAVIfig + theme(axis.text.x = element_blank()) + 
   PAVRfig + theme(axis.text.x = element_blank()) + 
   RPVIfig + RPVRfig + 
-  plot_annotation(tag_levels = "A") & 
+  plot_annotation(tag_levels = "a",
+                  tag_prefix = "(",
+                  tag_suffix = ")") & 
   theme(plot.tag = element_text(size = 8, face = "bold"))
 
+# Figure 4
 ggsave("output/PAV_RPV_virus_titer_figure.pdf", comb_fig,
-       width = 6, height = 5, units = "in")
+       width = 18, height = 13.5, units = "cm")
 
-# outlier
-filter(PAVdat, role == "only" & nutrient == "L" & time == 3) %>%
-  select(tube_label, quant.mg, expt_notes, extraction_notes)
-# looked at raw data from qPCR_data_processing
-# one technical replicate was > 1000, the other two were not, their average was not
-# averages below 1000 (or minimum standard) were converted to zero
 
-# PAV alone
-PAVSSimFig <- PAVURdat %>%
-  filter(role == "only") %>%
-  select(role, Nutrient, highN, highP) %>%
-  expand_grid(tibble(dpiR = min(PAVURdat$dpiR):max(PAVURdat$dpiR),
-                     dpiUR = min(PAVURdat$dpiUR):max(PAVURdat$dpiUR))) %>%
-  unique() %>%
-  mutate(set = NA) %>%
-  mutate(quant.mg = predict(PAVURmod, newdata = ., re.form = NA, type = "response"),
-         quant.se = predict(PAVURmod, newdata = ., se.fit = T, re.form = NA, type = "response")$se.fit)
+#### sample size table ####
 
-PAVdat %>%
-  filter(role == "only") %>%
-  ggplot(aes(dpiR, quant.mg, color = Nutrient, fill = Nutrient, linetype = Nutrient)) +
-  geom_ribbon(data = PAVSSimFig, aes(ymin = quant.mg - quant.se, ymax = quant.mg + quant.se), 
-              color = NA, alpha= 0.1) +
-  geom_line(data = PAVSSimFig,) +
-  stat_summary(geom = "errorbar", fun.data = "mean_se", width = 0, alpha = 0.8, 
-               position = position_dodge(dodge_size), linetype = "solid") +
-  stat_summary(geom = "point", size = 2, fun = "mean", position = position_dodge(dodge_size),
-               shape = 21, color = "black") +
-  scale_color_viridis_d(direction = -1) +
-  scale_fill_viridis_d(direction = -1) +
-  scale_y_continuous(labels=function(x)x/1e3) +
-  labs(title = "Single virus") +
-  fig_theme +
-  theme(plot.title = element_text(hjust = 0.5))
+# PAV sample sizes
+pav_size <- PAVdat %>%
+  count(role, dpiI, nutrient) %>%
+  pivot_wider(names_from = "role",
+              values_from = "n",
+              names_prefix = "pav_")
+
+# RPV sample sizes
+rpv_size <- RPVdat %>%
+  count(role, dpiI, nutrient) %>%
+  pivot_wider(names_from = "role",
+              values_from = "n",
+              names_prefix = "rpv_")
+
+# combine viruses
+virus_size <- full_join(pav_size, rpv_size)
+
+# can we condense columns?
+filter(virus_size, pav_invader != rpv_resident)
+filter(virus_size, rpv_invader != pav_resident) # no
+
+# Table S4
+write_csv(virus_size, "output/PAV_RPV_sample_sizes.csv")

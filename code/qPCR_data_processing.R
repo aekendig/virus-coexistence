@@ -1,17 +1,14 @@
-## Goal: process qPCR data
-
-
 #### set up ####
 
 # clear all existing data
 rm(list=ls())
 
 # load packages
-library(tidyverse)
+library(tidyverse) # version 2.0.0
 
 # import data
 qdat <- read_csv("intermediate-data/qPCR_data_compiled.csv") # qPCR data
-edat <- read_csv("data/plant_data_071617.csv") # experiment data
+edat <- read_csv("intermediate-data/plant_data.csv") # experiment data
 
 
 #### edit data ####
@@ -36,7 +33,6 @@ unique(edat$extraction_notes)
 # make cycle numeric
 # update tasks
 # fix label errors (manually checked the group-specific one)
-# assigned quantities for standards
 qdat3 <- qdat2 %>%
   mutate(cycle = as.numeric(cycle),
          task = case_when(substr(sample, 1, 1) == "S" ~ "sample",
@@ -169,7 +165,7 @@ q_group_1_std %>%
 # tests on right side of plate
 # location didn't affect RPV standards
 
-# PAV Function
+# PAV standards function
 stdPAVfun <- function(dat){
   
   # extract min, max, and curve characteristics
@@ -199,7 +195,7 @@ stdPAVfun <- function(dat){
   return(stdPAVdf)
 } 
 
-# RPV Function
+# RPV standards function
 stdRPVfun <- function(dat){
   
   # extract min, max, and curve characteristics
@@ -229,7 +225,7 @@ stdRPVfun <- function(dat){
   return(stdRPVdf)
 }
 
-# examine standard curves (uncomment within functions, comment return line)
+# examine standard curve figures 
 # for(i in unique(qdat4$q_group)){
 #   
 #   stdPAVfun(filter(qdat4, q_group == i))
@@ -241,6 +237,8 @@ stdRPVfun <- function(dat){
 # contamination function
 confun <- function(dat){
   
+  # identify highest qPCR value in negative controls
+  # add as columns to rest of data
   fulldf <- dat %>%
     filter(task == "control"|task == "nonTargetStandard") %>%
     group_by(q_group, target) %>%
@@ -250,6 +248,8 @@ confun <- function(dat){
     rename(PAVcont = PAV, RPVcont = RPV) %>%
     merge(dat, ., all = T)
   
+  # indicate whether standard should be removed because it's less 
+  # concentrated than contamination
   stddf <- fulldf %>%
     group_by(q_group) %>%
     filter(task == "standard") %>%
@@ -264,6 +264,8 @@ confun <- function(dat){
     rename(PAVstdRem = PAV, RPVstdRem = RPV) %>%
     merge(fulldf, ., all = T)
   
+  # remove those standards
+  # re-calculate standard curve
   PAVdf <- fulldf %>%
     filter(cycle < PAVcont) %>%
     stdPAVfun
@@ -272,6 +274,7 @@ confun <- function(dat){
     filter(cycle < RPVcont) %>%
     stdRPVfun
   
+  # combine new dataframe
   findf <- stddf %>%
     merge(PAVdf, all = T) %>%
     merge(RPVdf, all = T)
@@ -279,9 +282,8 @@ confun <- function(dat){
   return(findf)
 }
 
-# identify contamination as the highest concentrated control or non-target standard per target per run
-# identify standards with lower concentration than these
-# remove these standards and re-calculate standard curve
+# identify contamination
+# remove standards and re-calculate standard curve
 qdat5 <- qdat4 %>%
   confun()
 # warnings: Inf returned when no contamination
@@ -355,10 +357,9 @@ filter(samp, extraction_notes == "May be PP4I2. Both tubes were labelled PP4S2")
 # both contain PAV and RPV above the minimum detection
 
 # identify which samples will be removed:
-# standard curve efficiency outside of boundaries
-# boundaries originally 85%-115%, widened to keep 2 groups in (see below)
+# standard curve efficiency outside of boundaries (80-120%)
 # quantity greater than 1e3, but less than standard curve minimum (removes contamination)
-# mis-labelled samples
+# mis-labelled samples that can't be reconciled
 samp2 <- samp %>%
   mutate(remove = case_when(is.na(PAVslope) | is.na(RPVslope) ~ 1, # 120 (group 22)
                             target == "RPV" & (round(RPVefficiency) < 80 | round(RPVefficiency) > 120) ~ 1, # 60 (group 4)
@@ -379,7 +380,6 @@ samp2 %>%
 # RPV group 4: 66%
 # PAV group 11: 82%
 # PAV group 21: 83%
-# adjust bounds to include 11 and 21
 
 # identify duplicate samples and select ones with detection or lower variance
 samp_d <- samp2 %>%
@@ -432,17 +432,6 @@ cor.test(~ quant_mean + quant_var, data = samp_d)
 #                             TRUE ~ 0)) %>%
 #   filter(remove == 1)
 
-
-# transfer this over to main dataset
-# samp3 <- samp2 %>%
-#   mutate(sample_q_tar = paste(sample, q_group, target, sep = "_"),
-#          remove = case_when(sample_q_tar %in% samp_d_r$sample_q_tar ~ 1,
-#                             TRUE ~ remove)) %>%
-#   select(-sample_q_tar)
-# 
-# sum(samp3$remove) 
-# 292 
-
 # save full data
 write_csv(samp2, "intermediate-data/qPCR_expt_data_compiled.csv")
 
@@ -455,7 +444,7 @@ samp2 %>%
   select(cycle, quantity) %>%
   unique()
 
-# no analysis column
+# no analysis column (from edat)
 filter(samp2, no_analysis == 1) %>%
   select(expt_notes, extraction_notes) %>%
   unique()

@@ -1,0 +1,3 @@
+This dataset is associated with the paper "Within-plant coexistence of viruses across nitrogen and phosphorus supply rates" by Kendig et al (2024). Please reference this open-access paper for methods: [insert doi]  
+
+R script outputs can be found here: https://github.com/aekendig/virus-coexistence

@@ -1,6 +1,3 @@
-## Goal: estimate plant and virus growth rates
-
-
 #### set up ####
 
 # import data
@@ -17,18 +14,17 @@ source("./edi.411.2/code/qPCR_raw_data_processing.R")
 rm(list = setdiff(ls(), c("dat")))
 
 # load packages
-library(FME)
-library(manipulate)
-library(minpack.lm)
-library(cowplot)
-library(ggh4x)
+library(FME) # version 1.3.6.3
+library(manipulate) # version 1.0.1
+library(minpack.lm) # version 1.2-4
+library(cowplot) # version 1.1.1
+library(ggh4x) # version 0.2.6
 
 # import data
 sdat <- read_csv("./edi.411.2/data/sample_exp_molc_data.csv")
 
 
 #### edit data ####
-# code source: concentration_analysis.R in edi folder
 
 # days post inoculation
 dpi <- tibble(time = 1:8,
@@ -36,7 +32,8 @@ dpi <- tibble(time = 1:8,
 
 # remove samples:
 # poor standard curve efficiency
-# quantities below standard curve, but greater than 1e3 (not sure if these should be zeros or not; standards removed if contamination had higher concentration)
+# non-shoot samples
+# quantities below standard curve, but greater than 1e3 (possible contamination)
 # multiple qPCR tests of the same sample and the sample wasn't detected in one or had the higher variance in detected in multiple
 # specific cases: low volume, known contamination, mis-labelling
 # make values below the standard curve 0 (will be removed in this analysis)
@@ -81,7 +78,7 @@ dups %>%
   left_join(dat4) %>%
   select(sample, target, quant_ul) %>%
   data.frame() 
-# all are zero's, none are healthy
+# all are zero's
 
 # select rows from sdat
 sdat2 <- sdat %>%
@@ -116,7 +113,6 @@ dat5 <- dat4 %>%
            !(inoc %in% c("RPV", "coinfection") & quant_RPV == 0)) %>%
   mutate(conc_PAV = 1000 * quant_PAV * 50 / mass_ext_mg, # convert to quantity / g
          conc_RPV = 1000 * quant_RPV * 50 / mass_ext_mg,
-         co = ifelse(inoc == "coinfection", 1, 0),
          dpp = case_when(round == 1 ~ dpi + 10,
                          TRUE ~ dpi + 11),
          full_mass_g = shoot_mass_g + root_mass_g)
@@ -233,7 +229,6 @@ plant_cost <- function(P){
 #### estimate plant parameters ####
 
 # fit model
-# fit_plant <- modFit(plant_cost, c(0.14, 0.001), lower = c(0)) # super low m
 fit_plant <- modFit(plant_cost, c(0.15), lower = c(0))
 summary(fit_plant)
 deviance(fit_plant)
@@ -245,12 +240,10 @@ fit_plant$ms # mean squared residuals
 
 # save value
 params_def1["g"] <- fit_plant$par[1]
-# params_def1["m"] <- fit_plant$par[2]
 params_def1["m"] <- 0.001
 
 # time 
 times <- seq(0, max(dat5$dpp), length.out = 100)
-# times <- seq(0, 800, length.out = 100)
 
 # data for plant figure
 plant_pred_dat <- ode(init_def1, times, plant_model, params_def1) %>%
@@ -349,13 +342,11 @@ times <- seq(0, max(dat5$dpi), length.out = 100)
 
 # PAV
 manipulate(virus_wrapper(c, r, species = "PAV"), c = slider(0, 1), r = slider(0, 2.1))
-# low:
 # r ~ 0.6
 # c ~ 0.3
 
 # RPV
 manipulate(virus_wrapper(c, r, species = "RPV"), c = slider(0, 1), r = slider(0, 2.1))
-# +P:
 # r ~ 0.7
 # c ~ 0.2
 
@@ -509,14 +500,13 @@ fig_raw_dat <- mock %>%
                        "'\n+N'",
                        "'predictions:\n+P'"))
 
-pdf("output/growth_rate_fit_figure.pdf", width = 6.5, height = 5)
-ggplot(fig_pred_dat, aes(x = time, y = value, color = nutrient)) +
+fig_pred <- ggplot(fig_pred_dat, aes(x = time, y = value, color = nutrient)) +
   geom_line() +
   stat_summary(data = fig_raw_dat, geom = "errorbar", fun.data = "mean_se",
                width = 0) +
   stat_summary(data = fig_raw_dat, geom = "point", fun = "mean") +
   facet_grid2(fitType ~ nutrient_fit, labeller = label_parsed, axes = "all",
-                 scales = "free_y", switch = "y", independent = "y",
+              scales = "free_y", switch = "y", independent = "y",
               remove_labels = "x") +
   scale_color_viridis_d(direction = -1, name = "Nutrient supply") +
   scale_y_continuous(labels = function(x) ifelse(x > 1e4, format(x, scientific = TRUE), x)) +
@@ -525,7 +515,11 @@ ggplot(fig_pred_dat, aes(x = time, y = value, color = nutrient)) +
   theme(axis.title.y = element_blank(),
         legend.position = "none",
         strip.text.x = element_text(vjust = -1.1))
-dev.off()
+
+# Appendix S1: Figure S1
+ggsave("output/growth_rate_fit_figure.pdf", 
+       fig_pred,
+       width = 6.5, height = 5, units = "in")
 
 # parameters
 write_csv(tibble(parameter = c("g", "m", "r_b", "c_b", "r_c", "c_c"),

@@ -1,0 +1,9 @@
+attributeName	code	definition
+inoculation	PAV	primary inoculation with BYDV-PAV
+inoculation	RPV	primary inoculation with CYDV-RPV
+invasion	I	invasion inoculation (primary/resident and secondary/invader)
+invasion	S	single virus inoculation
+nutrient	L	grown with low treatment
+nutrient	N	grown with elevated N treatment
+nutrient	NP	grown with elevated N and P treatment
+nutrient	P	grown with elevated P treatment

@@ -1,0 +1,24 @@
+attributeName	attributeDefinition	class	unit	dateTimeFormatString	missingValueCode	missingValueCodeExplanation
+well	position of sample in 96-well plate	character			NA	not applicable
+sample	ID assigned to sample	character			NA	not applicable
+target	virus species being targeted for qPCR	categorical			NA	not applicable
+task	purpose of the sample	categorical			NA	not applicable
+reporter	fluorescent dye probe used to detect amplification	categorical			NA	not applicable
+quencher	molecule attached to the 3' end of the probes to prevent the reporter from emitting signal while the probe is still intact	categorical			NA	not applicable
+cycle	PCR cycle at which the fluorescence meets the threshold in the amplification plot (lower concentration samples take longer and have higher cycle numbers)	character			NA	not applicable
+cycle_mean	the mean of the cycles associated with a single sample-target combination	numeric	dimensionless		NA	not applicable
+cycle_sd	the standard deviation of the cycles associated with a single sample-target combination	numeric	dimensionless		NA	not applicable
+quantity	"the automatically estimated amount of target in the well, based on cycle and standard curve"	numeric	dimensionless		NA	not applicable
+quantity_mean	the mean of the quantities associated with a single sample-target combination	numeric	dimensionless		NA	not applicable
+quantity_sd	the standard deviation of the quantities associated with a single sample-target combination	numeric	dimensionless		NA	not applicable
+auto_threshold	indicator variable for whether or not the threshold was set automatically	categorical			NA	not applicable
+threshold	the level of fluorescence above the baseline and within the exponential amplification region	numeric	dimensionless		NA	not applicable
+auto_baseline	indicator variable for whether or not the baseline was set automatically	categorical			NA	not applicable
+baseline_start	the lower end of the cycle range that defines background fluorescence	numeric	dimensionless		NA	not applicable
+baseline_end	the upper end of the cycle range that defines background fluorescence	numeric	dimensionless		NA	not applicable
+comments	comments entered during qPCR analysis	character			NA	not applicable
+high_sd	indicator that the cycle_sd value is high relative to a predetermined threshold	categorical			NA	not applicable
+no_amp	indicator that the sample did not amplify (no fluorescence detected at or above the threshold)	categorical			NA	not applicable
+outlier_rg	indicator that the well cycle has a large deviation from other replicate wells in the same sample-target combination (outlier in replicate group)	categorical			NA	not applicable
+exp_fail	indicator that the automatic algorithm failed for the well (exponential algorithm failed)	categorical			NA	not applicable
+q_group	qPCR group in which the sample was analyzed (numbered in order of analysis)	numeric	dimensionless		NA	not applicable
