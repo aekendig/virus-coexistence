@@ -60,7 +60,7 @@
       <electronicMailAddress>borer@umn.edu</electronicMailAddress>
       <userId directory="https://orcid.org">https://orcid.org/0000-0003-2259-5853</userId>
     </creator>
-    <pubDate>2024-03-17</pubDate>
+    <pubDate>2024-05-23</pubDate>
     <abstract>
       <para>Most species can be coinfected by multiple pathogens that may interact through shared resources (i.e., resource competition) or the host immune system (i.e., apparent competition). Community theory developed for free-living organisms suggests that coinfecting pathogens can persist if they satisfy the mutual invasion criterion of coexistence, establishing infections in hosts that are already infected. Furthermore, the likelihood of coexistence may depend on host nutrition which can affect shared resources and host immunity. Here we apply the novel approach of combining a dynamical model and experimental mutual invasibility trials to explore the effects of host nutrient supply on the coexistence of two viral plant pathogens. We focus on among-pathogen interactions mediated by shared resources. First, we used a model to generate hypotheses about how nitrogen (N) and phosphorus (P) supply rates affect the ability of two plant viruses to invade established infections of the other virus. Then, we experimentally manipulated the N and P supplied to oats (Avena sativa) in a growth chamber experiment and tested mutual invasion of two RNA viral pathogens, BYDV-PAV and CYDV-RPV. Nutrient supplies ranged from rates that barely kept hosts alive up to high, but sub-toxic, rates. Model simulations suggested that the viruses were more likely to invade established infections either when they could replicate at lower N and P concentrations or when plant N and P concentrations increased due to a combination of nutrient supply rates and resident virus nutrient use. In the experiment, each virus successfully invaded hosts infected by the other and had consistent growth rates across N and P supply rates. Our results suggest that BYDV-PAV and CYDV-RPV can coexist across a wide range environmental nutrient supply, which is consistent with the high levels of co-occurrence of these two viruses in field populations. </para>
     </abstract>
@@ -1087,8 +1087,8 @@
       <entityDescription>code to analyze qPCR data</entityDescription>
       <physical>
         <objectName>qPCR_analysis.R</objectName>
-        <size unit="bytes">26524</size>
-        <authentication method="MD5">346b1a3a78e65f788cfcd2e48462618a</authentication>
+        <size unit="bytes">26607</size>
+        <authentication method="MD5">b10c2ae4f5bb01c99b7034958bbf58f0</authentication>
         <dataFormat>
           <externallyDefinedFormat>
             <formatName>text/plain</formatName>

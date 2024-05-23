@@ -715,6 +715,7 @@ ggsave("output/PAV_RPV_virus_titer_figure.pdf", comb_fig,
 
 # PAV sample sizes
 pav_size <- PAVdat %>%
+  filter(role == "invader" | (role %in% c("only", "resident") & quant.mg > 0)) %>%
   count(role, dpiI, nutrient) %>%
   pivot_wider(names_from = "role",
               values_from = "n",
