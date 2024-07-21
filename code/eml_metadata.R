@@ -109,10 +109,10 @@ make_eml(path = "./metadata",
          maintenance.description = "completed", 
          user.id = "aekendig",
          user.domain = "EDI",
-         package.id = "edi.1602.1")
+         package.id = "edi.1602.2")
 
 
 #### check warnings ####
 
-eml <- EML::read_eml("./metadata/edi.1602.1.xml")
+eml <- EML::read_eml("./metadata/edi.1602.2.xml")
 EML::eml_validate(eml)

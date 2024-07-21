@@ -4,6 +4,6 @@ Amy	E	Kendig	Minnesota Department of Natural Resources	aekendig@gmail.com	0000-0
 Eric	W	Seabloom	University of Minnesota	seabloom@umn.edu	0000-0001-6780-9259	PI		NSF	DEB-1015805
 Eric	W	Seabloom	University of Minnesota	seabloom@umn.edu	0000-0001-6780-9259	creator			
 Bruce		Pell	Lawrence Technological University	bpell@ltu.edu	0000-0003-1358-8061	creator			
-Kuang		Yang	Arizona State University	kuang@asu.edu	0000-0003-2774-4133	creator			
+Yang		Kuang	Arizona State University	kuang@asu.edu	0000-0003-2774-4133	creator			
 Elizabeth	T	Borer	University of Minnesota	borer@umn.edu	0000-0003-2259-5853	PI		NSF	DEB-1015805
 Elizabeth	T	Borer	University of Minnesota	borer@umn.edu	0000-0003-2259-5853	creator			
